@@ -41,7 +41,6 @@ class Qoa_Client(object):
         body_mess = json.dumps(report)
         self.transceiver.send_report(body_mess)
         # TO DO:
-        print('report sent')
 
     def start(self):
         self.transceiver.start()
