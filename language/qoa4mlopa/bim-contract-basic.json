@@ -1,0 +1,33 @@
+{
+    "stakeholders":
+    {
+        "id": "solibri",
+        "roles": ["mlprovider"]
+    },
+
+    "resources":{
+        "services": [
+            {"id": "bimclassification", "serviceapi": ["rest"],"machinetypes":["small"], "processortypes": ["GPU"]}
+        ],
+        "data": [
+            {"id": "bimdata", "datatypes": ["files"], "formats": ["smc"]}
+        ],
+        "mlmodels": [
+            {"id": "model1", "formats": ["kerash5"], "mlinfrastructures": ["tensorflow"]}
+        ]
+    },
+    "quality": {
+        "services":{
+            "ResponseTime":{"operators":["min"],"value":"300"}
+        },
+        "data":{
+            "Accuracy": {"operators":["min"],"value":"0.99"}
+        },
+        "mlmodels": {
+            "Accuracy":{"operators":["min"],"value":"0.99"}
+        }
+    },
+    "interpretability": {
+        "explanability":{"modes": ["full"]}
+    }
+}

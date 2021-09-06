@@ -1,0 +1,33 @@
+{
+    "stakeholders":
+    {
+        "id": "mobifone",
+        "roles": ["mlprovider"]
+    },
+
+    "resources":{
+        "services": [
+            {"id": "alarmservice", "serviceapi": ["mqtt"],"machinetypes":["small"], "processortypes": ["GPU"]}
+        ],
+        "data": [
+            {"id": "alarmdata", "datatypes": ["files"], "formats": ["wrong"]}
+        ],
+        "mlmodels": [
+            {"id": "model1", "formats": ["kerash5"], "mlinfrastructures": ["tensorflow","predictio"]}
+        ]
+    },
+    "quality": {
+        "services":{
+            "ResponseTime":{"operators":["min"],"value":"100"}
+        },
+        "data":{
+            "Accuracy":{"operators":["min"],"value":"100"}
+        },
+        "mlmodels": {
+            "Accuracy":{"operators":["min"],"value":"100"}
+        }
+    },
+    "interpretability": {
+        "explanability":{"modes": ["full"]}
+    }
+}
