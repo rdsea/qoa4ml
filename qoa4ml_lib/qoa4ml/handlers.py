@@ -34,7 +34,7 @@ class Qoa_Connector(object):
 class Mess_Handler(object):
     def __init__(self, info):
         # Init Message queue, handling report in server
-        self.report = info["report"]
+        self.report = json.dumps(info["report"])
         self.queue_info = info["queue_info"]
         self.broker_info = info["broker_info"]
         self.amqp_client = Amqp_Client(self, self.broker_info, self.queue_info)
@@ -56,24 +56,26 @@ class Mess_Handler(object):
         try: 
             # TO DO: handle json data
             rec_data = json.loads(str(data.decode("utf-8")))
-            mandatory_client_info = self.report["mandatory"]["client_info"]
-            mandatory_service_info = self.report["mandatory"]["service_info"]
+            qoa_report = json.loads(self.report)
+            mandatory_client_info = qoa_report["mandatory"]["client_info"]
+            mandatory_service_info = qoa_report["mandatory"]["service_info"]
+            qoa_report = json.loads(self.report)
             for item in mandatory_client_info:
                 try:
-                    self.report["client_info"][item] = rec_data[item]
+                    qoa_report["client_info"][item] = rec_data[item]
                 except Exception as e:
                     print("{} not found - {}".format(item, e))
             for item in mandatory_service_info:
                 try:
-                    self.report["service_info"][item] = rec_data[item]
+                    qoa_report["service_info"][item] = rec_data[item]
                 except Exception as e:
                     print("{} not found - {}".format(item, e))
             try:
                 metric_name = rec_data["metric"]
-                self.report["metric"][metric_name] = rec_data["value"]
+                qoa_report["metric"][metric_name] = rec_data["value"]
             except Exception as e:
                 print("Fail to import metric - {}".format(e))
-            qoa_report = {"input":self.report}
+            qoa_report = {"input":qoa_report}
             try:
                 qoa_report["url"] = rec_data["url"]
             except Exception as e:
