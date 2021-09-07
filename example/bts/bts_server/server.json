@@ -18,14 +18,18 @@
         "service_info": {
             "service": "request",
             "machinetypes": "small",
-            "metric": [
-                "DataAccuracy",
-                "ResponseTime"
-            ]
-        },
-        "metric": {
-            "DataAccuracy": 100.0,
-            "ResponseTime": 0.0
+            "metric": {
+                "DataAccuracy": {
+                    "Type": "Gauge",
+                    "Description": "Data accuracy",
+                    "Default": 100
+                },
+                "ResponseTime": {
+                    "Type": "Gauge",
+                    "Description": "Service ResponseTime",
+                    "Default": 100
+                }
+            }
         }
     },
     "broker_service":{

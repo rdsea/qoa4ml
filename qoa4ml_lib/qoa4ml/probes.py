@@ -27,6 +27,12 @@ class Metric(object):
         return self.metric_name
     def get_des(self):
         return self.description
+    def __str__(self) -> str:
+        return "metric_name:" + self.metric_name + ", " + "value:" + str(self.value)
+    def to_dict(self):
+        mectric_dict = {}
+        mectric_dict[self.metric_name] = self.value
+        return mectric_dict
 
 class Counter(Metric):
     """

@@ -1,6 +1,8 @@
+import sys
 import json
 import argparse
-from qoa4ml.handlers import Mess_Handler
+sys.path.append("../")
+from qoa4ml_lib.qoa4ml.handlers import Mess_Handler
 
 
 if __name__ == '__main__':

@@ -1,4 +1,6 @@
-from qoa4ml.util.amqp_client import Amqp_Client
+import sys
+sys.path.append("../")
+from qoa4ml_lib.qoa4ml.util.amqp_client import Amqp_Client
 import time
 import json
 import uuid
@@ -8,7 +10,6 @@ import threading
 
 ####################### Import the Library ###########################
 from qoa4ml_lib.qoa4ml.reports import Qoa_Client
-from qoa4ml_lib.qoa4ml.probes import Gauge
 ######################################################################
 
 class LSTM_Prediction_Client(object):
@@ -19,17 +20,15 @@ class LSTM_Prediction_Client(object):
         self.broker_info = configuration["broker_service"]
         self.ml_service = configuration["ml_service"]
         self.qoa_info = configuration["qoa_service"]
-        self.metric = self.qoa_info["metric"]
         self.normalize = configuration["data_normalize"]
 
 
         self.amqp_client = Amqp_Client(self, self.broker_info, self.ml_service)
         self.sub_thread = threading.Thread(target=self.amqp_client.start)
-        self.accuracy = Gauge("Accuracy", "Inference accuracy", 0)
-        self.responsetime = Gauge("ResponseTime", "Service ResponseTime", 100)
 
         #################### Declare the QoA Object ###############################
         self.qoa_client = Qoa_Client(self.qoa_info, self.broker_info)
+        self.metrices = self.qoa_client.get_metric()
         ###########################################################################
             
     # Check if the response is available
@@ -51,10 +50,12 @@ class LSTM_Prediction_Client(object):
         self.print_result(self.ml_response)
         ####################### SEND THE QOA4ML REPORT #########################
         # Sending QoA report
-        self.accuracy.set(self.ml_response["Accuracy"])
-        self.responsetime.set(self.ml_response["ResponseTime"])
-        self.qoa_client.send_report(self.accuracy)
-        self.qoa_client.send_report(self.responsetime)
+        self.metrices["Accuracy"].set(self.ml_response["Accuracy"])
+        self.metrices["ResponseTime"].set(self.ml_response["ResponseTime"])
+        metrices = {}
+        for metric in self.metrices:
+            metrices = {**metrices,**self.metrices[metric].to_dict()}
+        self.qoa_client.send_report(metrices)
         ########################################################################
 
     # Send prediction request

@@ -71,8 +71,9 @@ class Mess_Handler(object):
                 except Exception as e:
                     print("{} not found - {}".format(item, e))
             try:
-                metric_name = rec_data["metric"]
-                qoa_report["metric"][metric_name] = rec_data["value"]
+                metric_list = rec_data["metric"]
+                for key in metric_list:
+                    qoa_report["metric"][key] = metric_list[key]
             except Exception as e:
                 print("Fail to import metric - {}".format(e))
             qoa_report = {"input":qoa_report}
