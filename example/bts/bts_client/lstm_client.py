@@ -16,7 +16,6 @@ if __name__ == '__main__':
     with open(args.clientInfo, "r") as f:
         client_conf = json.load(f)
     lstm_predition_client = LSTM_Prediction_Client(client_conf)
-    print(1)
     lstm_predition_client.start()
     while (1):
         lstm_predition_client.publish_message(args.file)

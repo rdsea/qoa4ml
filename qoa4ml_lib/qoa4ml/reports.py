@@ -1,5 +1,6 @@
+from typing import List
 from .util.transceiver import Mess_Transceiver, Rest_Transceiver
-from .probes import Metric
+from .probes import Gauge, Counter
 import json
 
 class Qoa_Client(object):
@@ -30,20 +31,31 @@ class Qoa_Client(object):
         except Exception as e:
             print("{} not found - {}".format(key,e))
     
-    def generate_report(self, metric: Metric):
+    def generate_report(self, metric):
         report = self.info
-        report["metric"] = metric.metric_name
-        report["value"] = metric.value
+        for key in metric:
+            report["metric"][key] = metric[key]
         return report
     
-    def send_report(self, metric: Metric):
+    def send_report(self, metric):
         report = self.generate_report(metric)
         body_mess = json.dumps(report)
         self.transceiver.send_report(body_mess)
         # TO DO:
 
+
     def start(self):
         self.transceiver.start()
+
+    def get_metric(self):
+        metrices = {}
+        for metric in self.info["metric"]:
+            if self.info["metric"][metric]["Type"] == "Gauge":
+                metrices[metric] = Gauge(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
+            elif self.info["metric"][metric]["Type"] == "Counter":
+                metrices[metric] = Counter(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
+        print(metrices)
+        return metrices
 
     def __str__(self):
         return str(self.info) + '\n' + str(self.queue_info)

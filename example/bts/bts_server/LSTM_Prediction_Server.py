@@ -1,4 +1,6 @@
-from qoa4ml.util.amqp_client import Amqp_Client
+import sys
+sys.path.append("../")
+from qoa4ml_lib.qoa4ml.util.amqp_client import Amqp_Client
 from ML_Loader import ML_Loader
 from qoa4ml_lib.qoa4ml.external_lib import bts
 import time
@@ -8,7 +10,6 @@ import numpy as np
 
 ####################### Import the Library ###########################
 from qoa4ml_lib.qoa4ml.reports import Qoa_Client
-from qoa4ml_lib.qoa4ml.probes import Gauge
 ######################################################################
 
 
@@ -23,12 +24,9 @@ class LSTM_Prediction_Server(object):
         self.amqp_client = Amqp_Client(self, self.broker_info, self.ml_service)
         self.sub_thread = threading.Thread(target=self.amqp_client.start)
         self.model = ML_Loader(self.model_info)
-        self.metric = self.qoa_service["metric"]
-        self.dataaccuracy = Gauge("DataAccuracy", "Data Accuracy", 0)
-        self.responsetime = Gauge("ResponseTime", "Service ResponseTime", 100)
-        
         #################### Declare the QoA Object ###############################
         self.qoa_client = Qoa_Client(self.qoa_service, self.broker_info)
+        self.metrices = self.qoa_client.get_metric()
         ###########################################################################
 
     def ML_prediction(self, pas_series):
@@ -69,10 +67,12 @@ class LSTM_Prediction_Server(object):
         # Calling external function to evaluate Data Quality
         data_accuracy = bts.data_quality_for_lstm(pas_series,self.normalize["mean"],self.normalize["max"])
         # Making report
-        self.dataaccuracy.set(data_accuracy)
-        self.responsetime.set(response_time)
-        self.qoa_client.send_report(self.dataaccuracy)
-        self.qoa_client.send_report(self.responsetime)
+        self.metrices["DataAccuracy"].set(data_accuracy)
+        self.metrices["ResponseTime"].set(response_time)
+        metrices = {}
+        for metric in self.metrices:
+            metrices = {**metrices,**self.metrices[metric].to_dict()}
+        self.qoa_client.send_report(metrices)
         ########################################################################      
 
     def print_result(self, data):
