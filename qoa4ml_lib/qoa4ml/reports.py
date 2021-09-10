@@ -1,6 +1,6 @@
 from typing import List
 from .util.transceiver import Mess_Transceiver, Rest_Transceiver
-from .probes import Gauge, Counter
+from .probes import Gauge, Counter, Summary, Histogram
 import json
 
 class Qoa_Client(object):
@@ -54,7 +54,10 @@ class Qoa_Client(object):
                 metrices[metric] = Gauge(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
             elif self.info["metric"][metric]["Type"] == "Counter":
                 metrices[metric] = Counter(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
-        print(metrices)
+            elif self.info["metric"][metric]["Type"] == "Summary":
+                metrices[metric] = Summary(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
+            elif self.info["metric"][metric]["Type"] == "Histogram":
+                metrices[metric] = Histogram(metric, self.info["metric"][metric]["Description"], self.info["metric"][metric]["Default"])
         return metrices
 
     def __str__(self):

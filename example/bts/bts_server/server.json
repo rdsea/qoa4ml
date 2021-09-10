@@ -3,6 +3,7 @@
         "service_name": "bts",
         "url": "http://195.148.22.62:8181/v1/data/qoa4ml/bts/alarm/violation",
         "queue_info":{
+            "client_id":"qoa_aaltosea1",
             "exchange_name": "qoa_topic",
             "exchange_type": "topic",
             "in_queue": "in_qoa_aaltosea1",
@@ -27,7 +28,7 @@
                 "ResponseTime": {
                     "Type": "Gauge",
                     "Description": "Service ResponseTime",
-                    "Default": 100
+                    "Default": 0
                 }
             }
         }
@@ -37,6 +38,7 @@
         "url": "195.148.22.62"
     },
     "ml_service":{
+        "client_id":"aaltosea1",
         "exchange_name": "lstm_bts",
         "exchange_type": "topic",
         "in_queue": "in_request_lstm",

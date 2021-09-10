@@ -23,7 +23,7 @@ class LSTM_Prediction_Client(object):
         self.normalize = configuration["data_normalize"]
 
 
-        self.amqp_client = Amqp_Client(self, self.broker_info, self.ml_service)
+        self.amqp_client = Amqp_Client(self, self.broker_info, self.ml_service, log=True)
         self.sub_thread = threading.Thread(target=self.amqp_client.start)
 
         #################### Declare the QoA Object ###############################
@@ -62,7 +62,7 @@ class LSTM_Prediction_Client(object):
     def send_request(self, dict_mess):
         self.response = None
         # init an uniques id for each request
-        self.corr_id = str(uuid.uuid4())
+        corr_id = str(uuid.uuid4())
         # set routing key when send data to the Exchange
         routing_key = self.ml_service["out_routing_key"]
         # load data to json object
@@ -80,7 +80,7 @@ class LSTM_Prediction_Client(object):
         }
         body_mess = json.dumps(json_mess)
     
-        self.amqp_client.send_data(routing_key, body_mess, self.corr_id)
+        self.amqp_client.send_data(routing_key, body_mess, corr_id)
         print("Data sent")
 
         

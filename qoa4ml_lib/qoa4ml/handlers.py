@@ -2,6 +2,7 @@ import time
 import json
 import requests
 from .util.amqp_client import Amqp_Client
+from .util.prom_connector import Prom_Handler
 # import prometheus_client
 import threading
 # from prometheus_client import Counter, Histogram, Gauge
@@ -32,7 +33,7 @@ class Qoa_Connector(object):
         return json.loads(response.text.encode('utf8'))["result"]
 
 class Mess_Handler(object):
-    def __init__(self, info):
+    def __init__(self, info, prom=False):
         # Init Message queue, handling report in server
         self.report = json.dumps(info["report"])
         self.queue_info = info["queue_info"]
@@ -41,6 +42,9 @@ class Mess_Handler(object):
         # Init connector
         self.connector = Qoa_Connector(headers,"POST")
         self.sub_thread = threading.Thread(target=self.amqp_client.start)
+        self.prom_flag = prom
+        if self.prom_flag:
+            self.prom_metric = Prom_Handler(info["prom_info"])
         
 
     def message_processing(self, ch, method, props, body):
@@ -73,6 +77,8 @@ class Mess_Handler(object):
             try:
                 metric_list = rec_data["metric"]
                 for key in metric_list:
+                    if self.prom_flag:
+                        self.prom_metric.set(key,metric_list[key])
                     qoa_report["metric"][key] = metric_list[key]
             except Exception as e:
                 print("Fail to import metric - {}".format(e))
