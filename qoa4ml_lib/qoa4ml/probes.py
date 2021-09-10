@@ -63,5 +63,44 @@ class Gauge(Metric):
         self.value += num
     # TO DO:
     # implement other functions
+    def dec(self,num):
+        self.value -= num
+    def set(self,val):
+        self.value = val
 
+class Summary(Metric):
+    """
+    This class inherit all attributes of Metric
+    - Attribute: (Developing)
+
+    - Function: 
+        - inc: increase its value by num
+        - others: (Developing)
+    """
+    def inc(self,num):
+        self.value += num
+    # TO DO:
+    # implement other functions
+    def dec(self,num):
+        self.value -= num
+    def set(self,val):
+        self.value = val
+
+class Histogram(Metric):
+    """
+    This class inherit all attributes of Metric
+    - Attribute: (Developing)
+
+    - Function: 
+        - inc: increase its value by num
+        - others: (Developing)
+    """
+    def inc(self,num):
+        self.value += num
+    # TO DO:
+    # implement other functions
+    def dec(self,num):
+        self.value -= num
+    def set(self,val):
+        self.value = val
 

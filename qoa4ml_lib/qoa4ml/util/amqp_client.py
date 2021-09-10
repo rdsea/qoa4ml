@@ -1,13 +1,17 @@
 import pika
+from .mess_logging import Mess_Logging
 
 class Amqp_Client(object):
     # Init an amqp client handling the connection to amqp servier
-    def __init__(self, host_object, broker_info, queue_info):
+    def __init__(self, host_object, broker_info, queue_info, log=False):
         self.host_object = host_object  
         self.exchange_name = queue_info["exchange_name"]
         self.exchange_type = queue_info["exchange_type"]
         self.roles = queue_info["roles"]
         self.in_routing_key = queue_info["in_routing_key"]
+        self.client_id = queue_info["client_id"] 
+        self.mess_logging = Mess_Logging(self.client_id)
+        self.log_flag = log
 
         # Connect to RabbitMQ host
         self.in_connection = pika.BlockingConnection(pika.ConnectionParameters(host=broker_info["url"]))
@@ -40,9 +44,13 @@ class Amqp_Client(object):
         else:
             self.sub_properties = pika.BasicProperties(correlation_id=corr_id)
             self.out_channel.basic_publish(exchange='',routing_key=routing_key,properties=self.sub_properties,body=body_mess)
+        if self.log_flag:
+            self.mess_logging.log_request(body_mess,corr_id)
         
     def on_request(self, ch, method, props, body):
         # Process the data on request: sending back to host object
+        if self.log_flag:
+            self.mess_logging.log_response(body,props.correlation_id)
         self.host_object.message_processing(ch, method, props, body)
 
     def start(self):

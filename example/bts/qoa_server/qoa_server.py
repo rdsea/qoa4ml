@@ -13,6 +13,6 @@ if __name__ == '__main__':
     with open(args.qoaInfo, "r") as f:
         qoa_info = json.load(f)
         print(qoa_info)
-    OPA_object = Mess_Handler(qoa_info)
+    OPA_object = Mess_Handler(qoa_info,prom=True)
     print("============================ OPA is running - Waiting for client ============================")
     OPA_object.start()
