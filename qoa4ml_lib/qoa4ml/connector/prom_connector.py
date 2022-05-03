@@ -1,7 +1,7 @@
 import prometheus_client as pr
 _INF = float("inf")
 
-class Prom_Handler(object):
+class Prom_Connector(object):
     def __init__(self,info):
         self.info = info["metric"]
         self.port = info["port"]

@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 
-class Paho_Client(object):
+class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application
     def __init__(self, host_object, queue_info, broker_info, client_id): 
         # Init the host object to return message 

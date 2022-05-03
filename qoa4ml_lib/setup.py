@@ -2,9 +2,9 @@ from setuptools import find_packages, setup
 
 setup(
     name='qoa4ml',
-    version='0.0.1',
+    version='0.0.13',
     description='Quality of Analysis for Machine Learning',
-    long_description=open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
+    long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
     long_description_content_type='text/markdown',
     url='https://rdsea.github.io/',
     author='Aaltosea',
