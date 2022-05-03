@@ -28,7 +28,7 @@ class Metric(object):
     def get_des(self):
         return self.description
     def __str__(self) -> str:
-        return "metric_name:" + self.metric_name + ", " + "value:" + str(self.value)
+        return "metric_name: " + self.metric_name + ", " + "value: " + str(self.value)
     def to_dict(self):
         mectric_dict = {}
         mectric_dict[self.metric_name] = self.value
@@ -44,6 +44,9 @@ class Counter(Metric):
         - reset: set the value back to zero
         - others: (Developing)
     """
+    def __init__(self, metric_name, description, default_value=-1):
+        super().__init__(metric_name, description, default_value)
+
     def inc(self,num=1):
         self.value += num
     
@@ -59,11 +62,14 @@ class Gauge(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def inc(self,num):
+    def __init__(self, metric_name, description, default_value=-1):
+        super().__init__(metric_name, description, default_value)
+
+    def inc(self,num=1):
         self.value += num
     # TO DO:
     # implement other functions
-    def dec(self,num):
+    def dec(self,num=1):
         self.value -= num
     def set(self,val):
         self.value = val
@@ -77,6 +83,9 @@ class Summary(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
+    def __init__(self, metric_name, description, default_value=-1):
+        super().__init__(metric_name, description, default_value)
+
     def inc(self,num):
         self.value += num
     # TO DO:
@@ -95,6 +104,9 @@ class Histogram(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
+    def __init__(self, metric_name, description, default_value=-1):
+        super().__init__(metric_name, description, default_value)
+
     def inc(self,num):
         self.value += num
     # TO DO:
