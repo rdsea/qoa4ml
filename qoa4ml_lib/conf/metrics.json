@@ -8,15 +8,5 @@
         "class": "Gauge",
         "description": "model training response time",
         "default": 0
-    },
-    "CPU":{
-        "class": "Gauge",
-        "description": "CPU usage",
-        "default": 0
-    },
-    "Mem":{
-        "class": "Gauge",
-        "description": "memmory usage",
-        "default": 0
     }
 }

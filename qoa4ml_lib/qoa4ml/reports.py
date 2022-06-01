@@ -96,7 +96,7 @@ class Qoa_Client(object):
         if metric == None:
             metric = list(self.metrics.keys())
         for key in metric:
-            report["metric"][key] = self.metrics[key].to_dict()
+            report["metric"][key] = self.metrics[key].get_val()
         return report
     
 
