@@ -23,7 +23,7 @@ class Qoa_Client(object):
             "amqp_connector":{
                 "class": "amqp",
                 "conf":{
-                    "end_point": "195.148.22.62",
+                    "end_point": "localhost",
                     "exchange_name": "qoa4ml",
                     "exchange_type": "topic",
                     "out_routing_key": "qoa.report.ml"
