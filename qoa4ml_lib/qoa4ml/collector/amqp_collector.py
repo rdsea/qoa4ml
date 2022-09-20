@@ -9,7 +9,10 @@ class Amqp_Collector(object):
         self.in_routing_key = configuration["in_routing_key"]
 
         # Connect to RabbitMQ host
-        self.in_connection = pika.BlockingConnection(pika.ConnectionParameters(host=configuration["end_point"]))
+        if "amqps://" in configuration["end_point"]:
+            self.in_connection = pika.BlockingConnection(pika.URLParameters(configuration["end_point"]))
+        else:
+            self.in_connection = pika.BlockingConnection(pika.ConnectionParameters(host=configuration["end_point"]))
         
         # Create a channel
         self.in_channel = self.in_connection.channel()

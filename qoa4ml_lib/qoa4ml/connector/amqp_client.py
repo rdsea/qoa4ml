@@ -16,7 +16,10 @@ class Amqp_Connector(object):
         self.log_flag = log
 
         # Connect to RabbitMQ host
-        self.out_connection = pika.BlockingConnection(pika.ConnectionParameters(host=configuration["end_point"]))        
+        if "amqps://" in configuration["end_point"]:
+            self.out_connection = pika.BlockingConnection(pika.URLParameters(configuration["end_point"]))
+        else:
+            self.out_connection = pika.BlockingConnection(pika.ConnectionParameters(host=configuration["end_point"]))        
 
         # Create a channel
         self.out_channel = self.out_connection.channel()
@@ -31,7 +34,7 @@ class Amqp_Connector(object):
         # if sender is server, it will reply the message to "reply_to" via default exchange 
         if routing_key == None:
             routing_key = self.out_routing_key
-        self.sub_properties = pika.BasicProperties(correlation_id=corr_id)
+        self.sub_properties = pika.BasicProperties(correlation_id=corr_id,expiration='1000')
         self.out_channel.basic_publish(exchange=self.exchange_name,routing_key=routing_key,properties=self.sub_properties,body=body_mess)
         # if self.log_flag:
         #     self.mess_logging.log_request(body_mess,corr_id)
