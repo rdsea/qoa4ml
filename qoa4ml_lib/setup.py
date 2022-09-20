@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='qoa4ml',
-    version='0.0.19',
+    version='0.0.54',
     description='Quality of Analysis for Machine Learning',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
     long_description_content_type='text/markdown',
@@ -10,7 +10,7 @@ setup(
     author='Aaltosea',
     email='tri.m.nguyen@aalto.fi',
     keyword='Monitoring Machine Learning',
-    install_requires=['pika','requests'],
+    install_requires=['pika','requests','paho-mqtt','prometheus-client','psutil', 'docker'],
     packages=find_packages(),
-    license='MIT'
+    license='Apache License 2.0'
 )

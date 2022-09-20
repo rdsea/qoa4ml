@@ -12,3 +12,7 @@ Update system metric
 0.0.19 (31/05/2022)
 ---------------------
 Update process metric
+
+0.0.54 (20/09/2022)
+---------------------
+Update monitoring system/process/docker
