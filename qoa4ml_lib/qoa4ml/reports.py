@@ -33,7 +33,7 @@ class Qoa_Client(object):
             }
         }
         '''
-
+        self.start_time = time.time()
         self.config = client_conf
         self.metrics = {}
         self.connector = {}
@@ -109,9 +109,7 @@ class Qoa_Client(object):
     
     
     def generate_report(self, metric:list=None, category=None):
-        report = self.config.copy()
-        report['timestamp'] = str(datetime.fromtimestamp(time.time()))
-
+        report = {}
         if (category == None):
             for category_key in self.metrics:
                 report[category_key] = {}
@@ -128,8 +126,13 @@ class Qoa_Client(object):
     
 
     def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None, category=None):
+        client_inf = self.config.copy()
+        client_inf['timestamp'] = str(datetime.fromtimestamp(time.time()))
+        client_inf['runtime'] = time.time() - self.start_time
+        
         if (report == None):
             report = self.generate_report(metrics, category)
+        report.update(client_inf)
         body_mess = json.dumps(report)
         self.lock.acquire()
         if (connectors == None):

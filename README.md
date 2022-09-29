@@ -6,7 +6,7 @@
 The design of QoA4ML specification is in [language](language/)
 
 ## Probes
-* [QoA4ML Probes](probes/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
+* [QoA4ML Probes](qoa4ml_lib/qoa4ml/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
 * Probe properties:
   - Can be written in different languages (Python, GoLang)
   - Can have different communications to monitoring systems (depending on probes and its ML support)
@@ -32,7 +32,7 @@ Examples are in [examples](examples/).
 
 ## QoA4ML Observability
 
-The code is in [observability](observability./)
+The code is in [observability](observability/)
 
 ![The overal architecture of the Observability Service](img/qoa4mlos-overview.png)
 QoA4ML Monitor is a component monitoring QoA for a ML model which is deployed in a serving platform.
