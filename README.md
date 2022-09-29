@@ -27,7 +27,7 @@ This module defines ``QoA_Client``, an object that will gather metrics from prob
 
 ## Examples
 
-Examples are in [examples](examples/).
+Examples are in [examples](example/).
 
 
 ## QoA4ML Observability
