@@ -35,7 +35,7 @@ default_proc_metric = {
         "memory": {
             "class": "Gauge",
             "description": "monitor system memory used",
-            "default": - 0,
+            "default": 0,
             "key": "used"
         }
     }
@@ -91,14 +91,27 @@ def get_mem(key:str = None):
         pass
     return psutil.virtual_memory().used
 
-def get_proc_cpu(pid = None):
+def get_proc_cpu(pid = None, key=None):
     if (pid == None):
         pid = os.getpid()
     process = psutil.Process(pid)
     child_list = process.children()
-    cpu_usage = process.cpu_times().user
-    for child in child_list:
-        cpu_usage += child.cpu_times().user
+    if key == "iowait":
+        cpu_usage = process.cpu_times().iowait
+        for child in child_list:
+            cpu_usage += child.cpu_times().iowait
+    elif key == "system":
+        cpu_usage = process.cpu_times().system
+        for child in child_list:
+            cpu_usage += child.cpu_times().system
+    elif key == "all":
+        cpu_usage = process.cpu_times().system + process.cpu_times().iowait + process.cpu_times().user
+        for child in child_list:
+            cpu_usage = cpu_usage + child.cpu_times().system + child.cpu_times().iowait + child.cpu_times().user
+    else:
+        cpu_usage = process.cpu_times().user
+        for child in child_list:
+            cpu_usage += child.cpu_times().user
     return cpu_usage
 
 def get_proc_mem(pid = None):
@@ -165,7 +178,7 @@ def process_report(client:Qoa_Client, interval:int, pid:int = None, metrics: dic
         try:
             for metric_name in metrics['proc_cpu']:
                 metric = client.get_metric(metric_name,category=category)
-                metric.set(get_proc_cpu(pid=pid))
+                metric.set(get_proc_cpu(pid=pid, key=metrics["proc_cpu"][metric_name]["key"]))
                 metric_list.append(metric_name)
         except Exception as e:
             print("Unable to report process CPU stat: ", e)
