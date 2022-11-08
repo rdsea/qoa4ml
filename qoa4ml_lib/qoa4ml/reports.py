@@ -55,21 +55,25 @@ class Qoa_Client(object):
         # if configuration["class"] == "kafka":
         #     return Kafka_Connector(configuration["conf"])
         
-    def add_metric(self, metric_conf: dict, category=None):
+    # def add_metric(self, metric_conf: dict, category=None):
+    #     # Add multiple metrics 
+    #     if (category == None):
+    #         # category = "default"
+    #         pass
+    #     else:
+    #         if category in self.metrics:
+    #             pass
+    #         else:
+    #             self.metrics[category] = {}
+    #         for key in metric_conf:
+    #             if key in self.metrics[category]:
+    #                 pass
+    #             else:
+    #                 self.metrics[category][key] = self.init_metric(key, metric_conf[key])
+    def add_metric(self, metric_conf: dict):
         # Add multiple metrics 
-        if (category == None):
-            # category = "default"
-            pass
-        else:
-            if category in self.metrics:
-                pass
-            else:
-                self.metrics[category] = {}
-            for key in metric_conf:
-                if key in self.metrics[category]:
-                    pass
-                else:
-                    self.metrics[category][key] = self.init_metric(key, metric_conf[key])
+        for key in metric_conf:
+            self.metrics[key] = self.init_metric(key, metric_conf[key])
 
     def init_metric(self, name, configuration: dict):
         # init individual metrics
@@ -86,19 +90,28 @@ class Qoa_Client(object):
         # TO DO:
         return self.config
 
-    def get_metric(self, key=None, category=None):
+    # def get_metric(self, key=None, category=None):
+    #     # TO DO:
+    #     if (category == None) & (key == None):
+    #         metrics = {}
+    #         for category in self.metrics:
+    #             metrics.update(self.metrics[category])
+    #         return metrics
+    #     if (key == None) & (category != None):
+    #         return self.metrics[category]
+    #     if (isinstance(key, list)) & (category!=None):
+    #         return dict((k, self.metrics[category][k]) for k in key)
+    #     if (key!=None) & (category!=None): 
+    #         return self.metrics[category][key]
+
+    def get_metric(self, key=None):
         # TO DO:
-        if (category == None) & (key == None):
-            metrics = {}
-            for category in self.metrics:
-                metrics.update(self.metrics[category])
-            return metrics
-        if (key == None) & (category != None):
-            return self.metrics[category]
-        if (isinstance(key, list)) & (category!=None):
-            return dict((k, self.metrics[category][k]) for k in key)
-        if (key!=None) & (category!=None): 
-            return self.metrics[category][key]
+        if key == None:
+            return self.metrics
+        elif isinstance(key, list):
+            return dict((k, self.metrics[k]) for k in key)
+        else: 
+            return self.metrics[key]
 
     def set(self, key, value):
         # TO DO:
@@ -108,42 +121,71 @@ class Qoa_Client(object):
             print("{} not found - {}".format(key,e))
     
     
-    def generate_report(self, metric:list=None, category=None):
+    # def generate_report(self, metric:list=None, category=None):
+    #     report = {}
+    #     if (category == None):
+    #         for category_key in self.metrics:
+    #             report[category_key] = {}
+    #             list_metric = list(self.metrics[category_key].keys())
+    #             for key in list_metric:
+    #                 report[category_key][key] = self.metrics[category_key][key].get_val()
+    #     else:
+    #         report[category] = {}
+    #         if (metric == None):
+    #             metric = list(self.metrics[category].keys())
+    #         for key in metric:
+    #             report[category][key] = self.metrics[category][key].get_val()
+    #     return report
+    def generate_report(self, metric:list=None):
         report = {}
-        if (category == None):
-            for category_key in self.metrics:
-                report[category_key] = {}
-                list_metric = list(self.metrics[category_key].keys())
-                for key in list_metric:
-                    report[category_key][key] = self.metrics[category_key][key].get_val()
-        else:
-            report[category] = {}
-            if (metric == None):
-                metric = list(self.metrics[category].keys())
-            for key in metric:
-                report[category][key] = self.metrics[category][key].get_val()
+        report["metric"] = {}
+        if metric == None:
+            metric = list(self.metrics.keys())
+        for key in metric:
+            report["metric"][key] = self.metrics[key].get_val()
         return report
     
 
-    def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None, category=None):
+    # def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None, category=None):
+    #     client_inf = self.config.copy()
+    #     client_inf['timestamp'] = str(datetime.fromtimestamp(time.time()))
+    #     client_inf['runtime'] = time.time() - self.start_time
+        
+    #     if (report == None):
+    #         report = self.generate_report(metrics, category)
+    #     report.update(client_inf)
+    #     body_mess = json.dumps(report)
+    #     self.lock.acquire()
+    #     if (connectors == None):
+    #         self.connector[self.default_connector].send_data(body_mess,str(uuid.uuid4()))
+    #     else:
+    #         for connector in connectors:
+    #             print(connector)
+    #     self.lock.release()
+
+    # def report(self, metrics:list=None, report: dict = None, connectors:list=None, category=None):
+    #     sub_thread = Thread(target=self.asyn_report, args=(metrics,report, connectors, category))
+    #     sub_thread.start()
+
+    def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None):
         client_inf = self.config.copy()
         client_inf['timestamp'] = str(datetime.fromtimestamp(time.time()))
         client_inf['runtime'] = time.time() - self.start_time
-        
+
         if (report == None):
-            report = self.generate_report(metrics, category)
+            report = self.generate_report(metrics)
         report.update(client_inf)
         body_mess = json.dumps(report)
         self.lock.acquire()
-        if (connectors == None):
+        if connectors == None:
             self.connector[self.default_connector].send_data(body_mess,str(uuid.uuid4()))
         else:
             for connector in connectors:
                 print(connector)
         self.lock.release()
 
-    def report(self, metrics:list=None, report: dict = None, connectors:list=None, category=None):
-        sub_thread = Thread(target=self.asyn_report, args=(metrics,report, connectors, category))
+    def report(self, metrics:list=None, report: dict = None, connectors:list=None):
+        sub_thread = Thread(target=self.asyn_report, args=(metrics, report, connectors))
         sub_thread.start()
 
 

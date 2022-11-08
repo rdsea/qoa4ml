@@ -4,42 +4,7 @@ import json, psutil, time, os, docker
 from qoa4ml.reports import Qoa_Client
 from threading import Thread
 
-default_sys_metric = {
-    "cpu_stat":{
-        "cpu":{
-            "class": "Gauge",
-            "description": "monitor system cpu times",
-            "default": -1,
-            "key": "cpu time"
-        }
-    },
-    "mem_stat":{
-        "memory": {
-            "class": "Gauge",
-            "description": "monitor system memory used",
-            "default": - 0,
-            "key": "used"
-        }
-    }
-}
-default_proc_metric = {
-    "proc_cpu":{
-        "cpu":{
-            "class": "Gauge",
-            "description": "monitor system cpu times",
-            "default": -1,
-            "key": "cpu time"
-        }
-    },
-    "proc_mem":{
-        "memory": {
-            "class": "Gauge",
-            "description": "monitor system memory used",
-            "default": 0,
-            "key": "used"
-        }
-    }
-}
+###################### DEFAULT METRIC ######################
 default_docker_metric = {
     "dock_cpu_percentage":{
         "class": "Gauge",
@@ -55,6 +20,8 @@ default_docker_metric = {
     }
 }
 
+
+###################### COMMON USED FUNCTION ######################
 def load_config(file_path:str)->dict:
     """
     file_path: file path to load config
@@ -69,141 +36,123 @@ def to_json(file_path:str, conf:dict):
     with open(file_path, "w") as f:
         json.dump(conf, f)
     
-def get_cpu(key:str = None):
-    if key == "cpu time":
-        return psutil.cpu_times().user
-    if key == "percentage":
-        pass
-    return psutil.cpu_percent()
+def get_sys_cpu():
+    stats = psutil.cpu_stats()
+    cpu_time = psutil.cpu_times()
+    info = {}
+    for key in stats._fields:
+        info[key] = getattr(stats,key)
+    for key in cpu_time._fields:
+        info[key] = getattr(cpu_time,key)
+    return info
 
-def get_mem(key:str = None):
-    if key == "percentage":
-        return psutil.virtual_memory().percent
-    if key == "free":
-        return psutil.virtual_memory().free
-    if key == "total":
-        return psutil.virtual_memory().total
-    if key == "active":
-        return psutil.virtual_memory().active
-    if key == "available":
-        return psutil.virtual_memory().available
-    if key == "used":
-        pass
-    return psutil.virtual_memory().used
+def get_sys_mem():
+    stats = psutil.virtual_memory()
+    info = {}
+    for key in stats._fields:
+        info[key] = getattr(stats,key)
+    return info
 
-def get_proc_cpu(pid = None, key=None):
+def report_proc_cpu(process):
+    report = {}
+    cpu_time = process.cpu_times()
+    contex = process.num_ctx_switches()
+    for key in cpu_time._fields:
+        report[key] = getattr(cpu_time,key)
+    for key in contex._fields:
+        report[key] = getattr(contex,key)
+    report['num_thread'] = process.num_threads()
+
+    return report
+    
+def get_proc_cpu(pid = None):
     if (pid == None):
         pid = os.getpid()
     process = psutil.Process(pid)
     child_list = process.children()
-    if key == "iowait":
-        cpu_usage = process.cpu_times().iowait
-        for child in child_list:
-            cpu_usage += child.cpu_times().iowait
-    elif key == "system":
-        cpu_usage = process.cpu_times().system
-        for child in child_list:
-            cpu_usage += child.cpu_times().system
-    elif key == "all":
-        cpu_usage = process.cpu_times().system + process.cpu_times().iowait + process.cpu_times().user
-        for child in child_list:
-            cpu_usage = cpu_usage + child.cpu_times().system + child.cpu_times().iowait + child.cpu_times().user
-    else:
-        cpu_usage = process.cpu_times().user
-        for child in child_list:
-            cpu_usage += child.cpu_times().user
-    return cpu_usage
+    info = {}
+    info[pid] = report_proc_cpu(process)
+    
+    for child in child_list:
+        info[child.pid + "c"] = report_proc_cpu(child)
+    return info
 
+def report_proc_mem(process):
+    report = {}
+    mem_info = process.memory_info()
+    for key in mem_info._fields:
+        report[key] = getattr(mem_info,key)
+    return report
+    
 def get_proc_mem(pid = None):
     if (pid == None):
         pid = os.getpid()
     process = psutil.Process(pid)
     child_list = process.children()
-    mem_usage = process.memory_info().rss
+    info = {}
+    info[pid] = report_proc_mem(process)
+    
     for child in child_list:
-        mem_usage += child.memory_info().rss
-    return mem_usage
+        info[child.pid + "c"] = report_proc_mem(child)
+    return info
 
-
+###################### SYSTEM REPORT ######################
 
 sys_monitor_flag = False
 proc_monitor_flag = False
 doc_monitor_flag = False
 
-def system_report(client:Qoa_Client, interval:int, metrics:dict = None, category=None):
-    try:
-        client.add_metric(metrics['cpu_stat'])
-        client.add_metric(metrics['mem_stat'])
-    except Exception as e:
-        print("Unable to add system metric: ", e)
-    metric_list = []
+def system_report(client:Qoa_Client, interval:int):
+    report = {}
     while sys_monitor_flag:
         try:
-            for metric_name in metrics['cpu_stat']:
-                metric = client.get_metric(metric_name)
-                metric.set(get_cpu(metrics['cpu_stat'][metric_name]["key"]))
-                metric_list.append(metric_name)
+            report["sys_cpu_stats"] = get_sys_mem()
         except Exception as e:
             print("Unable to report CPU stat: ", e)
         try:
-            for metric_name in metrics['mem_stat']:
-                metric = client.get_metric(metric_name)
-                metric.set(get_mem(metrics['mem_stat'][metric_name]["key"]))
-                metric_list.append(metric_name)
+            report["sys_mem_stats"] = get_sys_mem()
         except Exception as e:
             print("Unable to report memory stat: ", e)
         try:
-            client.report(metrics=metric_list, category=category)
+            client.report(report=report)
         except Exception as e:
             print("Unable to send system report: ", e)
         time.sleep(interval)
 
 
-def sys_monitor(client:Qoa_Client, interval:int, metrics: dict = None, category=None):
-    if (metrics == None):
-        metrics = default_sys_metric
-    sub_thread = Thread(target=system_report, args=(client, interval, metrics, category))
+def sys_monitor(client:Qoa_Client, interval:int):
+    sub_thread = Thread(target=system_report, args=(client, interval))
     sub_thread.start()
 
-def process_report(client:Qoa_Client, interval:int, pid:int = None, metrics: dict = None, category=None):
-    if category == None:
-        category = 'resource_monitor'
-    try:
-        client.add_metric(metrics['proc_cpu'],category=category)
-        client.add_metric(metrics['proc_mem'],category=category)
-    except Exception as e:
-        print("Unable to add process metric: ", e)
-    metric_list = []
+
+###################### PROCESS REPORT ######################   
+
+def process_report(client:Qoa_Client, interval:int, pid:int = None):
+    report = {}
     while proc_monitor_flag:
         try:
-            for metric_name in metrics['proc_cpu']:
-                metric = client.get_metric(metric_name,category=category)
-                metric.set(get_proc_cpu(pid=pid, key=metrics["proc_cpu"][metric_name]["key"]))
-                metric_list.append(metric_name)
+            report["proc_cpu_stats"] = get_proc_cpu()
         except Exception as e:
             print("Unable to report process CPU stat: ", e)
         try:
-            for metric_name in metrics['proc_mem']:
-                metric = client.get_metric(metric_name,category=category)
-                metric.set(get_proc_mem(pid=pid))
-                metric_list.append(metric_name)
+            report["proc_mem_stats"] = get_proc_mem()
         except Exception as e:
             print("Unable to report process memory stat: ", e)
         try:
-            client.report(category=category)
-            # client.report(metrics=metric_list, category=category)
+            client.report(report=report)
         except Exception as e:
             print("Unable to send process report: ", e)
         time.sleep(interval)
 
 
-def process_monitor(client:Qoa_Client, interval:int, pid:int = None, metrics: dict = None, category=None):
-    if (metrics == None):
-        metrics = default_proc_metric
+def process_monitor(client:Qoa_Client, interval:int, pid:int = None):
     if (pid == None):
         pid = os.getpid()
-    sub_thread = Thread(target=process_report, args=(client, interval, pid, metrics, category))
+    sub_thread = Thread(target=process_report, args=(client, interval, pid))
     sub_thread.start()
+
+
+###################### DOCKER REPORT ######################
 
 def get_cpu_stat(stats,key):
     if key == 'percentage':
@@ -223,6 +172,7 @@ def get_mem_stat(stats,key):
     else:
         return -1
 
+        
 def get_docker_stats(client):
     stats = {}
     try:
