@@ -2,55 +2,259 @@
     "stakeholders": [
         {
             "id": "name",
-            "roles": ["mlconsumer", "mlprovider","mlinfrastructure"],
-            "provisioning": ["mlservice", "storage", "mlmodels"]
+            "roles": [
+                "mlconsumer",
+                "mlprovider",
+                "mlinfrastructure"
+            ],
+            "provisioning": [
+                "mlservice",
+                "storage",
+                "mlmodels"
+            ]
         }
     ],
-
     "resources": {
-        "services":[
-            {"id": "service_id", "serviceapis": ["rest", "mqtt","kafka", "amqp", "coapp"], "machinetypes":["micro","small","normal"],"processortypes":["CPU","GPU", "TPU"]}
+        "services": [
+            {
+                "id": "service_id",
+                "serviceapis": [
+                    "rest",
+                    "mqtt",
+                    "kafka",
+                    "amqp",
+                    "coapp"
+                ],
+                "machinetypes": [
+                    "micro",
+                    "small",
+                    "normal"
+                ],
+                "processortypes": [
+                    "CPU",
+                    "GPU",
+                    "TPU"
+                ]
+            }
         ],
         "data": [
-            {"id": "data_id", "datatypes": ["video","image","message"], "formats": ["binary","csv","json","avro"]}
+            {
+                "id": "data_id",
+                "datatypes": [
+                    "video",
+                    "image",
+                    "message"
+                ],
+                "formats": [
+                    "binary",
+                    "csv",
+                    "json",
+                    "avro"
+                ]
+            }
         ],
         "mlmodels": [
-            {"id": "mlmodel_id", "formats": ["kerash5","onnx"], "mlinfrastructures": ["tensorflow","predictio"], "modelclasses":["SVM","DT","CNN","RNN","LR","KMeans","ANN"], "inferencemodes":["static","dynamic"]}
+            {
+                "id": "mlmodel_id",
+                "formats": [
+                    "kerash5",
+                    "onnx"
+                ],
+                "mlinfrastructures": [
+                    "tensorflow",
+                    "predictio"
+                ],
+                "modelclasses": [
+                    "SVM",
+                    "DT",
+                    "CNN",
+                    "RNN",
+                    "LR",
+                    "KMeans",
+                    "ANN"
+                ],
+                "inferencemodes": [
+                    "static",
+                    "dynamic"
+                ]
+            }
         ]
     },
     "quality": {
         "services": {
-                "ResponseTime":{"operators":["min","max"],"unit":"ms","value":"value","class": ["performance"]},
-                "Reliability":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["performance"]}
+            "ResponseTime": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "ms",
+                "value": "value",
+                "class": [
+                    "performance"
+                ]
+            },
+            "Reliability": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "performance"
+                ]
             }
-        ,
-        "data":{
-            "Accuracy":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["qualityofdata"]},
-            "Completeness":{"operators":["min","max"],"unit":"percentage","value":"value", "resourceType": ["qualityofdata"]}
+        },
+        "data": {
+            "Accuracy": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "qualityofdata"
+                ]
+            },
+            "Completeness": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "resourceType": [
+                    "qualityofdata"
+                ]
+            }
         },
         "mlmodels": {
-            "Accuracy":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]},
-            "Precision":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]},
-            "Recall":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]},
-            "AUC":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]},
-            "MSE":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]}
+            "Accuracy": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "Accuracy"
+                ]
+            },
+            "Precision": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "Accuracy"
+                ]
+            },
+            "Recall": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "Accuracy"
+                ]
+            },
+            "AUC": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "Accuracy"
+                ]
+            },
+            "MSE": {
+                "operators": [
+                    "min",
+                    "max"
+                ],
+                "unit": "percentage",
+                "value": "value",
+                "class": [
+                    "Accuracy"
+                ]
+            }
         }
     },
     "security": {
-        "encryption":{"types": ["end2end"]},
-        "encryptedinference": {"mode":[true,false]}
+        "encryption": {
+            "types": [
+                "end2end"
+            ]
+        },
+        "encryptedinference": {
+            "mode": [
+                true,
+                false
+            ]
+        }
     },
     "privacy": {
-        "membershipinferencerisk":{"operators":["min","max"],"unit":"float","range":[0,1],"value":"value", "class": ["Privacy"]}
+        "membershipinferencerisk": {
+            "operators": [
+                "min",
+                "max"
+            ],
+            "unit": "float",
+            "range": [
+                0,
+                1
+            ],
+            "value": "value",
+            "class": [
+                "Privacy"
+            ]
+        }
     },
-    "fairness":{
-        "Predictionbias":{"operators":["min","max"],"unit":"percentage","value":"value", "class": ["Accuracy"]}
+    "fairness": {
+        "Predictionbias": {
+            "operators": [
+                "min",
+                "max"
+            ],
+            "unit": "percentage",
+            "value": "value",
+            "class": [
+                "Accuracy"
+            ]
+        }
     },
     "interpretability": {
-        "explainability": {"modes": ["full","compact"]}
+        "explainability": {
+            "modes": [
+                "full",
+                "compact"
+            ]
+        }
     },
     "cost": {
-        "cost":{"operators":["min","max"],"unit":["USD","EUR","other"],"value":"value", "class": "cost"},
-        "pricingmodel":{"name":"name", "class": "cost"}
+        "cost": {
+            "operators": [
+                "min",
+                "max"
+            ],
+            "unit": [
+                "USD",
+                "EUR",
+                "other"
+            ],
+            "value": "value",
+            "class": "cost"
+        },
+        "pricingmodel": {
+            "name": "name",
+            "class": "cost"
+        }
     }
 }

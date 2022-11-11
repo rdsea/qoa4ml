@@ -1,21 +1,39 @@
 {
-    "qoa4mlattributes":{
-        "__comment":"it is like a catalog of attributes. We can load it for APIs",
+    "qoa4mlattributes": {
+        "__comment": "it is like a catalog of attributes. We can load it for APIs",
         "quality": {
-            "services":{
-                "ResponseTime":{"description":"response time"},
-                "Reliability":{"description":"reliability"}
-        },
-        "data": {
-                "Accuracy": {"description":"data accuracy"},
-                "Completeness":{"description":"to be written"}
-        },
-        "mlmodels": {
-                "Accuracy":{"description":"to be written"},
-                "Precision":{"description":"to be written"},
-                "Recall":{"description":"to be written"},
-                "AUC":{"description":"to be written"},
-                "MSE":{"description":"to be written"}
+            "services": {
+                "ResponseTime": {
+                    "description": "response time"
+                },
+                "Reliability": {
+                    "description": "reliability"
+                }
+            },
+            "data": {
+                "Accuracy": {
+                    "description": "data accuracy"
+                },
+                "Completeness": {
+                    "description": "to be written"
+                }
+            },
+            "mlmodels": {
+                "Accuracy": {
+                    "description": "to be written"
+                },
+                "Precision": {
+                    "description": "to be written"
+                },
+                "Recall": {
+                    "description": "to be written"
+                },
+                "AUC": {
+                    "description": "to be written"
+                },
+                "MSE": {
+                    "description": "to be written"
+                }
             }
         }
     }
