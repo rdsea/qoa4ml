@@ -53,6 +53,13 @@ def get_sys_mem():
         info[key] = getattr(stats,key)
     return info
 
+def get_sys_net():
+    info = {}
+    net = psutil.net_io_counters()
+    for key in net._fields:
+        info[key] = getattr(net,key)
+    return info
+
 def report_proc_cpu(process):
     report = {}
     cpu_time = process.cpu_times()
@@ -113,6 +120,10 @@ def system_report(client:Qoa_Client, interval:int):
             report["sys_mem_stats"] = get_sys_mem()
         except Exception as e:
             print("Unable to report memory stat: ", e)
+        try:
+            report["sys_net_stats"] = get_sys_net()
+        except Exception as e:
+            print("Unable to report network stat: ", e)
         try:
             client.report(report=report)
         except Exception as e:
