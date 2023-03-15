@@ -43,6 +43,7 @@ class Amqp_Collector(object):
         self.in_channel.start_consuming()
 
     def stop(self):
+        self.in_channel.stop_consuming()
         self.in_channel.close()
 
     def get_queue(self):

@@ -6,7 +6,7 @@ from .probes import Gauge, Counter, Summary, Histogram
 import json, uuid
 import threading
 from threading import Thread
-import time
+import time, uuid
 from datetime import datetime
 
 class Qoa_Client(object):
@@ -36,7 +36,18 @@ class Qoa_Client(object):
         self.start_time = time.time()
         self.config = client_conf
         self.metrics = {}
+        self.ex_metrics = {}
         self.connector = {}
+        self.ex_report = {}
+        self.timer_flag = False
+        self.timer_start = 0
+        self.report_list = []
+        self.cur_instance_id = None
+        self.cur_method = None
+        self.cur_stage_id = None
+        self.qoa_uuid = str(uuid.uuid4())
+        self.cur_report = None
+        self.data_quality = []
         # Init all connectors in for loop 
         for key in connector_conf:
             self.connector[key] = self.init_connector(connector_conf[key])
@@ -52,24 +63,7 @@ class Qoa_Client(object):
             return Amqp_Connector(configuration["conf"])
         if configuration["class"] == "mqtt":
             return Mqtt_Connector(configuration["conf"])
-        # if configuration["class"] == "kafka":
-        #     return Kafka_Connector(configuration["conf"])
-        
-    # def add_metric(self, metric_conf: dict, category=None):
-    #     # Add multiple metrics 
-    #     if (category == None):
-    #         # category = "default"
-    #         pass
-    #     else:
-    #         if category in self.metrics:
-    #             pass
-    #         else:
-    #             self.metrics[category] = {}
-    #         for key in metric_conf:
-    #             if key in self.metrics[category]:
-    #                 pass
-    #             else:
-    #                 self.metrics[category][key] = self.init_metric(key, metric_conf[key])
+
     def add_metric(self, metric_conf: dict):
         # Add multiple metrics 
         for key in metric_conf:
@@ -90,19 +84,6 @@ class Qoa_Client(object):
         # TO DO:
         return self.config
 
-    # def get_metric(self, key=None, category=None):
-    #     # TO DO:
-    #     if (category == None) & (key == None):
-    #         metrics = {}
-    #         for category in self.metrics:
-    #             metrics.update(self.metrics[category])
-    #         return metrics
-    #     if (key == None) & (category != None):
-    #         return self.metrics[category]
-    #     if (isinstance(key, list)) & (category!=None):
-    #         return dict((k, self.metrics[category][k]) for k in key)
-    #     if (key!=None) & (category!=None): 
-    #         return self.metrics[category][key]
 
     def get_metric(self, key=None):
         # TO DO:
@@ -112,6 +93,20 @@ class Qoa_Client(object):
             return dict((k, self.metrics[k]) for k in key)
         else: 
             return self.metrics[key]
+    
+    def reset_metric(self, key=None):
+        # TO DO:
+        try:
+            if key == None:
+                for key in self.metrics:
+                    self.metrics[key].reset()
+            elif isinstance(key, list):
+                for k in key:
+                    self.metrics[k].reset()
+            else: 
+                return self.metrics[key].reset()
+        except Exception as e:
+            print("[Error]: {}".format(e))
 
     def set(self, key, value):
         # TO DO:
@@ -120,22 +115,7 @@ class Qoa_Client(object):
         except Exception as e:
             print("{} not found - {}".format(key,e))
     
-    
-    # def generate_report(self, metric:list=None, category=None):
-    #     report = {}
-    #     if (category == None):
-    #         for category_key in self.metrics:
-    #             report[category_key] = {}
-    #             list_metric = list(self.metrics[category_key].keys())
-    #             for key in list_metric:
-    #                 report[category_key][key] = self.metrics[category_key][key].get_val()
-    #     else:
-    #         report[category] = {}
-    #         if (metric == None):
-    #             metric = list(self.metrics[category].keys())
-    #         for key in metric:
-    #             report[category][key] = self.metrics[category][key].get_val()
-    #     return report
+
     def generate_report(self, metric:list=None):
         report = {}
         report["metric"] = {}
@@ -145,31 +125,126 @@ class Qoa_Client(object):
             report["metric"][key] = self.metrics[key].get_val()
         return report
     
+    def get_reports(self, report):
+        self.report_list.append(report)
 
-    # def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None, category=None):
-    #     client_inf = self.config.copy()
-    #     client_inf['timestamp'] = str(datetime.fromtimestamp(time.time()))
-    #     client_inf['runtime'] = time.time() - self.start_time
-        
-    #     if (report == None):
-    #         report = self.generate_report(metrics, category)
-    #     report.update(client_inf)
-    #     body_mess = json.dumps(report)
-    #     self.lock.acquire()
-    #     if (connectors == None):
-    #         self.connector[self.default_connector].send_data(body_mess,str(uuid.uuid4()))
-    #     else:
-    #         for connector in connectors:
-    #             print(connector)
-    #     self.lock.release()
+    def init_report(self, instance_id, method, stage_id):
+        self.cur_instance_id = instance_id
+        self.cur_method = method
+        self.cur_stage_id = stage_id
+        self.cur_report = {}
+        self.cur_report[self.qoa_uuid] = {}
+        self.cur_report[self.qoa_uuid]["instance_id"] = instance_id
+        self.cur_report[self.qoa_uuid]["method"] = method
+        self.cur_report["data_quality"] = {}
+        self.cur_report["data_quality"][stage_id] = {}
+        self.cur_report["performance"] = {}
+        self.cur_report["performance"][stage_id] = {}
+        self.cur_report["performance"][stage_id]["response_time"] = {}
+        self.ex_report = {"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{stage_id:{"response_time": {}}}}
 
-    # def report(self, metrics:list=None, report: dict = None, connectors:list=None, category=None):
-    #     sub_thread = Thread(target=self.asyn_report, args=(metrics,report, connectors, category))
-    #     sub_thread.start()
+
+    def build_report(self, response_time):
+        for metric in self.data_quality:
+            self.cur_report["data_quality"][self.cur_stage_id][metric["name"]] = {self.qoa_uuid:{"value": metric["value"]}}
+        self.cur_report["performance"][self.cur_stage_id]["response_time"][self.qoa_uuid] = {"start_time":response_time[0], "execution_time":response_time[1]}
+
+
+    def process_ex_report(self, response_time):
+        self.build_report(response_time)
+        f_report = self.ex_report
+        f_graph = f_report["execution_graph"]
+        f_data_quality = f_report["data_quality"]
+        f_performance = f_report["performance"]
+        previous_instance = f_graph["last_instance"]
+        for report in self.report_list:
+            i_graph = report["execution_graph"]
+            previous_instance.append(i_graph["last_instance"])
+            f_graph["instances"].update(i_graph["instances"])
+
+            i_data_quality = report["data_quality"]
+            for stage in i_data_quality:
+                if stage in f_data_quality:
+                    for metric in i_data_quality[stage]:
+                        if metric in f_data_quality[stage]:
+                            f_data_quality[stage][metric].update(i_data_quality[stage][metric])
+                        else:
+                            f_data_quality[stage][metric] = i_data_quality[stage][metric]
+                else:
+                    f_data_quality[stage] = i_data_quality[stage]
+            
+            i_performance = report["performance"]
+            for stage in i_performance:
+                if stage in f_performance:
+                    for metric in i_performance[stage]:
+                        if metric in f_performance[stage]:
+                            f_performance[stage][metric].update(i_performance[stage][metric])
+                        else:
+                            f_performance[stage][metric] = i_performance[stage][metric]
+                else:
+                    f_performance[stage] = i_performance[stage]
+
+
+        f_graph["last_instance"] = self.qoa_uuid
+        self.cur_report[self.qoa_uuid]["previous_instance"] = previous_instance
+        f_graph["instances"].update({self.qoa_uuid:self.cur_report[self.qoa_uuid]})
+        f_data_quality.update(self.cur_report["data_quality"])
+        f_performance[self.cur_stage_id].update(self.cur_report["performance"][self.cur_stage_id])
+        self.report_list = []
+
+    def ex_observe_prediction(self, value, confidence, dependency=[]):
+        if "prediction" not in self.ex_report:
+            self.ex_report["prediction"] = {}
+        pre_uuid = str(uuid.uuid4())
+        predictions = {}
+        if dependency:
+            for prediction in dependency:
+                predictions.update(prediction)
+            source = list(predictions.keys())
+        else:
+            source = []
+        predictions[pre_uuid] = {"value": value, "confidence": confidence, "source":source, "qoa_id": self.qoa_uuid}
+        self.ex_report["prediction"].update(predictions)
+        return predictions
+    
+    def ex_observe_data_quality(self, name, value):
+        self.data_quality.append({"name":name, "value":value})
+
+    def timer(self):
+        if self.timer_flag == False:
+            self.timer_flag = True
+            self.timer_start = time.time()
+            return []
+        else:
+            self.timer_flag = False
+            return [self.timer_start,time.time()-self.timer_start]
+
+    
+    def ex_set_metric(self, metric, value):
+        if "performance" not in self.ex_report:
+            self.ex_report["performance"] = {}
+        self.ex_report["performance"][self.cur_stage_id].update({metric:{self.qoa_uuid:{"value":value}}})
+
+    def ex_reset(self):
+        self.ex_report = {}
+        self.report_list = []
+
+    def ex_remove(self, metric):
+        self.ex_report["Metrics"].pop(metric)
+
+    def report_external(self, response_time):
+        self.process_ex_report(response_time)
+        self.report(report=self.ex_report)
+        report = self.ex_report.copy()
+        self.ex_reset()
+        return report
+
+    
+
 
     def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None):
         client_inf = self.config.copy()
-        client_inf['timestamp'] = str(datetime.fromtimestamp(time.time()))
+        client_inf['timestamp'] = time.time()
         client_inf['runtime'] = time.time() - self.start_time
 
         if (report == None):

@@ -17,6 +17,7 @@ class Metric(object):
     def __init__(self, metric_name, description, default_value=-1):
         self.metric_name = metric_name
         self.description = description
+        self.default_value = default_value
         self.value = default_value
     
     def set(self, value):
@@ -27,6 +28,8 @@ class Metric(object):
         return self.metric_name
     def get_des(self):
         return self.description
+    def reset(self):
+        self.value = self.default_value
     def __str__(self) -> str:
         return "metric_name: " + self.metric_name + ", " + "value: " + str(self.value)
     def to_dict(self):
@@ -44,14 +47,11 @@ class Counter(Metric):
         - reset: set the value back to zero
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1):
+    def __init__(self, metric_name, description, default_value=0):
         super().__init__(metric_name, description, default_value)
 
     def inc(self,num=1):
         self.value += num
-    
-    def reset(self):
-        self.value = 0
 
 class Gauge(Metric):
     """
