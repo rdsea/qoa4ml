@@ -1,4 +1,4 @@
-import pika
+import pika, uuid
 from .mess_logging import Mess_Logging
 
 class Amqp_Connector(object):
@@ -28,13 +28,15 @@ class Amqp_Connector(object):
         self.out_channel.exchange_declare(exchange=self.exchange_name, exchange_type=self.exchange_type)
         
 
-    def send_data(self, body_mess, corr_id, routing_key=None):
+    def send_data(self, body_mess, corr_id=None, routing_key=None,expiration=1000):
         # Sending data to desired destination
         # if sender is client, it will include the "reply_to" attribute to specify where to reply this message
         # if sender is server, it will reply the message to "reply_to" via default exchange 
+        if corr_id == None:
+            corr_id = str(uuid.uuid4())
         if routing_key == None:
             routing_key = self.out_routing_key
-        self.sub_properties = pika.BasicProperties(correlation_id=corr_id,expiration='1000')
+        self.sub_properties = pika.BasicProperties(correlation_id=corr_id,expiration=str(expiration))
         self.out_channel.basic_publish(exchange=self.exchange_name,routing_key=routing_key,properties=self.sub_properties,body=body_mess)
         # if self.log_flag:
         #     self.mess_logging.log_request(body_mess,corr_id)
