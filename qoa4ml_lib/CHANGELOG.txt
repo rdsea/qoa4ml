@@ -20,3 +20,7 @@ Update monitoring system/process/docker
 0.0.62 (20/09/2022)
 ---------------------
 Add metric and modify format of system/process reports
+
+0.0.64 (15/03/2022)
+---------------------
+Add metric and modify format of system/process reports
