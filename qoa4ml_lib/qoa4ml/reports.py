@@ -8,6 +8,8 @@ import threading
 from threading import Thread
 import time, uuid
 from datetime import datetime
+import os
+from .utils import get_proc_cpu, get_proc_mem
 
 class Qoa_Client(object):
     # Init QoA Client
@@ -48,6 +50,7 @@ class Qoa_Client(object):
         self.qoa_uuid = str(uuid.uuid4())
         self.cur_report = None
         self.data_quality = []
+        self.proc_monitor_flag = False
         # Init all connectors in for loop 
         for key in connector_conf:
             self.connector[key] = self.init_connector(connector_conf[key])
@@ -141,7 +144,7 @@ class Qoa_Client(object):
         self.cur_report["performance"] = {}
         self.cur_report["performance"][stage_id] = {}
         self.cur_report["performance"][stage_id]["response_time"] = {}
-        self.ex_report = {"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{stage_id:{"response_time": {}}}}
+        self.ex_report = {"prediction":{},"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{stage_id:{"response_time": {}}}}
 
 
     def build_report(self, response_time):
@@ -153,6 +156,7 @@ class Qoa_Client(object):
     def process_ex_report(self, response_time):
         self.build_report(response_time)
         f_report = self.ex_report
+        f_prediction = f_report["prediction"]
         f_graph = f_report["execution_graph"]
         f_data_quality = f_report["data_quality"]
         f_performance = f_report["performance"]
@@ -183,6 +187,7 @@ class Qoa_Client(object):
                             f_performance[stage][metric] = i_performance[stage][metric]
                 else:
                     f_performance[stage] = i_performance[stage]
+            f_prediction.update(report["prediction"])
 
 
         f_graph["last_instance"] = self.qoa_uuid
@@ -192,9 +197,7 @@ class Qoa_Client(object):
         f_performance[self.cur_stage_id].update(self.cur_report["performance"][self.cur_stage_id])
         self.report_list = []
 
-    def ex_observe_prediction(self, value, confidence, dependency=[]):
-        if "prediction" not in self.ex_report:
-            self.ex_report["prediction"] = {}
+    def ex_observe_confidence(self, value, confidence, dependency=[]):
         pre_uuid = str(uuid.uuid4())
         predictions = {}
         if dependency:
@@ -203,9 +206,14 @@ class Qoa_Client(object):
             source = list(predictions.keys())
         else:
             source = []
-        predictions[pre_uuid] = {"value": value, "confidence": confidence, "source":source, "qoa_id": self.qoa_uuid}
-        self.ex_report["prediction"].update(predictions)
-        return predictions
+        curr_prediction = {pre_uuid:{"value": value, "confidence": confidence, "source":source, "qoa_id": self.qoa_uuid}}
+        self.ex_report["prediction"].update(curr_prediction)
+        return curr_prediction
+    
+    def ex_observe_accuracy(self, prediction, accuracy):
+        keys = list(prediction.keys())
+        prediction[keys[0]]["accuracy"] = accuracy
+        self.ex_report["prediction"].update(prediction)
     
     def ex_observe_data_quality(self, name, value):
         self.data_quality.append({"name":name, "value":value})
@@ -226,15 +234,16 @@ class Qoa_Client(object):
         self.ex_report["performance"][self.cur_stage_id].update({metric:{self.qoa_uuid:{"value":value}}})
 
     def ex_reset(self):
-        self.ex_report = {}
+        self.ex_report = {"prediction":{},"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{self.cur_stage_id:{"response_time": {}}}}
         self.report_list = []
 
     def ex_remove(self, metric):
         self.ex_report["Metrics"].pop(metric)
 
-    def report_external(self, response_time):
+    def report_external(self, response_time, submit=False):
         self.process_ex_report(response_time)
-        self.report(report=self.ex_report)
+        if submit:
+            self.report(report=self.ex_report)
         report = self.ex_report.copy()
         self.ex_reset()
         return report
@@ -266,3 +275,27 @@ class Qoa_Client(object):
 
     def __str__(self):
         return str(self.config) + '\n' + str(self.connector)
+    
+    def process_report(self, interval:int, pid:int = None):
+        report = {}
+        while self.proc_monitor_flag:
+            try:
+                report["proc_cpu_stats"] = get_proc_cpu()
+            except Exception as e:
+                print("Unable to report process CPU stat: ", e)
+            try:
+                report["proc_mem_stats"] = get_proc_mem()
+            except Exception as e:
+                print("Unable to report process memory stat: ", e)
+            try:
+                self.report(report=report)
+            except Exception as e:
+                print("Unable to send process report: ", e)
+            time.sleep(interval)
+
+
+    def process_monitor(self, interval:int, pid:int = None):
+        if (pid == None):
+            pid = os.getpid()
+        sub_thread = Thread(target=self.process_report, args=(interval, pid))
+        sub_thread.start()

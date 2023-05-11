@@ -1,7 +1,6 @@
 from concurrent.futures import thread
 from email.policy import default
 import json, psutil, time, os, docker
-from qoa4ml.reports import Qoa_Client
 from threading import Thread
 
 ###################### DEFAULT METRIC ######################
@@ -109,7 +108,7 @@ sys_monitor_flag = False
 proc_monitor_flag = False
 doc_monitor_flag = False
 
-def system_report(client:Qoa_Client, interval:int):
+def system_report(client, interval:int):
     report = {}
     while sys_monitor_flag:
         try:
@@ -131,14 +130,14 @@ def system_report(client:Qoa_Client, interval:int):
         time.sleep(interval)
 
 
-def sys_monitor(client:Qoa_Client, interval:int):
+def sys_monitor(client, interval:int):
     sub_thread = Thread(target=system_report, args=(client, interval))
     sub_thread.start()
 
 
 ###################### PROCESS REPORT ######################   
 
-def process_report(client:Qoa_Client, interval:int, pid:int = None):
+def process_report(client, interval:int, pid:int = None):
     report = {}
     while proc_monitor_flag:
         try:
@@ -156,7 +155,7 @@ def process_report(client:Qoa_Client, interval:int, pid:int = None):
         time.sleep(interval)
 
 
-def process_monitor(client:Qoa_Client, interval:int, pid:int = None):
+def process_monitor(client, interval:int, pid:int = None):
     if (pid == None):
         pid = os.getpid()
     sub_thread = Thread(target=process_report, args=(client, interval, pid))
@@ -199,7 +198,7 @@ def get_docker_stats(client):
         print("Unable to query docker stat: ", e)
     return stats
 
-def docker_report(client:Qoa_Client, interval:int, metrics:dict = None, detail = False):
+def docker_report(client, interval:int, metrics:dict = None, detail = False):
     try:
         client.add_metric(metrics)
     except Exception as e:
@@ -232,7 +231,7 @@ def docker_report(client:Qoa_Client, interval:int, metrics:dict = None, detail =
             print("Unable to send system report: ", e)
         time.sleep(interval)
 
-def docker_monitor(client:Qoa_Client, interval:int, metrics: dict = None, detail=False):
+def docker_monitor(client, interval:int, metrics: dict = None, detail=False):
     if (metrics == None):
         metrics = default_docker_metric
     sub_thread = Thread(target=docker_report, args=(client, interval, metrics,detail))
