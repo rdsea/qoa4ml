@@ -1,3 +1,6 @@
+# Super classes is built based on Prometheus prototype
+
+
 class Metric(object):
     """
     This class defines the common attribute and provide basic function for handling a metric
@@ -5,6 +8,7 @@ class Metric(object):
         - name: name of the metric
         - description: describe the metric
         - value: value of the metric
+        - category: group metric into specific category supporting building QoA_Report
         - others: (Developing)
 
     - Function: 
@@ -14,11 +18,12 @@ class Metric(object):
         - get_des: return metric description
         - other: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1):
+    def __init__(self, metric_name, description, default_value=-1, category=None):
         self.metric_name = metric_name
         self.description = description
         self.default_value = default_value
         self.value = default_value
+        self.category = category
     
     def set(self, value):
         self.value = value
@@ -28,6 +33,9 @@ class Metric(object):
         return self.metric_name
     def get_des(self):
         return self.description
+    def get_category(self):
+        return self.category
+
     def reset(self):
         self.value = self.default_value
     def __str__(self) -> str:

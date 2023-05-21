@@ -2,6 +2,7 @@ from concurrent.futures import thread
 from email.policy import default
 import json, psutil, time, os, docker
 from threading import Thread
+import traceback,sys
 
 ###################### DEFAULT METRIC ######################
 default_docker_metric = {
@@ -236,3 +237,31 @@ def docker_monitor(client, interval:int, metrics: dict = None, detail=False):
         metrics = default_docker_metric
     sub_thread = Thread(target=docker_report, args=(client, interval, metrics,detail))
     sub_thread.start()
+
+
+def merge_report(f_report, i_report, prio=True):
+    try:
+        if isinstance(f_report, dict) and isinstance(i_report, dict):
+            for key in f_report:
+                if key in i_report:
+                    f_report[key] = merge_report(f_report[key],i_report[key],prio)
+                    i_report.pop(key)
+            f_report.update(i_report)
+        else:
+            if f_report != i_report:
+                if prio == True:
+                    return f_report
+                else:
+                    return i_report
+    except Exception as e:
+        print("[ERROR] - Error {} in merge_report: {}".format(type(e),e.__traceback__))
+        traceback.print_exception(*sys.exc_info())
+    return f_report
+
+def get_dict_at(dict, i=0):
+    try:
+        keys = list(dict.keys())
+        return  keys[i], dict[keys[i]]
+    except Exception as e:
+        print("[ERROR] - Error {} in get_dict_at: {}".format(type(e),e.__traceback__))
+        traceback.print_exception(*sys.exc_info())

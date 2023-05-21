@@ -2,11 +2,13 @@
     "Accuracy":{
         "class": "Gauge",
         "description": "model training accuracy",
-        "default": 0
+        "default": 0,
+        "category": ["quality", "inference"]
     },
     "ResponseTime":{
         "class": "Gauge",
         "description": "model training response time",
-        "default": 0
+        "default": 0,
+        "category": ["quality", "service"]
     }
 }
