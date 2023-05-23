@@ -1,10 +1,10 @@
 import numpy as np
-import tflite_runtime.interpreter as tflite
-
+#import tflite_runtime.interpreter as tflite
+import tensorflow.lite as tflite
 class ML_Loader(object):
-    def __init__(self, model_info):
+    def __init__(self, model_info,base_dir):
         # Init loader by loading model into the object
-        self.interpreter = tflite.Interpreter(model_info["path"])
+        self.interpreter = tflite.Interpreter(base_dir+"/"+model_info["path"])
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
