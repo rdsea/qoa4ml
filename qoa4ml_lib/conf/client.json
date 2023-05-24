@@ -1,4 +1,6 @@
 { 
     "client_id": "aaltosea1",
-    "component_id": "data_processing"
+    "instance_name": "data_handling01",
+    "stage_id": "Gateway",
+    "method": "REST"
 }

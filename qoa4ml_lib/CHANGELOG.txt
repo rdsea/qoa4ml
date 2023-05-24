@@ -24,3 +24,7 @@ Add metric and modify format of system/process reports
 0.0.64 (15/03/2022)
 ---------------------
 Add metric and modify format of system/process reports
+
+0.0.72 (22/05/2023)
+---------------------
+Refactor source code

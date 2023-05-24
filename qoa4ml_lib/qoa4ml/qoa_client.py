@@ -10,6 +10,7 @@ import time, uuid
 from datetime import datetime
 import os
 from .utils import get_proc_cpu, get_proc_mem
+from .reports import QoA_Report
 
 class Qoa_Client(object):
     # Init QoA Client
@@ -35,21 +36,19 @@ class Qoa_Client(object):
             }
         }
         '''
+        self.qoa_report = QoA_Report()
         self.start_time = time.time()
         self.config = client_conf
         self.metrics = {}
-        self.ex_metrics = {}
         self.connector = {}
-        self.ex_report = {}
         self.timer_flag = False
         self.timer_start = 0
-        self.report_list = []
-        self.cur_instance_id = None
-        self.cur_method = None
-        self.cur_stage_id = None
-        self.qoa_uuid = str(uuid.uuid4())
-        self.cur_report = None
-        self.data_quality = []
+        self.method = client_conf["method"]
+        self.stage_id = client_conf["stage_id"]
+        self.instance_id  = os.environ.get('INSTANCE_ID')
+        if not self.instance_id:
+            print("INSTANCE_ID is not defined")
+            self.instance_id  = str(uuid.uuid4())
         self.proc_monitor_flag = False
         # Init all connectors in for loop 
         for key in connector_conf:
@@ -75,13 +74,13 @@ class Qoa_Client(object):
     def init_metric(self, name, configuration: dict):
         # init individual metrics
         if configuration["class"] == "Gauge":
-            return Gauge(name, configuration["description"], configuration["default"])
+            return Gauge(name, configuration["description"], configuration["default"],configuration["category"])
         elif configuration["class"] == "Counter":
-            return Counter(name, configuration["description"], configuration["default"])
+            return Counter(name, configuration["description"], configuration["default"],configuration["category"])
         elif configuration["class"] == "Summary":
-            return Summary(name, configuration["description"], configuration["default"])
+            return Summary(name, configuration["description"], configuration["default"],configuration["category"])
         elif configuration["class"] == "Histogram":
-            return Histogram(name, configuration["description"], configuration["default"])
+            return Histogram(name, configuration["description"], configuration["default"],configuration["category"])
 
     def get(self):
         # TO DO:
@@ -111,7 +110,7 @@ class Qoa_Client(object):
         except Exception as e:
             print("[Error]: {}".format(e))
 
-    def set(self, key, value):
+    def set_config(self, key, value):
         # TO DO:
         try:
             self.config[key] = value
@@ -119,142 +118,75 @@ class Qoa_Client(object):
             print("{} not found - {}".format(key,e))
     
 
-    def generate_report(self, metric:list=None):
+    def set_metric(self, metric_name, value, quality=True, service_quality=False, data_quality=False, cl="Gauge", des="", def_val=-1):
+        if metric_name not in self.metrics:
+            metric_config = {}
+            metric_config["class"] = cl
+            metric_config["default"]= def_val
+            metric_config["description"]= des
+            metric_config["category"]= []
+            if quality == True:
+                metric_config["category"].append("quality")
+                if service_quality == True:
+                    metric_config["category"].append("service")
+                elif data_quality == True:
+                    metric_config["category"].append("data")
+            self.add_metric({metric_name:metric_config})
+        self.metrics[metric_name].set(value)
+        metric = {}
+        metric[self.stage_id] = {}
+        metric[self.stage_id][metric_name] = {}
+        metric[self.stage_id][metric_name][self.instance_id] = value
+        self.qoa_report.observe_metric(metric=metric,quality=quality,service_quality=service_quality,data_quality=data_quality,infer_quality=False)
+
+    def inference_report(self, inference):
         report = {}
-        report["metric"] = {}
-        if metric == None:
-            metric = list(self.metrics.keys())
-        for key in metric:
-            report["metric"][key] = self.metrics[key].get_val()
-        return report
-    
-    def get_reports(self, report):
-        self.report_list.append(report)
-
-    def init_report(self, instance_id, method, stage_id):
-        self.cur_instance_id = instance_id
-        self.cur_method = method
-        self.cur_stage_id = stage_id
-        self.cur_report = {}
-        self.cur_report[self.qoa_uuid] = {}
-        self.cur_report[self.qoa_uuid]["instance_id"] = instance_id
-        self.cur_report[self.qoa_uuid]["method"] = method
-        self.cur_report["data_quality"] = {}
-        self.cur_report["data_quality"][stage_id] = {}
-        self.cur_report["performance"] = {}
-        self.cur_report["performance"][stage_id] = {}
-        self.cur_report["performance"][stage_id]["response_time"] = {}
-        self.ex_report = {"prediction":{},"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{stage_id:{"response_time": {}}}}
-
-
-    def build_report(self, response_time):
-        for metric in self.data_quality:
-            self.cur_report["data_quality"][self.cur_stage_id][metric["name"]] = {self.qoa_uuid:{"value": metric["value"]}}
-        self.cur_report["performance"][self.cur_stage_id]["response_time"][self.qoa_uuid] = {"start_time":response_time[0], "execution_time":response_time[1]}
-
-
-    def process_ex_report(self, response_time):
-        self.build_report(response_time)
-        f_report = self.ex_report
-        f_prediction = f_report["prediction"]
-        f_graph = f_report["execution_graph"]
-        f_data_quality = f_report["data_quality"]
-        f_performance = f_report["performance"]
-        previous_instance = f_graph["last_instance"]
-        for report in self.report_list:
-            i_graph = report["execution_graph"]
-            previous_instance.append(i_graph["last_instance"])
-            f_graph["instances"].update(i_graph["instances"])
-
-            i_data_quality = report["data_quality"]
-            for stage in i_data_quality:
-                if stage in f_data_quality:
-                    for metric in i_data_quality[stage]:
-                        if metric in f_data_quality[stage]:
-                            f_data_quality[stage][metric].update(i_data_quality[stage][metric])
-                        else:
-                            f_data_quality[stage][metric] = i_data_quality[stage][metric]
-                else:
-                    f_data_quality[stage] = i_data_quality[stage]
-            
-            i_performance = report["performance"]
-            for stage in i_performance:
-                if stage in f_performance:
-                    for metric in i_performance[stage]:
-                        if metric in f_performance[stage]:
-                            f_performance[stage][metric].update(i_performance[stage][metric])
-                        else:
-                            f_performance[stage][metric] = i_performance[stage][metric]
-                else:
-                    f_performance[stage] = i_performance[stage]
-            f_prediction.update(report["prediction"])
-
-
-        f_graph["last_instance"] = self.qoa_uuid
-        self.cur_report[self.qoa_uuid]["previous_instance"] = previous_instance
-        f_graph["instances"].update({self.qoa_uuid:self.cur_report[self.qoa_uuid]})
-        f_data_quality.update(self.cur_report["data_quality"])
-        f_performance[self.cur_stage_id].update(self.cur_report["performance"][self.cur_stage_id])
-        self.report_list = []
-
-    def ex_observe_confidence(self, value, confidence, dependency=[]):
-        pre_uuid = str(uuid.uuid4())
-        predictions = {}
-        if dependency:
-            for prediction in dependency:
-                predictions.update(prediction)
-            source = list(predictions.keys())
-        else:
-            source = []
-        curr_prediction = {pre_uuid:{"value": value, "confidence": confidence, "source":source, "qoa_id": self.qoa_uuid}}
-        self.ex_report["prediction"].update(curr_prediction)
-        return curr_prediction
-    
-    def ex_observe_accuracy(self, prediction, accuracy):
-        keys = list(prediction.keys())
-        prediction[keys[0]]["accuracy"] = accuracy
-        self.ex_report["prediction"].update(prediction)
-    
-    def ex_observe_data_quality(self, name, value):
-        self.data_quality.append({"name":name, "value":value})
+        inference_id = str(uuid.uuid4())
+        report[inference_id] = {}
+        report[inference_id]["value"] = inference["value"]
+        if "confidence" in inference:
+            report[inference_id]["confidence"] = inference["confidence"]
+        if "accuracy" in inference:
+            report[inference_id]["accuracy"] = inference["accuracy"]
+        report[inference_id]["instance_id"] = self.instance_id
+        self.qoa_report.observe_metric(report,quality=True,infer_quality=True)
 
     def timer(self):
         if self.timer_flag == False:
             self.timer_flag = True
             self.timer_start = time.time()
-            return []
+            return {}
         else:
             self.timer_flag = False
-            return [self.timer_start,time.time()-self.timer_start]
+            response_time = {"start_time":self.start_time, "response_time":time.time()-self.timer_start}
+            self.set_metric("Response Time", response_time, quality=True,service_quality=True)
+            return response_time
 
-    
-    def ex_set_metric(self, metric, value):
-        if "performance" not in self.ex_report:
-            self.ex_report["performance"] = {}
-        self.ex_report["performance"][self.cur_stage_id].update({metric:{self.qoa_uuid:{"value":value}}})
+    def generate_report(self, metric:list=None,reset=True):
+        # TO DO: Generate report for list of metric
+        #  Inprogress
+        meta_data = {}
+        meta_data["instance_name"] = self.config["instance_name"]
+        meta_data["instances_id"] = self.instance_id
+        meta_data["method"] = self.config["method"]
+        return self.qoa_report.generate_report(meta_data, reset=reset)
 
-    def ex_reset(self):
-        self.ex_report = {"prediction":{},"execution_graph":{"instances":{},"last_instance":[]},"data_quality":{}, "performance":{self.cur_stage_id:{"response_time": {}}}}
-        self.report_list = []
+    def import_pReport(self, reports):
+        self.qoa_report.import_pReport(reports)
 
-    def ex_remove(self, metric):
-        self.ex_report["Metrics"].pop(metric)
 
-    def report_external(self, response_time, submit=False):
-        self.process_ex_report(response_time)
+    def get_report(self, submit=False,reset=True):
+        report = self.generate_report(reset=reset)
         if submit:
-            self.report(report=self.ex_report)
-        report = self.ex_report.copy()
-        self.ex_reset()
+            self.report(report=report)
         return report
-
-    
 
 
     def asyn_report(self, metrics:list=None, report:dict = None, connectors:list=None):
-        client_inf = self.config.copy()
-        client_inf['timestamp'] = time.time()
-        client_inf['runtime'] = time.time() - self.start_time
+        client_inf = {}
+        client_inf["metadata"] = self.config.copy()
+        client_inf["metadata"]['timestamp'] = time.time()
+        client_inf["metadata"]['runtime'] = time.time() - self.start_time
 
         if (report == None):
             report = self.generate_report(metrics)

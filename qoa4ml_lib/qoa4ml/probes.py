@@ -1,4 +1,4 @@
-# Super classes is built based on Prometheus prototype
+# Metrics are implemented based on these classes to be compatible with Prometheus
 
 
 class Metric(object):
@@ -55,8 +55,8 @@ class Counter(Metric):
         - reset: set the value back to zero
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=0):
-        super().__init__(metric_name, description, default_value)
+    def __init__(self, metric_name, description, default_value=0, category=None):
+        super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num=1):
         self.value += num
@@ -70,8 +70,8 @@ class Gauge(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1):
-        super().__init__(metric_name, description, default_value)
+    def __init__(self, metric_name, description, default_value=-1, category=None):
+        super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num=1):
         self.value += num
@@ -91,8 +91,8 @@ class Summary(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1):
-        super().__init__(metric_name, description, default_value)
+    def __init__(self, metric_name, description, default_value=-1, category=None):
+        super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num):
         self.value += num
@@ -112,8 +112,8 @@ class Histogram(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1):
-        super().__init__(metric_name, description, default_value)
+    def __init__(self, metric_name, description, default_value=-1, category=None):
+        super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num):
         self.value += num
