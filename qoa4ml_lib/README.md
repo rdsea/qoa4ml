@@ -56,23 +56,67 @@ Provide some metric classes for collecting different types of metric: Counter, G
 
 ## [QoA4ML Reports](https://github.com/rdsea/QoA4ML/blob/main/qoa4ml_lib/qoa4ml/reports.py)
 
-This module defines ``QoA_Client``, an object tha, provide functions to get/set metric values, create report one by one or all in one, etc
+This module defines ``QoA_Report``, an object that provide functions to export monitored metric to the following schema:
+```json
+{
+    "execution_graph":{
+        "instances":{
+            "@instance_id":{
+                "instance_name": "@name_of_instance",
+                "method": "@method/task/function",
+                "previous_instance":["@list_of_previous_instance"]
+            },
+            ...
+        },
+        "last_instance": "@name_of_last_instance_in_the_graph"
+    },
+    "quality":{
+        "data":{
+            "@stage_id":{
+                "@metric_name":{
+                    "@instance_id": "@value"
+                }
+            }
+        },
+        "service":{
+            "@stage_id":{
+                "@metric_name":{
+                    "@instance_id": "@value"
+                }
+            }
+        },
+        "inference":{
+            "@inference_id":{
+                "value": "@value",
+                "confident": "@confidence",
+                "accuracy": "@accuracy",
+                "instance_id": "@instance_id",
+                "source": ["@list_of_inferences_to_infer_this_inference"]
+            }
+        }
+    }
+}
+```
+
+The example is shown in `example/reports/qoa_report/example.txt`
+
 - Attribute:
-    - `config`: store the client configuration as a dictionary
-    - `metrics`: a dictionary of all metrics that client monitoring
-    - `connector`: a dictionary of connectors to send out monitoring data
+    - `previous_report_instance` = list previous services
+    - `report_list`: list of reports from previous services
+    - `previous_inference`: list previous inferences
+    - `quality_report`: report all quality (data, service, inference qualtiy) of the service
+    - `execution_graph`: report the execution graph
+    - `report`: the final report to be sent
+
 - Function:
-    - `__init__`: init the client from user configuration.
-    - `init_connector`: init the connnectors before sending monitoring data.
-    - `init_metric`: create metric instances for the list of metrics it monitors.
-    - `add_metric`: add metric to the client
-    - `get`: get the client configuration
-    - `get_metric`: return all metrics as a dictionary
-    - `set`: set the configuration.
-    - `generate_report`: generate report for given one/list/all metrics.
-    - `asyn_report`: send out report in another thread
-    - `report`: start new thread to send `asyn_report`
-    - `__str__`: return the client configuration and connector as string.
+    - `__init__`: init as empty report.
+    - `import_report_from_file`: init QoA Report from `json` file.
+    - `import_pReport`: import reports from previous service to build the execution and inference graph
+    - `build_execution_graph`: build execution graph from list of previous reports
+    - `build_quality_report`: build the quality report from metrics collected in runtime
+    - `generate_report`: return the final report.
+    - `observe_metric`: observe metrics in runtime with 3 categories: service quality, data quality, inference qualtiy. This can be extended to observe resource metrics.
+
 
 ## [Examples](https://github.com/rdsea/QoA4ML/tree/main/example)
 https://github.com/rdsea/QoA4ML/tree/main/example
