@@ -1,0 +1,1 @@
+The BTS serving example is using trained models from [BTS Prediction Machine Learning Units](https://github.com/rdsea/IoTCloudSamples/tree/master/MLUnits/BTSPrediction)
