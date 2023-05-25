@@ -2,10 +2,10 @@
     "qoa_service": {
         "client_info": {
             "client_id": "aaltosea1",
-            "instance_name": "LSTM Client Raps 01",
-            "stage_id": "Client",
-            "method": "REST",
-            "roles": "client"
+            "instance_name": "LSTM Prediction Raps 01",
+            "stage_id": "Inference",
+            "method": "LSTM",
+            "roles": "server"
         },
         "connector": {
             "amqp_connector":{
@@ -14,14 +14,14 @@
                     "end_point": "195.148.22.62",
                     "exchange_name": "qoa_lstm",
                     "exchange_type": "topic",
-                    "out_routing_key": "qoa1.report.bts.lstm.client"
+                    "out_routing_key": "qoa1.report.bts.lstm.server"
                 }
             }
         }
     },
-    "ml_service":{
-        "file": "../data/1161114002_122_norm.csv",
-        "url": "http://127.0.0.1:5000"
+    "model": {
+        "name": "LSTM",
+        "path": "/exported_models/tflite_model/LSTM_single_series.tflite"
     },
     "data_normalize":{
         "max": 12.95969626,

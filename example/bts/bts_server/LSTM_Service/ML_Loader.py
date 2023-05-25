@@ -1,13 +1,23 @@
 import numpy as np
 #import tflite_runtime.interpreter as tflite
 import tensorflow.lite as tflite
+import os, pathlib
+
+def get_current_dir():
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    return str(current_dir)
+
+
 class ML_Loader(object):
-    def __init__(self, model_info,base_dir):
+    def __init__(self, model_info,base_dir=None):
+        if not base_dir:
+            base_dir = get_current_dir()
         # Init loader by loading model into the object
-        self.interpreter = tflite.Interpreter(base_dir+"/"+model_info["path"])
+        self.interpreter = tflite.Interpreter(base_dir+model_info["path"])
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
+        print("Load LSTM model success")
 
     
     def prediction(self,pas_series):

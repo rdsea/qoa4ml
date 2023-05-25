@@ -1,34 +1,39 @@
-import random
-import time
-import argparse
-
+import time, argparse, random, random, requests, json
 import pandas as pd
-import json
-
-import requests
+from qoa4ml.qoa_client import Qoa_Client
+from qoa4ml import utils as qoa_utils
 
 
 headers = {
     'Content-Type': 'application/json'
 }
 
-data_normalize={
-        "max": 12.95969626,
-        "mean": 12.04030374
-}
 def denormalize(value):
     return value*data_normalize["max"]+data_normalize["mean"]
     
 if __name__ == '__main__':
+    # Load configuration
     parser = argparse.ArgumentParser(description="simple bts rest client")
-    parser.add_argument('--file', default="../data/1161114002_122_norm.csv")
-    parser.add_argument('--url', default="http://127.0.0.1:5000")
+    parser.add_argument('--config', default="./client.json")
     args = parser.parse_args()
-    file =args.file
-    ml_serving_url=args.url+"/predict"
+    client_config = qoa_utils.load_config(args.config)
+    ml_config = client_config["ml_service"]
+    data_normalize = client_config["data_normalize"]
+
+    # Load ML service configuration
+    file =ml_config["file"]
+    ml_serving_url=ml_config["url"]+"/predict"
+
+    ############################################### INIT QOA CLIENT ##################################################################
+    qoa_config = client_config["qoa_service"]
+    qoa_client = Qoa_Client(qoa_config["client_info"],qoa_config["connector"])
+    ####################################################################################################################################
+    
+    # Read data 
     raw_dataset = pd.read_csv(file)
     raw_dataset = raw_dataset.astype({'norm_value':'float','norm_1':'float', 'norm_2':'float', 'norm_3':'float', 'norm_4':'float', 'norm_5':'float', 'norm_6':'float'})
     print("Sending request...")
+    error = 0
     for index, line in raw_dataset.iterrows():
         time.sleep(random.uniform(0.2, 1))
         # Parse data
@@ -45,29 +50,57 @@ if __name__ == '__main__':
         # Publish data to a specific topi
         start_time = time.time()
         json_mess = {
-            "norm_value": float(dict_mess["norm_value"]), 
-            "norm_1": float(dict_mess["norm_1"]), 
-            "norm_2": float(dict_mess["norm_2"]), 
-            "norm_3": float(dict_mess["norm_3"]), 
-            "norm_4": float(dict_mess["norm_4"]),
-            "norm_5": float(dict_mess["norm_5"]),
-            "norm_6": float(dict_mess["norm_6"]),
-            "start_time": start_time
+            "model": "LSTM",
+            "data":{
+                "norm_value": float(dict_mess["norm_value"]), 
+                "norm_1": float(dict_mess["norm_1"]), 
+                "norm_2": float(dict_mess["norm_2"]), 
+                "norm_3": float(dict_mess["norm_3"]), 
+                "norm_4": float(dict_mess["norm_4"]),
+                "norm_5": float(dict_mess["norm_5"]),
+                "norm_6": float(dict_mess["norm_6"]),
+                "start_time": start_time
+            }
         }
+        # Start qoa timer for calculating response time
+        qoa_client.timer()
+
         response = requests.request("POST", ml_serving_url, headers=headers, data=json.dumps(json_mess))
-        predict_value = response.json()
-        print(predict_value)
+        # Response_time is already report by calling timer 2nd time
+        response_time = qoa_client.timer()
+
+        dict_response = response.json()
+        if "result" in dict_response:
+            predict_value = dict_response["result"]
+            print(dict_response)
+            if  isinstance (predict_value, dict):
+                if "LSTM" in predict_value:
+                    pre_val = denormalize(predict_value["LSTM"])
+                    inference_id = predict_value["inference_id"]
+                    dict_predicted = {
+                        "LSTM": pre_val
+                    }
+                    # calculate accuracy
+                    accuracy =  (1 - abs((predict_value["LSTM"] - float(predict_value["norm_value"]))/float(predict_value["norm_value"])))*100
+                    if accuracy < 0:
+                        accuracy = 0
+                    # calculate response time
+                    response_time = time.time() - predict_value["start_time"]
+                    # return prediction analysis
+                    ml_response = {"Prediction": dict_predicted, "ResponseTime": response_time, "Accuracy": accuracy}
+                    print(ml_response)
+            print(predict_value)
+        else:
+            print(dict_response)
         
-        pre_val = denormalize(predict_value["LSTM"])
-        dict_predicted = {
-            "LSTM": pre_val
-        }
-        # calculate accuracy
-        accuracy =  (1 - abs((predict_value["LSTM"] - float(predict_value["norm_value"]))/float(predict_value["norm_value"])))*100
-        if accuracy < 0:
-            accuracy = 0
-        # calculate response time
-        response_time = time.time() - predict_value["start_time"]
-        # return prediction analysis
-        ml_response = {"Prediction": dict_predicted, "ResponseTime": response_time, "Accuracy": accuracy}
-        print(ml_response)
+        ####################### SEND THE QOA4ML REPORT #########################
+        if "accuracy" in locals():
+            print(accuracy)
+            qoa_client.inference_report(value=pre_val, accuracy=accuracy,inference_id=inference_id)
+        else:
+            print("Error: ", error)
+            error += 1
+            qoa_client.set_metric("service_errors", error, service_quality=True)
+        qoa_report = qoa_client.get_report(submit=True)
+        print("--------------\nQoA Report: \n",qoa_report,"\n--------------")
+        
