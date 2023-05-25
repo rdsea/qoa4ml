@@ -8,7 +8,7 @@ import threading
 from threading import Thread
 import time, uuid
 from datetime import datetime
-import os
+import os, sys, traceback
 from .utils import get_proc_cpu, get_proc_mem
 from .reports import QoA_Report
 
@@ -108,14 +108,16 @@ class Qoa_Client(object):
             else: 
                 return self.metrics[key].reset()
         except Exception as e:
-            print("[Error]: {}".format(e))
+            print("[ERROR] - Error {} in reset_metric: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
 
     def set_config(self, key, value):
         # TO DO:
         try:
             self.config[key] = value
         except Exception as e:
-            print("{} not found - {}".format(key,e))
+            print("[ERROR] - Error {} in set_config: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
     
 
     def set_metric(self, metric_name, value, quality=True, service_quality=False, data_quality=False, cl="Gauge", des="", def_val=-1):
@@ -139,17 +141,19 @@ class Qoa_Client(object):
         metric[self.stage_id][metric_name][self.instance_id] = value
         self.qoa_report.observe_metric(metric=metric,quality=quality,service_quality=service_quality,data_quality=data_quality,infer_quality=False)
 
-    def inference_report(self, inference):
+    def inference_report(self, value, confidence=None, accuracy=None,inference_id=None):
         report = {}
-        inference_id = str(uuid.uuid4())
+        if not inference_id:
+            inference_id = str(uuid.uuid4())
         report[inference_id] = {}
-        report[inference_id]["value"] = inference["value"]
-        if "confidence" in inference:
-            report[inference_id]["confidence"] = inference["confidence"]
-        if "accuracy" in inference:
-            report[inference_id]["accuracy"] = inference["accuracy"]
+        report[inference_id]["value"] = value
+        if confidence:
+            report[inference_id]["confidence"] = confidence
+        if accuracy:
+            report[inference_id]["accuracy"] = accuracy
         report[inference_id]["instance_id"] = self.instance_id
         self.qoa_report.observe_metric(report,quality=True,infer_quality=True)
+        return inference_id
 
     def timer(self):
         if self.timer_flag == False:
@@ -214,15 +218,18 @@ class Qoa_Client(object):
             try:
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
-                print("Unable to report process CPU stat: ", e)
+                print("[ERROR] - Error {} in process cpu stat: {}".format(type(e),e.__traceback__))
+                traceback.print_exception(*sys.exc_info())
             try:
                 report["proc_mem_stats"] = get_proc_mem()
             except Exception as e:
-                print("Unable to report process memory stat: ", e)
+                print("[ERROR] - Error {} in process memory stat: {}".format(type(e),e.__traceback__))
+                traceback.print_exception(*sys.exc_info())
             try:
                 self.report(report=report)
             except Exception as e:
-                print("Unable to send process report: ", e)
+                print("[ERROR] - Error {} in send process report: {}".format(type(e),e.__traceback__))
+                traceback.print_exception(*sys.exc_info())
             time.sleep(interval)
 
 

@@ -1,5 +1,5 @@
 # Metrics are implemented based on these classes to be compatible with Prometheus
-
+import numpy as np
 
 class Metric(object):
     """
@@ -124,3 +124,20 @@ class Histogram(Metric):
     def set(self,val):
         self.value = val
 
+
+
+def data_validate_max(data, normalize):
+    """Return percentage data lower than threshold before normalization (%)
+    data is a numpy array
+    normalize example:
+    {
+        "max": <@value>,
+        "mean": <@value>,
+        "threshold": <@value>
+    }
+    """
+    mean_val = normalize["mean"]
+    max_val = normalize["max"]
+    threshold = normalize["threshold"]
+    data_accuracy = 100*np.sum(data<((threshold-mean_val)/max_val))/data.size
+    return data_accuracy

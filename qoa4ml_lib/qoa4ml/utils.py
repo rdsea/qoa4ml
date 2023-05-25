@@ -2,7 +2,8 @@ from concurrent.futures import thread
 from email.policy import default
 import json, psutil, time, os, docker
 from threading import Thread
-import traceback,sys
+import traceback,sys, pathlib
+import numpy as np
 
 ###################### DEFAULT METRIC ######################
 default_docker_metric = {
@@ -115,19 +116,23 @@ def system_report(client, interval:int):
         try:
             report["sys_cpu_stats"] = get_sys_mem()
         except Exception as e:
-            print("Unable to report CPU stat: ", e)
+            print("[ERROR] - Error {} in report CPU stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         try:
             report["sys_mem_stats"] = get_sys_mem()
         except Exception as e:
-            print("Unable to report memory stat: ", e)
+            print("[ERROR] - Error {} in report memory stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         try:
             report["sys_net_stats"] = get_sys_net()
         except Exception as e:
-            print("Unable to report network stat: ", e)
+            print("[ERROR] - Error {} in report network stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         try:
             client.report(report=report)
         except Exception as e:
-            print("Unable to send system report: ", e)
+            print("[ERROR] - Error {} in sent system report: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         time.sleep(interval)
 
 
@@ -144,15 +149,18 @@ def process_report(client, interval:int, pid:int = None):
         try:
             report["proc_cpu_stats"] = get_proc_cpu()
         except Exception as e:
-            print("Unable to report process CPU stat: ", e)
+            print("[ERROR] - Error {} in report process cpu stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         try:
             report["proc_mem_stats"] = get_proc_mem()
         except Exception as e:
-            print("Unable to report process memory stat: ", e)
+            print("[ERROR] - Error {} in report process memory stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         try:
             client.report(report=report)
         except Exception as e:
-            print("Unable to send process report: ", e)
+            print("[ERROR] - Error {} in sent process report: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         time.sleep(interval)
 
 
@@ -196,14 +204,16 @@ def get_docker_stats(client):
             stats[container.name]["cpu"]["percentage"] = get_cpu_stat(stat,"percentage")
             stats[container.name]["mem"]["used"] = get_mem_stat(stat,"used")
     except Exception as e:
-        print("Unable to query docker stat: ", e)
+        print("[ERROR] - Error {} in query docker stat: {}".format(type(e),e.__traceback__))
+        traceback.print_exception(*sys.exc_info())
     return stats
 
 def docker_report(client, interval:int, metrics:dict = None, detail = False):
     try:
         client.add_metric(metrics)
     except Exception as e:
-        print("Unable to add docker metric: ", e)
+        print("[ERROR] - Error {} in add docker metric: {}".format(type(e),e.__traceback__))
+        traceback.print_exception(*sys.exc_info())
     metric_list = list(metrics.keys())
     doc_client = docker.from_env()
     
@@ -221,7 +231,8 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
             mem_metric = client.get_metric('docker_memory_used')
             mem_metric.set(sum_memory)
         except Exception as e:
-            print("Unable to report docker stat: ", e)
+            print("[ERROR] - Error {} in report docker stat: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
 
         try:
             if detail:
@@ -229,7 +240,8 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
             else:
                 client.report(metrics=metric_list)
         except Exception as e:
-            print("Unable to send system report: ", e)
+            print("[ERROR] - Error {} in send docker report: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         time.sleep(interval)
 
 def docker_monitor(client, interval:int, metrics: dict = None, detail=False):
@@ -265,3 +277,7 @@ def get_dict_at(dict, i=0):
     except Exception as e:
         print("[ERROR] - Error {} in get_dict_at: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
+
+def get_file_dir(file):
+    current_dir = pathlib.Path(file).parent.resolve()
+    return str(current_dir)
