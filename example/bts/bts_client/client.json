@@ -1,23 +1,14 @@
 {
     "qoa_service": {
         "client_info": {
+            "application": "bts",
             "client_id": "aaltosea1",
             "instance_name": "LSTM Client Raps 01",
             "stage_id": "Client",
             "method": "REST",
             "roles": "client"
         },
-        "connector": {
-            "amqp_connector":{
-                "class": "amqp",
-                "conf":{
-                    "end_point": "195.148.22.62",
-                    "exchange_name": "qoa_lstm",
-                    "exchange_type": "topic",
-                    "out_routing_key": "qoa1.report.bts.lstm.client"
-                }
-            }
-        }
+        "registration":"http://127.0.0.1:5001/registration"
     },
     "ml_service":{
         "file": "../data/1161114002_122_norm.csv",

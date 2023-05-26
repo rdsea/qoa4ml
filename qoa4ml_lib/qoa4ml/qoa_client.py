@@ -6,15 +6,19 @@ from .probes import Gauge, Counter, Summary, Histogram
 import json, uuid
 import threading
 from threading import Thread
-import time, uuid
+import time, uuid, requests
 from datetime import datetime
 import os, sys, traceback
 from .utils import get_proc_cpu, get_proc_mem
 from .reports import QoA_Report
 
+headers = {
+    'Content-Type': 'application/json'
+}
+
 class Qoa_Client(object):
     # Init QoA Client
-    def __init__(self, client_conf: dict, connector_conf: dict):
+    def __init__(self, client_conf: dict, registration_url: str):
         '''
         Client configuration contains the information about the client and its configuration in form of dictionary
         Example: 
@@ -51,13 +55,32 @@ class Qoa_Client(object):
             self.instance_id  = str(uuid.uuid4())
         self.proc_monitor_flag = False
         # Init all connectors in for loop 
-        for key in connector_conf:
-            self.connector[key] = self.init_connector(connector_conf[key])
+        self.registration_flag = False
+        try:
+            registration_data = self.registration(registration_url)
+            json_data = registration_data.json()
+            response = json_data["response"]
+            
+            if isinstance (response,dict):
+                self.registration_flag = True
+                connector_conf = response["connector"]
+
+                for key in connector_conf:
+                    self.connector[key] = self.init_connector(connector_conf[key])
+            else: 
+                print("Unable to register Qoa Client")
+        except Exception as e:
+            print("[ERROR] - Error {} when register QoA client: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
         
+
         # Set default connector for sending monitoring data if not specify
         self.default_connector = list(self.connector.keys())[0]
         # self.add_metric(metric_conf)
         self.lock = threading.Lock()
+
+    def registration(self, url):
+        return requests.request("POST", url, headers=headers, data=json.dumps(self.config))
         
 
     def init_connector(self, configuration: dict):
@@ -205,8 +228,11 @@ class Qoa_Client(object):
         self.lock.release()
 
     def report(self, metrics:list=None, report: dict = None, connectors:list=None):
-        sub_thread = Thread(target=self.asyn_report, args=(metrics, report, connectors))
-        sub_thread.start()
+        if self.registration_flag:
+            sub_thread = Thread(target=self.asyn_report, args=(metrics, report, connectors))
+            sub_thread.start()
+        else:
+            print("This QoA client has not been registered")
 
 
     def __str__(self):

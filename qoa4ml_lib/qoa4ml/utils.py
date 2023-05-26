@@ -278,6 +278,18 @@ def get_dict_at(dict, i=0):
         print("[ERROR] - Error {} in get_dict_at: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
 
-def get_file_dir(file):
-    current_dir = pathlib.Path(file).parent.resolve()
-    return str(current_dir)
+def get_file_dir(file, to_string=True):
+    current_dir = pathlib.Path(file).parent.absolute()
+    if to_string:
+        return str(current_dir)
+    else:
+        return current_dir
+
+def get_parent_dir(file, parent_level=1, to_string=True):
+    current_dir = get_file_dir(file=file, to_string=False)
+    for i in range(parent_level):
+        current_dir = current_dir.parent.absolute()
+    if to_string:
+        return str(current_dir)
+    else:
+        return current_dir

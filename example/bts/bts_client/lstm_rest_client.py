@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     ############################################### INIT QOA CLIENT ##################################################################
     qoa_config = client_config["qoa_service"]
-    qoa_client = Qoa_Client(qoa_config["client_info"],qoa_config["connector"])
+    qoa_client = Qoa_Client(qoa_config["client_info"],qoa_config["registration"])
     ####################################################################################################################################
     
     # Read data 
