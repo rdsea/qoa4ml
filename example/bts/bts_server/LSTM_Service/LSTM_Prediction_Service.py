@@ -29,7 +29,7 @@ class LSTM_Prediction_Service(object):
         
         ############################################### INIT QOA CLIENT ##################################################################
         self.qoa_config = self.config["qoa_service"]
-        self.qoa_client = Qoa_Client(self.qoa_config["client_info"], self.qoa_config["connector"])
+        self.qoa_client = Qoa_Client(self.qoa_config["client_info"], self.qoa_config["registration"])
         ####################################################################################################################################
 
 
