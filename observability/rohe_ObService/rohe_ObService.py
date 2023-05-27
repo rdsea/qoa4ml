@@ -1,11 +1,10 @@
-import pymongo
-from qoa4ml.collector.amqp_collector import Amqp_Collector
+from rohe_Agent import Rohe_Agent
 import qoa4ml.utils as utils
-from threading import Thread, Timer
-import time, json, os, uuid
+import uuid
 import pandas as pd
 import argparse, random
 import traceback,sys,pathlib
+
 
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
@@ -20,47 +19,6 @@ def get_dict_at(dict, i):
 
 application_list = {}
 agent_list = {}
-
-class Rohe_Agent(object):
-    def __init__(self, configuration):
-        self.conf = configuration
-        colletor_conf = self.conf["collector"]
-        self.collector = Amqp_Collector(colletor_conf['amqp_collector']['conf'], host_object=self)
-        db_conf = self.conf["database"]
-        self.mongo_client = pymongo.MongoClient(db_conf["url"])
-        self.db = self.mongo_client[db_conf["db_name"]]
-        self.metric_collection = self.db[db_conf["metric_collection"]]
-
-        self.insert_db = True
-    
-    def reset_db(self):
-        self.metric_collection.drop()
-
-    def start_consuming(self):
-        print("Start Consuming")
-        self.collector.start()
-
-    def start(self):
-        sub_thread = Thread(target=self.start_consuming)
-        sub_thread.start()
-        print("start consumming message")
-
-
-
-    def message_processing(self, ch, method, props, body):
-        mess = json.loads(str(body.decode("utf-8")))
-        print("Receive QoA Report: \n", mess)
-        if self.insert_db:
-            insert_id = self.metric_collection.insert_one(mess)
-            print("Insert to database", insert_id)
-
-    def stop(self):
-        # self.collector.stop()
-        self.insert_db = False
-    def restart(self):
-        # self.collector.stop()
-        self.insert_db = True
-    
 
 
 class Rohe_ObService(Resource):
@@ -127,6 +85,8 @@ class Rohe_ObService(Resource):
                         i_config = collector_i["conf"]
                         i_config["exchange_name"] = str(application_name)+"_exchange"
                         i_config["out_routing_key"] = str(application_name)+".#"
+
+                    # Agent configuration 
                     agent_config ={}
                     agent_config["database"] = agent_db_config
                     agent_config["collector"] = collector_config
@@ -137,8 +97,7 @@ class Rohe_ObService(Resource):
                     agent_list[application_id][agent_id]["agent"] = agent
                     agent_list[application_id][agent_id]["status"] = "stop"
                     agent_list[application_id][agent_id]["configuration"] = agent_config
-                    print(agent_list)
-                    agent_list[application_id][agent_id]["agent"].start()
+                    agent.start()
 
             else:
                 response["Error"] = "Application name not found"
