@@ -90,3 +90,72 @@ class QoA_Report(object):
                     self.quality_report["inference"] = {}
                 self.quality_report["inference"] = merge_report(self.quality_report["inference"],metric)
                 self.quality_report["inference"]["last_inference"] = key
+
+
+class Report(object):
+    def __init__(self, report:dict=None):
+        self.report = report
+        if report:
+            self.load_metadata()
+        self.t_report = self.report.copy()
+    
+    def set_report(self, report:dict):
+        self.report = report
+        self.t_report = self.report.copy()
+        self.load_metadata()
+
+    def load_metadata(self):
+        self.application = self.report["application"]
+        self.client_id = self.report["client_id"]
+        self.instance_name = self.report["instance_name"]
+        self.stage_id = self.report["stage_id"]
+        self.method = self.report["method"]
+        self.roles = self.report["roles"]
+        self.timestamp = self.report["timestamp"]
+        self.runtime = self.report["runtime"]
+    
+    def load_execution_graph(self):
+        self.execution_graph = self.report["execution_graph"]
+
+    def load_metric(self):
+        if self.t_report:
+            pass
+
+    def get_metric(self, metric_name, data_quality=False, service_quality=False, inference_quality=False):
+        if data_quality:
+            return self.get_data_quality(metric_name)
+        elif service_quality:
+            return self.get_service_quality(metric_name)
+        elif inference_quality:
+            return self.get_inference_quality(metric_name)
+        else:
+            return self.get_data_quality(metric_name)
+
+    def get_responsetime_list(self, sum=True):
+        if self.t_report:
+            data = self.t_report["quality"]["data"]
+            result = 0
+            responsetimes = []
+            for stage in data:
+                stage_i = data[stage]
+                if "Response Time" in stage_i:
+                    dict_res = stage_i.pop("Response Time")
+                    for instance in dict_res:
+                        res = dict_res[instance]
+                        res["instance_id"] = instance
+                        responsetimes.append(res)
+
+    def get_data_quality(self, metric_name):
+        if self.t_report:
+            data = self.t_report["quality"]["data"]
+        else:
+            return None
+
+    def get_service_quality(self, metric_name):
+        if self.t_report:
+            data = self.t_report["quality"]["service"]
+        else:
+            return None
+
+    def get_inference_quality(self, metric_name):
+        pass
