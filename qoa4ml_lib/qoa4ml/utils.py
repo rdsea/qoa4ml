@@ -104,14 +104,25 @@ def get_proc_mem(pid = None):
         info[child.pid + "c"] = report_proc_mem(child)
     return info
 
+def convert_to_gbyte(value):
+    return value/1024./1024./1024.
+
+def convert_to_mbyte(value):
+    return value/1024./1024.
+
+def convert_to_kbyte(value):
+    return value/1024.
+
 ###################### SYSTEM REPORT ######################
 
 sys_monitor_flag = False
 proc_monitor_flag = False
 doc_monitor_flag = False
 
-def system_report(client, interval:int):
+
+def system_report(client, interval:int, to_mb=True, to_gb=False, to_kb=False):
     report = {}
+    last_net_value = {"sent":0, "receive":0}  
     while sys_monitor_flag:
         try:
             report["sys_cpu_stats"] = get_sys_mem()
@@ -125,6 +136,23 @@ def system_report(client, interval:int):
             traceback.print_exception(*sys.exc_info())
         try:
             report["sys_net_stats"] = get_sys_net()
+            sent = 0
+            if to_mb:
+                sent = convert_to_mbyte(psutil.net_io_counters().bytes_sent)
+                receive = convert_to_mbyte(psutil.net_io_counters().bytes_recv)
+            elif to_gb:
+                sent = convert_to_gbyte(psutil.net_io_counters().bytes_sent)
+                receive = convert_to_gbyte(psutil.net_io_counters().bytes_recv)
+            elif to_kb:
+                sent = convert_to_kbyte(psutil.net_io_counters().bytes_sent)
+                receive = convert_to_kbyte(psutil.net_io_counters().bytes_recv)
+            else:
+                sent = psutil.net_io_counters().bytes_sent
+                receive = psutil.net_io_counters().bytes_recv
+            curr_net_value = {"sent": sent, "receive": receive}  
+            report["sys_net_send"]  = curr_net_value["sent"] - last_net_value["sent"]
+            report["sys_net_receive"]  = curr_net_value["receive"] - last_net_value["receive"]
+            last_net_value = curr_net_value.copy()
         except Exception as e:
             print("[ERROR] - Error {} in report network stat: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
