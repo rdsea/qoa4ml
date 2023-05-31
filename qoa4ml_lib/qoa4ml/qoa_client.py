@@ -2,7 +2,7 @@ from typing import List
 from .connector.amqp_connector import Amqp_Connector
 from .connector.mqtt_connector import Mqtt_Connector
 from .connector.prom_connector import Prom_Connector
-from .probes import Gauge, Counter, Summary, Histogram
+from .metric import Gauge, Counter, Summary, Histogram
 import json, uuid
 import threading
 from threading import Thread
