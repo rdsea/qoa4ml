@@ -146,5 +146,3 @@ def image_quality(image):
         quality["mode"] = image.mode
         quality["channel"] = len(image.getbands())
     return quality
-
-################################################ DATA QUALITY ########################################################
