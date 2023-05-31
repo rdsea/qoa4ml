@@ -6,8 +6,10 @@ from ydata_quality.erroneous_data import ErroneousDataIdentifier
 from ydata_quality.missings import MissingsProfiler
 from ydata_quality.labelling import LabelInspector
 from ydata_quality.duplicates import DuplicateChecker
+from PIL import Image
+import PIL, io
 
-
+################################################ DATA QUALITY ########################################################
 
 def is_numpyarray(obj):
     return type(obj) == np.ndarray
@@ -128,3 +130,21 @@ class Outlier_Detector(object):
             return {"Response":  "Success"}
         else:
             return {"Error":  "Unsupported data: {}".format(type(data))}
+
+
+def image_quality(image):
+    quality = {}
+    if isinstance(image,bytes):
+        image = Image.open(io.BytesIO(image))
+    if isinstance(image,np.ndarray):
+        image = Image.fromarray(image)
+    if isinstance(image,PIL.JpegImagePlugin.JpegImageFile) or isinstance(image,PIL.Image.Image):
+        # print(dir(image))
+        quality["width"] = image.width
+        quality["height"] = image.height
+        quality["size"] = image.size
+        quality["mode"] = image.mode
+        quality["channel"] = len(image.getbands())
+    return quality
+
+################################################ DATA QUALITY ########################################################
