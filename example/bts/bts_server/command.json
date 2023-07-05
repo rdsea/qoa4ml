@@ -3,6 +3,10 @@
         "id": "aaltosea1",
         "roles": "ml_provider"
     },
+    "service": {
+        "name": "PowerGrid Prediction",
+        "metric": "power_grid"
+    },
     "model": {
         "name": "LSTM"
     },

@@ -1,7 +1,6 @@
 from flask import Flask, request
-from LSTM_Service.LSTM_Prediction_Service import LSTM_Prediction_Service
-import time, traceback, sys
-import pathlib
+from predictionService.powerGrid.LSTM_Prediction import LSTM_Prediction_Service
+import traceback, sys, argparse
 
 app = Flask(__name__)
 #for storing service
@@ -123,4 +122,10 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--port', help='Port of the service')
+
+    args = parser.parse_args()
+    port =int(args.port)
+    app.run(debug=True, port=port)

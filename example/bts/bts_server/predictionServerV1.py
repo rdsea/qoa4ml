@@ -3,7 +3,7 @@ import os
 import sys
 
 from flask import Flask, request
-from LSTM_Service.ML_Loader import ML_Loader
+from predictionService.powerGrid.ML_Loader import ML_Loader
 import time
 import json
 import numpy as np
