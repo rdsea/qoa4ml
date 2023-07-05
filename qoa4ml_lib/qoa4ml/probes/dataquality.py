@@ -146,3 +146,17 @@ def image_quality(image):
         quality["mode"] = image.mode
         quality["channel"] = len(image.getbands())
     return quality
+
+def eva_none(data):
+    try:
+        if is_pddataframe(data):
+            data = data.to_numpy()
+        if is_numpyarray(data):
+            valid_count = np.count_nonzero(~np.isnan(data))
+            none_count = np.count_nonzero(np.isnan(data))
+            return valid_count/(valid_count+none_count)
+        else:
+            return {"Error":  "Unsupported data: {}".format(type(data))}
+    except Exception as e:
+        print("[ERROR] - Error {} in eva_none: {}".format(type(e),e.__traceback__))
+        traceback.print_exception(*sys.exc_info())
