@@ -280,12 +280,13 @@ def docker_monitor(client, interval:int, metrics: dict = None, detail=False):
     sub_thread.start()
 
 
-def merge_report(f_report, i_report, prio=True):
+def mergeReport(f_report, i_report, prio=True):
     try:
         if isinstance(f_report, dict) and isinstance(i_report, dict):
-            for key in f_report:
+            key_list = tuple(f_report.keys())
+            for key in key_list:
                 if key in i_report:
-                    f_report[key] = merge_report(f_report[key],i_report[key],prio)
+                    f_report[key] = mergeReport(f_report[key],i_report[key],prio)
                     i_report.pop(key)
             f_report.update(i_report)
         else:
@@ -295,7 +296,7 @@ def merge_report(f_report, i_report, prio=True):
                 else:
                     return i_report
     except Exception as e:
-        print("[ERROR] - Error {} in merge_report: {}".format(type(e),e.__traceback__))
+        print("[ERROR] - Error {} in mergeReport: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
     return f_report
 

@@ -3,14 +3,14 @@ from .connector.amqp_connector import Amqp_Connector
 from .connector.mqtt_connector import Mqtt_Connector
 from .connector.prom_connector import Prom_Connector
 from .metric import Gauge, Counter, Summary, Histogram
-import json, uuid, time, traceback,sys
-from .utils import merge_report, get_dict_at, load_config
+import json, uuid, time, traceback,sys, copy
+from .utils import mergeReport, get_dict_at, load_config
 
 
 class QoaReport(object):
     # Init QoA Client
     def __init__(self, clientConfig):
-        self.clientConfig = clientConfig.copy()
+        self.clientConfig = copy.deepcopy(clientConfig)
         self.reset()
         self.initTime = time.time()
 
@@ -27,7 +27,8 @@ class QoaReport(object):
         self.qualityReport = report["quality"]
         self.computationGraph = report["computationGraph"]
     
-    def processPReport(self, report):
+    def processPReport(self, pReport):
+        report = copy.deepcopy(pReport)
         self.reportList.append(report)
         self.previousReportInstance.append(report["computationGraph"]["last_instance"])
         if "inference" in report["quality"]:
@@ -54,49 +55,64 @@ class QoaReport(object):
             self.computationGraph["instances"][self.clientConfig["instances_id"]]["previous_instance"] = self.previousReportInstance
             for report in self.reportList:
                 i_graph = report["computationGraph"]
-                self.computationGraph = merge_report(self.computationGraph, i_graph)
+                self.computationGraph = mergeReport(self.computationGraph, i_graph)
             self.computationGraph["last_instance"] = self.clientConfig["instances_id"]
         except Exception as e:
             print("[ERROR] - Error {} in buildComputationGraph: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         return self.computationGraph
     
-    def build_qualityReport(self):
+    def buildQualityReport(self):
         for report in self.reportList:
             i_quality = report["quality"]
-            self.qualityReport = merge_report(self.qualityReport,i_quality)
+            self.qualityReport = mergeReport(self.qualityReport,i_quality)
         return self.qualityReport
 
     def generateReport(self, metric:list=None,reset=True):
         # Todo: only report on specific metrics
         self.report["computationGraph"] = self.buildComputationGraph()
-        self.report["quality"] = self.build_qualityReport()
-        self.report["metadata"] = self.clientConfig.copy()
+        self.report["quality"] = self.buildQualityReport()
+        self.report["metadata"] = copy.deepcopy(self.clientConfig)
         self.report["metadata"]["timestamp"] = time.time()
         self.report["metadata"]["runtime"] = self.report["metadata"]["timestamp"] - self.initTime
-        report = self.report.copy()
+        report = copy.deepcopy(self.report)
         if reset:
             self.reset()
         return report
     
-    def observeMetric(self, metric, quality=True, service_quality=False, data_quality=False, infer_quality=False):
-        if quality == True:
-            if service_quality == True:
-                if "service" not in self.qualityReport:
-                    self.qualityReport["service"] = {}
-                self.qualityReport["service"] = merge_report(self.qualityReport["service"],metric)
-            elif data_quality == True:
-                if "data" not in self.qualityReport:
-                    self.qualityReport["data"] = {}
-                self.qualityReport["data"] = merge_report(self.qualityReport["data"],metric)
-            elif infer_quality == True:
-                key,value = get_dict_at(metric)
-                metric[key]["source"] = self.previousInference
-                if "inference" not in self.qualityReport:
-                    self.qualityReport["inference"] = {}
-                self.qualityReport["inference"] = merge_report(self.qualityReport["inference"],metric)
-                self.qualityReport["inference"]["last_inference"] = key
+    def observeMetric(self, metric):
+        metricReport = {}
+        metricReport[self.clientConfig["stage_id"]] = {}
+        metricReport[self.clientConfig["stage_id"]][metric.name] = {}
+        metricReport[self.clientConfig["stage_id"]][metric.name][self.clientConfig["instances_id"]] = metric.value
 
+        if metric.category == 0:
+            if "performance" not in self.qualityReport:
+                self.qualityReport["performance"] = {}
+            self.qualityReport["performance"] = mergeReport(self.qualityReport["performance"],metricReport)
+        elif metric.category == 1:
+            if "data" not in self.qualityReport:
+                self.qualityReport["data"] = {}
+            self.qualityReport["data"] = mergeReport(self.qualityReport["data"],metricReport)
+        # elif metric.category == 2:
+        #     key,value = get_dict_at(metricReport)
+        #     metricReport[key]["source"] = self.previousInference
+        #     if "inference" not in self.qualityReport:
+        #         self.qualityReport["inference"] = {}
+        #     self.qualityReport["inference"] = mergeReport(self.qualityReport["inference"],metricReport)
+        #     self.qualityReport["inference"]["last_inference"] = key
+
+    def observeInferenceMetric(self, infReport, dependency=None):
+
+        key,value = get_dict_at(infReport)
+        if dependency != None:
+            infReport[key]["source"] = dependency
+        else:
+            infReport[key]["source"] = self.previousInference
+        if "inference" not in self.qualityReport:
+            self.qualityReport["inference"] = {}
+        self.qualityReport["inference"] = mergeReport(self.qualityReport["inference"],infReport)
+        self.qualityReport["inference"]["last_inference"] = key
 
 class Report(object):
     def __init__(self, report:dict=None):
