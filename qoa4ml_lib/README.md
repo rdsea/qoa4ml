@@ -59,7 +59,7 @@ Provide some metric classes for collecting different types of metric: Counter, G
 This module defines ``QoA_Report``, an object that provide functions to export monitored metric to the following schema:
 ```json
 {
-    "execution_graph":{
+    "computationGraph":{
         "instances":{
             "@instance_id":{
                 "instance_name": "@name_of_instance",
@@ -78,7 +78,7 @@ This module defines ``QoA_Report``, an object that provide functions to export m
                 }
             }
         },
-        "service":{
+        "performance":{
             "@stage_id":{
                 "@metric_name":{
                     "@instance_id": "@value"

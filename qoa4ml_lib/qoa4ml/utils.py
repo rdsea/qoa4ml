@@ -1,6 +1,6 @@
 from concurrent.futures import thread
 from email.policy import default
-import json, psutil, time, os, docker
+import json, psutil, time, os, docker, yaml, logging
 from threading import Thread
 import traceback,sys, pathlib
 import numpy as np
@@ -24,12 +24,26 @@ default_docker_metric = {
 
 
 ###################### COMMON USED FUNCTION ######################
-def load_config(file_path:str)->dict:
+def load_config(file_path:str, format=0)->dict:
     """
     file_path: file path to load config
+    format:
+        0 - json
+        1 - yaml
+        other - To Do
     """
-    with open(file_path, "r") as f:
-        return json.load(f)
+    try:
+        if format == 0:
+            with open(file_path, "r") as f:
+                return json.load(f)
+        elif format == 1:
+            with open('file_path', 'r') as f:
+                return yaml.safe_load(f)
+        else:
+            logging.warning("Unsupported format")
+            return None
+    except Exception as e:
+        logging.error("Unable to load configuration")
 
 def to_json(file_path:str, conf:dict):
     """
@@ -37,6 +51,13 @@ def to_json(file_path:str, conf:dict):
     """
     with open(file_path, "w") as f:
         json.dump(conf, f)
+
+def to_yaml(file_path:str, conf:dict):
+    """
+    file_path: file path to save config
+    """
+    with open(file_path, "w") as f:
+        yaml.dump(conf, f)
     
 def get_sys_cpu():
     stats = psutil.cpu_stats()

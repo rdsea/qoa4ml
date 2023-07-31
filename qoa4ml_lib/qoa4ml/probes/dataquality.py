@@ -1,7 +1,7 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
 import pandas as pd 
 import numpy as np
-import traceback, sys
+import traceback, sys, logging
 from ydata_quality.erroneous_data import ErroneousDataIdentifier
 from ydata_quality.missings import MissingsProfiler
 from ydata_quality.labelling import LabelInspector
@@ -17,13 +17,13 @@ import utils
 
 
 
-def eva_erronous(data, errors=None, ratio=False, sum=True):
+def eva_erronous(data, errors=None):
     """
     Return number/percentage of error data
     data: numpy array or pandas data frame
     errors: list of item considered as error
     ratio: return percentage if set to True
-    sum: sumarize the result if set to True, otherwise return errors following the categories in list of 'errors'
+    sum: sum the result if set to True, otherwise return errors following the categories in list of 'errors'
     """
     try:
         if utils.is_numpyarray(data):
@@ -34,20 +34,20 @@ def eva_erronous(data, errors=None, ratio=False, sum=True):
             else:
                 eva_err = ErroneousDataIdentifier(df=data) 
             error_df = eva_err.predefined_erroneous_data()
-            if ratio:
-                total_count = data.count().to_numpy().flatten().sum()
-                error_df.to_numpy().flatten().sum()
-                error_df = 100*error_df/total_count
-            if sum:
-                error_df = error_df.to_numpy().flatten().sum()
-            return error_df
+            
+            total_count = data.count().to_numpy().flatten().sum()
+            results = {}
+            results["Total Errors"] = error_df.to_numpy().flatten().sum()
+            results["Error Ratio"] = 100*error_df/total_count
+            return results
         else:
-            return {"Error": "Unsupported data: {}".format(type(data))}
+            logging.warning("Unsupported data: {}".format(type(data)))
+            return None
     except Exception as e:
         print("[ERROR] - Error {} in eva_erronous: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
 
-def eva_duplicate(data, ratio=False):
+def eva_duplicate(data):
     """
     Return data/percentage of duplicate
     data: numpy array or pandas data frame
@@ -58,12 +58,14 @@ def eva_duplicate(data, ratio=False):
             data = pd.DataFrame(data)
         if utils.is_pddataframe(data):
             dc = DuplicateChecker(df=data)
-            result = dc.exact_duplicates()
-            if ratio:
-                result = {"duplicate": 100*len(result.index)/len(data.index)}
-            return result
+            dcEva = dc.exact_duplicates()
+            results = {}
+            results["Duplicate Ratio"] = 100*len(dcEva.index)/len(data.index)
+            results["Total Duplicate"] = len(dcEva.index)
+            return results
         else:
-            return {"Error": "Unsupported data: {}".format(type(data))}
+            logging.warning("Unsupported data: {}".format(type(data)))
+            return None
     except Exception as e:
         print("[ERROR] - Error {} in eva_duplicate: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -76,14 +78,15 @@ def eva_missing(data, null_count=True, correlations=False, predict=False, random
             mp = MissingsProfiler(df=data, random_state=random_state)
             results ={}
             if null_count:
-                results["null_count"] = mp.null_count()
+                results["Null Count"] = mp.null_count()
             if correlations:
-                results["correlations"] = mp.missing_correlations()
+                results["Correlations"] = mp.missing_correlations()
             if predict:
-                results["missing_prediction"]= mp.predict_missings()
+                results["Missing Prediction"]= mp.predict_missings()
             return results
         else:
-            return {"Error":  "Unsupported data: {}".format(type(data))}
+            logging.warning("Unsupported data: {}".format(type(data)))
+            return None
     except Exception as e:
         print("[ERROR] - Error {} in eva_erronous: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -139,12 +142,11 @@ def image_quality(image):
         image = Image.fromarray(image)
     if isinstance(image,PIL.JpegImagePlugin.JpegImageFile) or isinstance(image,PIL.Image.Image):
         # print(dir(image))
-        quality["image_quality"] = {}
-        quality["image_quality"]["width"] = image.width
-        quality["image_quality"]["height"] = image.height
-        quality["image_quality"]["size"] = image.size
-        quality["image_quality"]["mode"] = image.mode
-        quality["image_quality"]["channel"] = len(image.getbands())
+        quality["Image Width"] = image.width
+        quality["Image Height"] = image.height
+        quality["Image Size"] = image.size
+        quality["Color Mode"] = image.mode
+        quality["Color Channel"] = len(image.getbands())
     return quality
 
 def eva_none(data):
@@ -154,9 +156,14 @@ def eva_none(data):
         if utils.is_numpyarray(data):
             valid_count = np.count_nonzero(~np.isnan(data))
             none_count = np.count_nonzero(np.isnan(data))
-            return valid_count/(valid_count+none_count)
+            results = {}
+            results["Total Valid"] = valid_count
+            results["Total None"] = none_count
+            results["None Ratio"] = valid_count/(valid_count+none_count)
+            return results
         else:
-            return {"Error":  "Unsupported data: {}".format(type(data))}
+            logging.warning("Unsupported data: {}".format(type(data)))
+            return None
     except Exception as e:
         print("[ERROR] - Error {} in eva_none: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
