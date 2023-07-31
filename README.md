@@ -6,6 +6,13 @@ QoA4ML consists of a set of utilities and specs for supporting quality of analyt
 
 The design of QoA4ML specification is in [language](language/)
 
+## Monitoring Client
+[QoA Client](qoa4ml_lib/qoa4ml/): an object that observes metrics, generates metric reports, and sends them to the Observation agent via a list of connectors (e.g., messaging connector: RabbitMQ).
+
+Via this client, developers can call different monitoring probes to measure desired metrics and categorize them into data quality, service performance or inference quality.
+
+To initiate a QoA Client, developers can specify a configuration file path or refer to a configuration as a dictionary, or give the registration service (URL) where the client can get its configuration.
+
 ## Probes
 
 * [QoA4ML Probes](qoa4ml_lib/qoa4ml/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
@@ -19,13 +26,11 @@ The design of QoA4ML specification is in [language](language/)
     - depending on probes implementation
   - Can be instrumented into source code or standlone
   
-## QoA4ML Handler
-
-The module will run on server-side that handles all comming metrices. Metrices may come from message brokers or Rest API (developing). After receiving data, the handler will generate report in the right form and submit them to Observability service. The response will be return to client with the same ID.
 
 ## QoA4ML Reports
 
-This module defines ``QoA_Client``, an object that will gather metrics from probes and client information, create simple reports and send it to handler
+This module defines [QoA Report](qoa4ml_lib/qoa4ml/), an object supports developers in reporting metrics, computation graphs, and inference graphs of ML services in a concrete format. 
+![Report schema](img/inf_report.png)
 
 ## Examples
 

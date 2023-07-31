@@ -26,6 +26,7 @@ class QoaReport(object):
         report = load_config(file_path)
         self.qualityReport = report["quality"]
         self.computationGraph = report["computationGraph"]
+        self.metadata = report["metadata"]
     
     def processPReport(self, pReport):
         report = copy.deepcopy(pReport)
@@ -114,70 +115,26 @@ class QoaReport(object):
         self.qualityReport["inference"] = mergeReport(self.qualityReport["inference"],infReport)
         self.qualityReport["inference"]["last_inference"] = key
 
-class Report(object):
-    def __init__(self, report:dict=None):
-        self.report = report
-        if report:
-            self.load_metadata()
-        self.t_report = self.report.copy()
-    
-    def set_report(self, report:dict):
-        self.report = report
-        self.t_report = self.report.copy()
-        self.load_metadata()
+    def sortComputationGraph(self):
+        instanceList = {}
+        source = [self.computationGraph["last_instance"]]
+        rank = 0
+        while len(source) != 0:
+            new_source = []
+            for ikey in source:
+                instanceList.update({ikey:rank})
+                new_source.extend(self.computationGraph["instances"][ikey]["previous_instance"])
+            source = new_source
+            rank += 1
+        return instanceList
 
-    def load_metadata(self):
-        self.application = self.report["application"]
-        self.client_id = self.report["client_id"]
-        self.instance_name = self.report["instance_name"]
-        self.stageID = self.report["stage_id"]
-        self.method = self.report["method"]
-        self.roles = self.report["roles"]
-        self.timestamp = self.report["timestamp"]
-        self.runtime = self.report["runtime"]
-    
-    def load_computationGraph(self):
-        self.computationGraph = self.report["computationGraph"]
 
-    def load_metric(self):
-        if self.t_report:
-            pass
 
-    def getMetric(self, metric_name, data_quality=False, service_quality=False, inference_quality=False):
-        if data_quality:
-            return self.get_data_quality(metric_name)
-        elif service_quality:
-            return self.get_service_quality(metric_name)
-        elif inference_quality:
-            return self.get_inference_quality(metric_name)
-        else:
-            return self.get_data_quality(metric_name)
 
-    def get_responsetime_list(self, sum=True):
-        if self.t_report:
-            data = self.t_report["quality"]["data"]
-            result = 0
-            responsetimes = []
-            for stage in data:
-                stage_i = data[stage]
-                if "Response Time" in stage_i:
-                    dict_res = stage_i.pop("Response Time")
-                    for instance in dict_res:
-                        res = dict_res[instance]
-                        res["instance_id"] = instance
-                        responsetimes.append(res)
-
-    def get_data_quality(self, metric_name):
-        if self.t_report:
-            data = self.t_report["quality"]["data"]
-        else:
-            return None
-
-    def get_service_quality(self, metric_name):
-        if self.t_report:
-            data = self.t_report["quality"]["service"]
-        else:
-            return None
-
-    def get_inference_quality(self, metric_name):
-        pass
+    def getMetric(self, metric_name):
+        metricReport = []
+        for stage in self.qualityReport:
+            if metric_name in self.qualityReport[stage]:
+                pass
+            # Todo 
+        

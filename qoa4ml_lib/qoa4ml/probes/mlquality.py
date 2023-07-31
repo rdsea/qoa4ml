@@ -22,10 +22,12 @@ def timeseries_metric(model):
 def ts_inference_metric(model,name):
     try:
         metrics = timeseries_metric(model)
+        results = {}
         if name in metrics:
-            return metrics[name]
+            results[name] = metrics[name]
         if "Error" in metrics:
-            return metrics
+            results["Error"] = metrics["Error"]
+        return results
     except Exception as e:
         print("[ERROR] - Error {} when querying timeseries {}: {}".format(type(e),name,e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -34,7 +36,7 @@ def ts_inference_metric(model,name):
 def ts_inference_MAE(model):
     try:
         metrics = ts_inference_metric(model, "mean_absolute_error")
-        return metrics
+        return {"MAE":metrics}
     except Exception as e:
         print("[ERROR] - Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -43,7 +45,7 @@ def ts_inference_MAE(model):
 def ts_inference_loss(model):
     try:
         metrics = ts_inference_metric(model, "loss")
-        return metrics
+        return {"Loss":metrics}
     except Exception as e:
         print("[ERROR] - Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -54,6 +56,8 @@ def training_metric(model):
     try:
         if isinstance(model, tf.keras.Sequential):
             return model.history.history
+        else:
+            return None
     except Exception as e:
         print("[ERROR] - Error {} when querying training metrics: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -62,7 +66,9 @@ def training_metric(model):
 def training_loss(model):
     try:
         if isinstance(model, tf.keras.Sequential):
-            return model.history.history["loss"]
+            return {"Training Loss":model.history.history["loss"]}
+        else:
+            return None
     except Exception as e:
         print("[ERROR] - Error {} when querying training loss: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -71,7 +77,9 @@ def training_loss(model):
 def training_val_accuracy(model):
     try:
         if isinstance(model, tf.keras.Sequential):
-            return model.history.history["val_accuracy"]
+            return {"Evaluate Accuracy":model.history.history["val_accuracy"]}
+        else:
+            return None
     except Exception as e:
         print("[ERROR] - Error {} when querying training validation accuracy: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -80,7 +88,9 @@ def training_val_accuracy(model):
 def training_accuracy(model):
     try:
         if isinstance(model, tf.keras.Sequential):
-            return model.history.history["accuracy"]
+            return {"Train Accuracy": model.history.history["accuracy"]}
+        else:
+            return None
     except Exception as e:
         print("[ERROR] - Error {} when querying training accuracy: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -89,7 +99,9 @@ def training_accuracy(model):
 def training_val_loss(model):
     try:
         if isinstance(model, tf.keras.Sequential):
-            return model.history.history["val_loss"]
+            return {"Evaluate Loss":model.history.history["val_loss"]}
+        else:
+            return None
     except Exception as e:
         print("[ERROR] - Error {} when querying training validation loss: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -98,11 +110,11 @@ def training_val_loss(model):
 def classification_confidence(data, score=True):
     try:
         if score:
-            return 100 * np.max(data)
+            return {"Confidence": 100 * np.max(data)}
         else:
             if is_numpyarray(data):
                 scores = tf.nn.softmax(data[0])
-                return 100 * np.max(scores)
+                return {"Confidence":100 * np.max(scores)}
             else:
                 return {"Error": "Unsupported data: {}".format(type(data))}
     except Exception as e:
