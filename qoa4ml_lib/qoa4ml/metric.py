@@ -17,8 +17,15 @@ class Metric(object):
         - get_name: return metric name
         - get_des: return metric description
         - other: (Developing)
+
+    - Category: metrics are categorized into following groups
+        0 - Quality: Performance (metrics for evaluating service performance e.g., response time, throughput)
+        1 - Quality: Data (metrics for evaluating data quality e.g., missing, duplicate, erroneous)
+        2 - Quality: Inference (metrics for evaluating quality of ML inference, measured from inferences e.g., accuracy, confidence)
+        3 - Resource: metrics for evaluating resource utilization e.g. CPU, Memory
+        Other: To do (extend more categories)
     """
-    def __init__(self, metric_name, description, default_value=-1, category=None):
+    def __init__(self, metric_name, description, default_value=-1, category=0):
         self.metric_name = metric_name
         self.description = description
         self.default_value = default_value
@@ -55,7 +62,7 @@ class Counter(Metric):
         - reset: set the value back to zero
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=0, category=None):
+    def __init__(self, metric_name, description, default_value=0, category=0):
         super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num=1):
@@ -70,7 +77,7 @@ class Gauge(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1, category=None):
+    def __init__(self, metric_name, description, default_value=-1, category=0):
         super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num=1):
@@ -91,7 +98,7 @@ class Summary(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1, category=None):
+    def __init__(self, metric_name, description, default_value=-1, category=0):
         super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num):
@@ -112,7 +119,7 @@ class Histogram(Metric):
         - inc: increase its value by num
         - others: (Developing)
     """
-    def __init__(self, metric_name, description, default_value=-1, category=None):
+    def __init__(self, metric_name, description, default_value=-1, category=0):
         super().__init__(metric_name, description, default_value, category)
 
     def inc(self,num):

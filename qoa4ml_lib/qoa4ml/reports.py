@@ -7,89 +7,95 @@ import json, uuid, time, traceback,sys
 from .utils import merge_report, get_dict_at, load_config
 
 
-class QoA_Report(object):
+class QoaReport(object):
     # Init QoA Client
-    def __init__(self):
+    def __init__(self, clientConfig):
+        self.clientConfig = clientConfig.copy()
         self.reset()
+        self.initTime = time.time()
 
     def reset(self):
-        self.report_list = []
-        self.previous_report_instance = []
-        self.previous_inference = []
-        self.quality_report = {}
-        self.execution_graph = {}
+        self.reportList = []
+        self.previousReportInstance = []
+        self.previousInference = []
+        self.qualityReport = {}
+        self.computationGraph = {}
         self.report = {}
 
     def import_report_from_file(self, file_path):
         report = load_config(file_path)
-        self.quality_report = report["quality"]
-        self.execution_graph = report["execution_graph"]
+        self.qualityReport = report["quality"]
+        self.computationGraph = report["computationGraph"]
+    
+    def processPReport(self, report):
+        self.reportList.append(report)
+        self.previousReportInstance.append(report["computationGraph"]["last_instance"])
+        if "inference" in report["quality"]:
+            self.previousInference.append(report["quality"]["inference"]["last_inference"])
 
-    def import_pReport(self, reports):
+    def importPReport(self, reports):
         try:
             if isinstance(reports, list):
                 for report in reports:
-                    self.report_list.append(report)
-                    self.previous_report_instance.append(report["execution_graph"]["last_instance"])
-                    if "inference" in report["quality"]:
-                        self.previous_inference.append(report["quality"]["inference"]["last_inference"])
+                    self.processPReport(report)
             else:
-                self.report_list.append(reports)
-                self.previous_report_instance.append(reports["execution_graph"]["last_instance"])
-                if "inference" in reports["quality"]:
-                        self.previous_inference.append(reports["quality"]["inference"]["last_inference"])
+                self.processPReport(reports)
         except Exception as e:
-            print("[ERROR] - Error {} in import_pReport: {}".format(type(e),e.__traceback__))
+            print("[ERROR] - Error {} in importPReport: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         
         
-    def build_execution_graph(self,metadata):
+    def buildComputationGraph(self):
         try:
-            self.execution_graph["instances"] = {}
-            self.execution_graph["instances"][metadata["instances_id"]] = {}
-            self.execution_graph["instances"][metadata["instances_id"]]["instance_name"] = metadata["instance_name"]
-            self.execution_graph["instances"][metadata["instances_id"]]["method"] = metadata["method"]
-            self.execution_graph["instances"][metadata["instances_id"]]["previous_instance"] = self.previous_report_instance
-            for report in self.report_list:
-                i_graph = report["execution_graph"]
-                self.execution_graph = merge_report(self.execution_graph, i_graph)
-            self.execution_graph["last_instance"] = metadata["instances_id"]
+            self.computationGraph["instances"] = {}
+            self.computationGraph["instances"][self.clientConfig["instances_id"]] = {}
+            self.computationGraph["instances"][self.clientConfig["instances_id"]]["instance_name"] = self.clientConfig["instance_name"]
+            self.computationGraph["instances"][self.clientConfig["instances_id"]]["method"] = self.clientConfig["method"]
+            self.computationGraph["instances"][self.clientConfig["instances_id"]]["previous_instance"] = self.previousReportInstance
+            for report in self.reportList:
+                i_graph = report["computationGraph"]
+                self.computationGraph = merge_report(self.computationGraph, i_graph)
+            self.computationGraph["last_instance"] = self.clientConfig["instances_id"]
         except Exception as e:
-            print("[ERROR] - Error {} in build_execution_graph: {}".format(type(e),e.__traceback__))
+            print("[ERROR] - Error {} in buildComputationGraph: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
-        return self.execution_graph
+        return self.computationGraph
     
-    def build_quality_report(self):
-        for report in self.report_list:
+    def build_qualityReport(self):
+        for report in self.reportList:
             i_quality = report["quality"]
-            self.quality_report = merge_report(self.quality_report,i_quality)
-        return self.quality_report
+            self.qualityReport = merge_report(self.qualityReport,i_quality)
+        return self.qualityReport
 
-    def generate_report(self, metadata, metric:list=None,reset=True):
-        self.report["execution_graph"] = self.build_execution_graph(metadata)
-        self.report["quality"] = self.build_quality_report()
+    def generateReport(self, metric:list=None,reset=True):
+        # Todo: only report on specific metrics
+        self.report["computationGraph"] = self.buildComputationGraph()
+        self.report["quality"] = self.build_qualityReport()
+        self.report["metadata"] = self.clientConfig.copy()
+        self.report["metadata"]["timestamp"] = time.time()
+        self.report["metadata"]["runtime"] = self.report["metadata"]["timestamp"] - self.initTime
         report = self.report.copy()
         if reset:
             self.reset()
         return report
     
-    def observe_metric(self, metric, quality=True, service_quality=False, data_quality=False, infer_quality=False):
+    def observeMetric(self, metric, quality=True, service_quality=False, data_quality=False, infer_quality=False):
         if quality == True:
             if service_quality == True:
-                if "service" not in self.quality_report:
-                    self.quality_report["service"] = {}
-                self.quality_report["service"] = merge_report(self.quality_report["service"],metric)
+                if "service" not in self.qualityReport:
+                    self.qualityReport["service"] = {}
+                self.qualityReport["service"] = merge_report(self.qualityReport["service"],metric)
             elif data_quality == True:
-                if "data" not in self.quality_report:
-                    self.quality_report["data"] = {}
-                self.quality_report["data"] = merge_report(self.quality_report["data"],metric)
+                if "data" not in self.qualityReport:
+                    self.qualityReport["data"] = {}
+                self.qualityReport["data"] = merge_report(self.qualityReport["data"],metric)
             elif infer_quality == True:
                 key,value = get_dict_at(metric)
-                metric[key]["source"] = self.previous_inference
-                if "inference" not in self.quality_report:
-                    self.quality_report["inference"] = {}
-                self.quality_report["inference"] = merge_report(self.quality_report["inference"],metric)
-                self.quality_report["inference"]["last_inference"] = key
+                metric[key]["source"] = self.previousInference
+                if "inference" not in self.qualityReport:
+                    self.qualityReport["inference"] = {}
+                self.qualityReport["inference"] = merge_report(self.qualityReport["inference"],metric)
+                self.qualityReport["inference"]["last_inference"] = key
 
 
 class Report(object):
@@ -108,20 +114,20 @@ class Report(object):
         self.application = self.report["application"]
         self.client_id = self.report["client_id"]
         self.instance_name = self.report["instance_name"]
-        self.stage_id = self.report["stage_id"]
+        self.stageID = self.report["stage_id"]
         self.method = self.report["method"]
         self.roles = self.report["roles"]
         self.timestamp = self.report["timestamp"]
         self.runtime = self.report["runtime"]
     
-    def load_execution_graph(self):
-        self.execution_graph = self.report["execution_graph"]
+    def load_computationGraph(self):
+        self.computationGraph = self.report["computationGraph"]
 
     def load_metric(self):
         if self.t_report:
             pass
 
-    def get_metric(self, metric_name, data_quality=False, service_quality=False, inference_quality=False):
+    def getMetric(self, metric_name, data_quality=False, service_quality=False, inference_quality=False):
         if data_quality:
             return self.get_data_quality(metric_name)
         elif service_quality:

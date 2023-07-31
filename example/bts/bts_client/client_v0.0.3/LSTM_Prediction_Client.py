@@ -28,7 +28,7 @@ class LSTM_Prediction_Client(object):
 
         #################### Declare the QoA Object ###############################
         self.qoa_client = Qoa_Client(self.qoa_info, self.broker_info)
-        self.metrices = self.qoa_client.get_metric()
+        self.metrices = self.qoa_client.getMetric()
         ###########################################################################
             
     # Check if the response is available

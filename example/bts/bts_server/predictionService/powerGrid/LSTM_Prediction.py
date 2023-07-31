@@ -76,7 +76,7 @@ class LSTM_Prediction_Service(object):
         # Estimate data accuracy using qoa4ml library
         data_accuracy = qoa_probes.eva_none(pas_series)
         # Add data accuracy to QoA report
-        self.qoa_client.set_metric("data_accuracy", data_accuracy, data_quality=True)
+        self.qoa_client.observeMetric("data_accuracy", data_accuracy, data_quality=True)
         # Report prediction
         inference_id = self.qoa_client.inference_report(value=response["LSTM"])
         # Get QoA report - submit=True to submit report to QoA Observability server

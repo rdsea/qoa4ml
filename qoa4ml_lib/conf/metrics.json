@@ -3,12 +3,12 @@
         "class": "Gauge",
         "description": "model training accuracy",
         "default": 0,
-        "category": ["quality", "inference"]
+        "category": 2
     },
     "ResponseTime":{
         "class": "Gauge",
         "description": "model training response time",
         "default": 0,
-        "category": ["quality", "service"]
+        "category": 0
     }
 }

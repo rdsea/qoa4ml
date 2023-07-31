@@ -100,7 +100,7 @@ if __name__ == '__main__':
         else:
             print("Error: ", error)
             error += 1
-            qoa_client.set_metric("service_errors", error, service_quality=True)
+            qoa_client.observeMetric("service_errors", error, service_quality=True)
         qoa_report = qoa_client.get_report(submit=True)
         print("--------------\nQoA Report: \n",qoa_report,"\n--------------")
         ########################################################################
