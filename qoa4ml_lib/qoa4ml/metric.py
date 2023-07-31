@@ -26,7 +26,7 @@ class Metric(object):
         Other: To do (extend more categories)
     """
     def __init__(self, metric_name, description, default_value=-1, category=0):
-        self.metric_name = metric_name
+        self.name = metric_name
         self.description = description
         self.default_value = default_value
         self.value = default_value
@@ -37,7 +37,7 @@ class Metric(object):
     def get_val(self):
         return self.value
     def get_name(self):
-        return self.metric_name
+        return self.name
     def get_des(self):
         return self.description
     def get_category(self):
@@ -46,10 +46,10 @@ class Metric(object):
     def reset(self):
         self.value = self.default_value
     def __str__(self) -> str:
-        return "metric_name: " + self.metric_name + ", " + "value: " + str(self.value)
+        return "metric_name: " + self.name + ", " + "value: " + str(self.value)
     def to_dict(self):
         mectric_dict = {}
-        mectric_dict[self.metric_name] = self.value
+        mectric_dict[self.name] = self.value
         return mectric_dict
 
 class Counter(Metric):
