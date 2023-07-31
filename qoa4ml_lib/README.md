@@ -111,11 +111,11 @@ The example is shown in `example/reports/qoa_report/example.txt`
 - Function:
     - `__init__`: init as empty report.
     - `import_report_from_file`: init QoA Report from `json` file.
-    - `import_pReport`: import reports from previous service to build the execution and inference graph
+    - `importPReport`: import reports from previous service to build the execution and inference graph
     - `build_execution_graph`: build execution graph from list of previous reports
     - `build_quality_report`: build the quality report from metrics collected in runtime
-    - `generate_report`: return the final report.
-    - `observe_metric`: observe metrics in runtime with 3 categories: service quality, data quality, inference qualtiy. This can be extended to observe resource metrics.
+    - `generateReport`: return the final report.
+    - `observeMetric`: observe metrics in runtime with 3 categories: service quality, data quality, inference qualtiy. This can be extended to observe resource metrics.
 
 
 ## [Examples](https://github.com/rdsea/QoA4ML/tree/main/example)

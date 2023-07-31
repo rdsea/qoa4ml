@@ -8,14 +8,13 @@ from ydata_quality.labelling import LabelInspector
 from ydata_quality.duplicates import DuplicateChecker
 from PIL import Image
 import PIL, io
+import utils
 
+# Define metric names, return formats: dictionary {metric name} {sub-element}
+# Return error/debugging
 ################################################ DATA QUALITY ########################################################
 
-def is_numpyarray(obj):
-    return type(obj) == np.ndarray
 
-def is_pddataframe(obj):
-    return type(obj) == pd.DataFrame
 
 
 def eva_erronous(data, errors=None, ratio=False, sum=True):
@@ -27,9 +26,9 @@ def eva_erronous(data, errors=None, ratio=False, sum=True):
     sum: sumarize the result if set to True, otherwise return errors following the categories in list of 'errors'
     """
     try:
-        if is_numpyarray(data):
+        if utils.is_numpyarray(data):
             data = pd.DataFrame(data)
-        if is_pddataframe(data):
+        if utils.is_pddataframe(data):
             if errors and isinstance(errors, list):
                 eva_err =  ErroneousDataIdentifier(df=data,ed_extensions=errors) 
             else:
@@ -55,13 +54,13 @@ def eva_duplicate(data, ratio=False):
     ratio: return percentage if set to True
     """
     try:
-        if is_numpyarray(data):
+        if utils.is_numpyarray(data):
             data = pd.DataFrame(data)
-        if is_pddataframe(data):
+        if utils.is_pddataframe(data):
             dc = DuplicateChecker(df=data)
             result = dc.exact_duplicates()
             if ratio:
-                result = 100*len(result.index)/len(data.index)
+                result = {"duplicate": 100*len(result.index)/len(data.index)}
             return result
         else:
             return {"Error": "Unsupported data: {}".format(type(data))}
@@ -71,9 +70,9 @@ def eva_duplicate(data, ratio=False):
 
 def eva_missing(data, null_count=True, correlations=False, predict=False, random_state=0):
     try:
-        if is_numpyarray(data):
+        if utils.is_numpyarray(data):
             data = pd.DataFrame(data)
-        if is_pddataframe(data):
+        if utils.is_pddataframe(data):
             mp = MissingsProfiler(df=data, random_state=random_state)
             results ={}
             if null_count:
@@ -95,9 +94,9 @@ class Outlier_Detector(object):
         self.update_data(data)
     
     def detect_outlier(self, n_data, labels=[], random_state=0, n=10, cluster=False):
-        if is_numpyarray(n_data):
+        if utils.is_numpyarray(n_data):
             n_data = pd.DataFrame(n_data)
-        if is_pddataframe(n_data):
+        if utils.is_pddataframe(n_data):
             if self.data is not None:
                 data = None
                 try:
@@ -123,9 +122,9 @@ class Outlier_Detector(object):
             return {"Error":  "Unsupported data: {}".format(type(data))}
     
     def update_data(self, data):
-        if is_numpyarray(data):
+        if utils.is_numpyarray(data):
             data = pd.DataFrame(data)
-        if is_pddataframe(data):
+        if utils.is_pddataframe(data):
             self.data = data
             return {"Response":  "Success"}
         else:
@@ -140,18 +139,19 @@ def image_quality(image):
         image = Image.fromarray(image)
     if isinstance(image,PIL.JpegImagePlugin.JpegImageFile) or isinstance(image,PIL.Image.Image):
         # print(dir(image))
-        quality["width"] = image.width
-        quality["height"] = image.height
-        quality["size"] = image.size
-        quality["mode"] = image.mode
-        quality["channel"] = len(image.getbands())
+        quality["image_quality"] = {}
+        quality["image_quality"]["width"] = image.width
+        quality["image_quality"]["height"] = image.height
+        quality["image_quality"]["size"] = image.size
+        quality["image_quality"]["mode"] = image.mode
+        quality["image_quality"]["channel"] = len(image.getbands())
     return quality
 
 def eva_none(data):
     try:
-        if is_pddataframe(data):
+        if utils.is_pddataframe(data):
             data = data.to_numpy()
-        if is_numpyarray(data):
+        if utils.is_numpyarray(data):
             valid_count = np.count_nonzero(~np.isnan(data))
             none_count = np.count_nonzero(np.isnan(data))
             return valid_count/(valid_count+none_count)

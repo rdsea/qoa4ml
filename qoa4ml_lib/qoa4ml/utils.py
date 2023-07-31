@@ -4,6 +4,7 @@ import json, psutil, time, os, docker
 from threading import Thread
 import traceback,sys, pathlib
 import numpy as np
+import pandas as pd
 
 ###################### DEFAULT METRIC ######################
 default_docker_metric = {
@@ -116,7 +117,7 @@ def convert_to_kbyte(value):
 ###################### SYSTEM REPORT ######################
 
 sys_monitor_flag = False
-proc_monitor_flag = False
+procMonitorFlag = False
 doc_monitor_flag = False
 
 
@@ -173,7 +174,7 @@ def sys_monitor(client, interval:int):
 
 def process_report(client, interval:int, pid:int = None):
     report = {}
-    while proc_monitor_flag:
+    while procMonitorFlag:
         try:
             report["proc_cpu_stats"] = get_proc_cpu()
         except Exception as e:
@@ -238,7 +239,7 @@ def get_docker_stats(client):
 
 def docker_report(client, interval:int, metrics:dict = None, detail = False):
     try:
-        client.add_metric(metrics)
+        client.addMetric(metrics)
     except Exception as e:
         print("[ERROR] - Error {} in add docker metric: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
@@ -254,9 +255,9 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
                 sum_cpu += stats[container_name]["cpu"][metrics['dock_cpu_percentage']['key']]
                 sum_memory += stats[container_name]["mem"][metrics['docker_memory_used']['key']]
                 
-            cpu_metric = client.get_metric('dock_cpu_percentage')
+            cpu_metric = client.getMetric('dock_cpu_percentage')
             cpu_metric.set(sum_cpu)
-            mem_metric = client.get_metric('docker_memory_used')
+            mem_metric = client.getMetric('docker_memory_used')
             mem_metric.set(sum_memory)
         except Exception as e:
             print("[ERROR] - Error {} in report docker stat: {}".format(type(e),e.__traceback__))
@@ -321,3 +322,11 @@ def get_parent_dir(file, parent_level=1, to_string=True):
         return str(current_dir)
     else:
         return current_dir
+
+
+
+def is_numpyarray(obj):
+    return type(obj) == np.ndarray
+
+def is_pddataframe(obj):
+    return type(obj) == pd.DataFrame
