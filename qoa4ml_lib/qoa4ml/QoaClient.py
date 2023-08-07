@@ -9,7 +9,7 @@ from threading import Thread
 import time, uuid, requests
 from datetime import datetime
 import logging
-import os, sys, traceback
+import os, sys, traceback, copy
 from .utils import get_proc_cpu, get_proc_mem, load_config
 from .reports import QoaReport
 from .probes.dataquality import eva_duplicate, eva_erronous, eva_missing, eva_none, image_quality
@@ -72,7 +72,7 @@ class QoaClient(object):
         self.timerFlag = False
         self.method = self.clientConf["method"]
         self.stageID = self.clientConf["stage_id"]
-        self.procMonitorFlag = False
+        self.procMonitorFlag = 0
         self.inferenceFlag = False
 
         self.instanceID  = os.environ.get('INSTANCE_ID')
@@ -220,7 +220,7 @@ class QoaClient(object):
 
     def process_report(self, interval:int, pid:int = None):
         report = {}
-        while self.procMonitorFlag:
+        while self.procMonitorFlag == 1:
             try:
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
@@ -239,12 +239,18 @@ class QoaClient(object):
             time.sleep(interval)
 
 
-    def process_monitor(self, interval:int, pid:int = None):
-        if (pid == None):
-            pid = os.getpid()
-        sub_thread = Thread(target=self.process_report, args=(interval, pid))
-        sub_thread.start()
+    def process_monitor_start(self, interval:int, pid:int = None):
+        if self.procMonitorFlag == 0:
+            if (pid == None):
+                pid = os.getpid()
+            self.procMonitorFlag = 1
+            sub_thread = Thread(target=self.process_report, args=(interval, pid))
+            sub_thread.start()
+        self.procMonitorFlag = 1
+        
 
+    def process_monitor_stop(self):
+        self.procMonitorFlag = 2
     
     def asyn_report(self, report:dict, connectors:list=None):
         body_mess = json.dumps(report)
@@ -261,6 +267,10 @@ class QoaClient(object):
     def report(self, metrics:list=None, report: dict = None, connectors:list=None, submit=False,reset=True):
         if (report == None):
             report = self.qoaReport.generateReport(metrics, reset=reset)
+        else:
+            report["metadata"] = copy.deepcopy(self.clientConf)
+            report["metadata"]["timestamp"] = time.time()
+
         if submit:
             if self.default_connector != None:
                 sub_thread = Thread(target=self.asyn_report, args=(report, connectors))

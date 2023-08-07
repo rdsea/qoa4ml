@@ -1,13 +1,15 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
 import pandas as pd 
 import numpy as np
-import traceback, sys, logging
+import traceback, sys, logging, pathlib
 from ydata_quality.erroneous_data import ErroneousDataIdentifier
 from ydata_quality.missings import MissingsProfiler
 from ydata_quality.labelling import LabelInspector
 from ydata_quality.duplicates import DuplicateChecker
 from PIL import Image
 import PIL, io
+p_dir = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(p_dir))
 import utils
 
 # Define metric names, return formats: dictionary {metric name} {sub-element}
