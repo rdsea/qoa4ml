@@ -193,32 +193,32 @@ def sys_monitor(client, interval:int):
 
 ###################### PROCESS REPORT ######################   
 
-def process_report(client, interval:int, pid:int = None):
-    report = {}
-    while procMonitorFlag:
-        try:
-            report["proc_cpu_stats"] = get_proc_cpu()
-        except Exception as e:
-            print("[ERROR] - Error {} in report process cpu stat: {}".format(type(e),e.__traceback__))
-            traceback.print_exception(*sys.exc_info())
-        try:
-            report["proc_mem_stats"] = get_proc_mem()
-        except Exception as e:
-            print("[ERROR] - Error {} in report process memory stat: {}".format(type(e),e.__traceback__))
-            traceback.print_exception(*sys.exc_info())
-        try:
-            client.report(report=report)
-        except Exception as e:
-            print("[ERROR] - Error {} in sent process report: {}".format(type(e),e.__traceback__))
-            traceback.print_exception(*sys.exc_info())
-        time.sleep(interval)
+# def process_report(client, interval:int, pid:int = None):
+#     report = {}
+#     while procMonitorFlag:
+#         try:
+#             report["proc_cpu_stats"] = get_proc_cpu()
+#         except Exception as e:
+#             print("[ERROR] - Error {} in report process cpu stat: {}".format(type(e),e.__traceback__))
+#             traceback.print_exception(*sys.exc_info())
+#         try:
+#             report["proc_mem_stats"] = get_proc_mem()
+#         except Exception as e:
+#             print("[ERROR] - Error {} in report process memory stat: {}".format(type(e),e.__traceback__))
+#             traceback.print_exception(*sys.exc_info())
+#         try:
+#             client.report(report=report)
+#         except Exception as e:
+#             print("[ERROR] - Error {} in sent process report: {}".format(type(e),e.__traceback__))
+#             traceback.print_exception(*sys.exc_info())
+#         time.sleep(interval)
 
 
-def process_monitor(client, interval:int, pid:int = None):
-    if (pid == None):
-        pid = os.getpid()
-    sub_thread = Thread(target=process_report, args=(client, interval, pid))
-    sub_thread.start()
+# def process_monitor(client, interval:int, pid:int = None):
+#     if (pid == None):
+#         pid = os.getpid()
+#     sub_thread = Thread(target=process_report, args=(client, interval, pid))
+#     sub_thread.start()
 
 
 ###################### DOCKER REPORT ######################

@@ -2,8 +2,10 @@
 import pandas as pd 
 import numpy as np
 import tensorflow as tf
-import traceback, sys
-from dataquality import is_numpyarray
+import traceback, sys, pathlib
+p_dir = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(p_dir))
+from utils import is_numpyarray
 
 ################################################ ML QUALITY ########################################################
 
