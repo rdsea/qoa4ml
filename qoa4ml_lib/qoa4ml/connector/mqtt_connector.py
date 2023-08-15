@@ -1,4 +1,8 @@
 import paho.mqtt.client as mqtt
+import sys, pathlib
+p_dir = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(p_dir))
+from utils import qoaLogger
 
 class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application
@@ -18,7 +22,7 @@ class Mqtt_Connector(object):
 
 
     def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
+        qoaLogger.debug("Connected with result code "+str(rc))
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         client.subscribe(self.sub_queue)

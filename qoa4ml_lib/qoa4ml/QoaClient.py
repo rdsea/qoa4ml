@@ -8,9 +8,8 @@ import threading
 from threading import Thread
 import time, uuid, requests
 from datetime import datetime
-import logging
 import os, sys, traceback, copy
-from .utils import get_proc_cpu, get_proc_mem, load_config
+from .utils import get_proc_cpu, get_proc_mem, load_config, qoaLogger, set_logger_level
 from .reports import QoaReport
 from .probes.dataquality import eva_duplicate, eva_erronous, eva_missing, eva_none, image_quality
 from .probes.mlquality import *
@@ -21,7 +20,7 @@ headers = {
 
 class QoaClient(object):
     # Init QoA Client
-    def __init__(self, config_dict:dict=None, config_path: str=None, registration_url: str=None, logging_level=1, config_format = 0):
+    def __init__(self, config_dict:dict=None, config_path: str=None, registration_url: str=None, logging_level=2, config_format = 0):
         """
         The 'client' contains the information about the client and its configuration in form of dictionary
         Example: 
@@ -44,20 +43,8 @@ class QoaClient(object):
         }
         The 'registration_url' specify the service where the client register for monitoring service. If it's set, the client register with the service and receive connector configuration
         Example: "http://127.0.0.1:5001/registration"
-        The 'logging_level' specifies logging level: 
-        1 - Info, 
-        2 - Warning, 
-        3 - Debug,
-        other - Error
         """
-        if logging_level == 1:
-            logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.INFO)
-        elif logging_level == 2:
-            logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.WARNING)
-        elif logging_level == 3:
-            logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.DEBUG)
-        else:
-            logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.ERROR)
+        set_logger_level(logging_level)
         
         if config_dict != None:
             self.configuration = config_dict
@@ -90,10 +77,12 @@ class QoaClient(object):
                 for key in connector_conf:
                     self.connectorList[key] = self.initConnector(connector_conf[key])
             except Exception as e:
-                logging.error(str("[ERROR] - Error {} when configuring connector in QoaClient: {}".format(type(e),e.__traceback__)))
-        elif registration_url != None:
+                qoaLogger.error(str("[ERROR] - Error {} when configuring connector in QoaClient: {}".format(type(e),e.__traceback__)))
+        elif (registration_url != None) or ("registration_url" in self.configuration):
             # init connectors using configuration received from monitoring service, if it's specified
             try:
+                if registration_url == None:
+                    registration_url = self.configuration["registration_url"]
                 registration_data = self.registration(registration_url)
                 json_data = registration_data.json()
                 response = json_data["response"]
@@ -102,11 +91,13 @@ class QoaClient(object):
                     for key in connector_conf:
                         self.connectorList[key] = self.initConnector(connector_conf[key])
                 else: 
-                    logging.warning("Unable to register Qoa Client: connector configuration must be dictionary")
+                    qoaLogger.warning("Unable to register Qoa Client: connector configuration must be dictionary")
             except Exception as e:
-                logging.error(str("[ERROR] - Error {} when registering QoA client: {}".format(type(e),e.__traceback__)))
+                qoaLogger.error(str("[ERROR] - Error {} when registering QoA client: {}".format(type(e),e.__traceback__)))
+                traceback.print_exception(*sys.exc_info())
+  
         if not any(self.connectorList):
-            logging.warning("No connector initiated")
+            qoaLogger.warning("No connector initiated")
             self.default_connector = None
         else:
             # Set default connector for sending monitoring data if not specify
@@ -162,7 +153,7 @@ class QoaClient(object):
                 # Get a specific metric
                 return self.metricList[key]
         except Exception as e:
-            logging.error(str("[ERROR] - Error {} when getting metric from QoA client: {}".format(type(e),e.__traceback__)))
+            qoaLogger.error(str("[ERROR] - Error {} when getting metric from QoA client: {}".format(type(e),e.__traceback__)))
     
     def resetMetric(self, key=None):
         # TO DO:
@@ -176,14 +167,14 @@ class QoaClient(object):
             else: 
                 return self.metricList[key].reset()
         except Exception as e:
-            logging.error(str("[ERROR] - Error {} when reseting metric in QoA client: {}".format(type(e),e.__traceback__)))
+            qoaLogger.error(str("[ERROR] - Error {} when reseting metric in QoA client: {}".format(type(e),e.__traceback__)))
             
     def setConfig(self, key, value):
         # TO DO:
         try:
             self.clientConf[key] = value
         except Exception as e:
-            logging.error(str("[ERROR] - Error {} when setConfig in QoA client: {}".format(type(e),e.__traceback__)))
+            qoaLogger.error(str("[ERROR] - Error {} when setConfig in QoA client: {}".format(type(e),e.__traceback__)))
 
 
     def observeMetric(self, metric_name, value, category=0, cl="Gauge", des="", def_val=-1):
@@ -224,17 +215,17 @@ class QoaClient(object):
             try:
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
-                print("[ERROR] - Error {} in process cpu stat: {}".format(type(e),e.__traceback__))
+                qoaLogger.error("Error {} in process cpu stat: {}".format(type(e),e.__traceback__))
                 traceback.print_exception(*sys.exc_info())
             try:
                 report["proc_mem_stats"] = get_proc_mem()
             except Exception as e:
-                print("[ERROR] - Error {} in process memory stat: {}".format(type(e),e.__traceback__))
+                qoaLogger.error("Error {} in process memory stat: {}".format(type(e),e.__traceback__))
                 traceback.print_exception(*sys.exc_info())
             try:
                 self.report(report=report,submit=True)
             except Exception as e:
-                print("[ERROR] - Error {} in send process report: {}".format(type(e),e.__traceback__))
+                qoaLogger.error("Error {} in send process report: {}".format(type(e),e.__traceback__))
                 traceback.print_exception(*sys.exc_info())
             time.sleep(interval)
 
@@ -276,7 +267,7 @@ class QoaClient(object):
                 sub_thread = Thread(target=self.asyn_report, args=(report, connectors))
                 sub_thread.start()
             else:
-                logging.warning("No connector available")
+                qoaLogger.warning("No connector available")
         return report
 
     def observeInferenceMetric(self, metric_name, value, new_inf=False, inference_id=None, dependency=None):
@@ -362,7 +353,7 @@ class QoaClient(object):
         #     else: 
         #         print("Unable to register Qoa Client")
         # except Exception as e:
-        #     print("[ERROR] - Error {} when register QoA client: {}".format(type(e),e.__traceback__))
+        #     qoaLogger.error("Error {} when register QoA client: {}".format(type(e),e.__traceback__))
         #     traceback.print_exception(*sys.exc_info())
         
 
