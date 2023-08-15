@@ -4,7 +4,7 @@ from .connector.mqtt_connector import Mqtt_Connector
 from .connector.prom_connector import Prom_Connector
 from .metric import Gauge, Counter, Summary, Histogram
 import json, uuid, time, traceback,sys, copy
-from .utils import mergeReport, get_dict_at, load_config
+from .utils import mergeReport, get_dict_at, load_config, qoaLogger
 
 
 class QoaReport(object):
@@ -43,7 +43,7 @@ class QoaReport(object):
             else:
                 self.processPReport(reports)
         except Exception as e:
-            print("[ERROR] - Error {} in importPReport: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in importPReport: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         
         
@@ -59,7 +59,7 @@ class QoaReport(object):
                 self.computationGraph = mergeReport(self.computationGraph, i_graph)
             self.computationGraph["last_instance"] = self.clientConfig["instances_id"]
         except Exception as e:
-            print("[ERROR] - Error {} in buildComputationGraph: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in buildComputationGraph: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         return self.computationGraph
     

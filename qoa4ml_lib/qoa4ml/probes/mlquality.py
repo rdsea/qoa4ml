@@ -1,11 +1,17 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
 import pandas as pd 
 import numpy as np
-import tensorflow as tf
 import traceback, sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from utils import is_numpyarray
+from utils import is_numpyarray, qoaLogger
+
+try:
+    import tensorflow as tf
+except Exception as e:
+    qoaLogger.error("Error {} when importing TensorFlow: {}".format(type(e),e.__traceback__))
+    traceback.print_exception(*sys.exc_info())
+
 
 ################################################ ML QUALITY ########################################################
 
@@ -17,7 +23,7 @@ def timeseries_metric(model):
                 metrics[metric.name] = metric.result().numpy()
         return metrics
     except Exception as e:
-        print("[ERROR] - Error {} when querying timeseries model metrics: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying timeseries model metrics: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get metrics"}
 
@@ -31,7 +37,7 @@ def ts_inference_metric(model,name):
             results["Error"] = metrics["Error"]
         return results
     except Exception as e:
-        print("[ERROR] - Error {} when querying timeseries {}: {}".format(type(e),name,e.__traceback__))
+        qoaLogger.error("Error {} when querying timeseries {}: {}".format(type(e),name,e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get model {}".format(name)}
     
@@ -40,7 +46,7 @@ def ts_inference_MAE(model):
         metrics = ts_inference_metric(model, "mean_absolute_error")
         return {"MAE":metrics}
     except Exception as e:
-        print("[ERROR] - Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get model mean absolute error"}
     
@@ -49,7 +55,7 @@ def ts_inference_loss(model):
         metrics = ts_inference_metric(model, "loss")
         return {"Loss":metrics}
     except Exception as e:
-        print("[ERROR] - Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying timeseries mean absolute error: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get model mean absolute error"}
     
@@ -61,7 +67,7 @@ def training_metric(model):
         else:
             return None
     except Exception as e:
-        print("[ERROR] - Error {} when querying training metrics: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying training metrics: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get training metrics"}
     
@@ -72,7 +78,7 @@ def training_loss(model):
         else:
             return None
     except Exception as e:
-        print("[ERROR] - Error {} when querying training loss: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying training loss: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get training loss"}
     
@@ -83,7 +89,7 @@ def training_val_accuracy(model):
         else:
             return None
     except Exception as e:
-        print("[ERROR] - Error {} when querying training validation accuracy: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying training validation accuracy: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get validation accuracy"}
 
@@ -94,7 +100,7 @@ def training_accuracy(model):
         else:
             return None
     except Exception as e:
-        print("[ERROR] - Error {} when querying training accuracy: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying training accuracy: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get accuracy"}
     
@@ -105,7 +111,7 @@ def training_val_loss(model):
         else:
             return None
     except Exception as e:
-        print("[ERROR] - Error {} when querying training validation loss: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} when querying training validation loss: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get validation loss"}
 
@@ -120,7 +126,7 @@ def classification_confidence(data, score=True):
             else:
                 return {"Error": "Unsupported data: {}".format(type(data))}
     except Exception as e:
-        print("[ERROR] - Error {} in extracting classification confidence: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} in extracting classification confidence: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get classification confidence"}
 

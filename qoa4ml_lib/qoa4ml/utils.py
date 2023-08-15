@@ -5,6 +5,26 @@ from threading import Thread
 import traceback,sys, pathlib
 import numpy as np
 import pandas as pd
+import logging
+
+logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.INFO)
+
+qoaLogger = logging.getLogger()
+
+def set_logger_level(logging_level):
+    if logging_level == 0:
+        log_level = logging.NOTSET
+    elif logging_level == 1:
+        log_level = logging.DEBUG
+    elif logging_level == 2:
+        log_level = logging.INFO
+    elif logging_level == 3:
+        log_level = logging.WARNING
+    elif logging_level == 4:
+        log_level = logging.ERROR
+    elif logging_level == 5:
+        log_level = logging.CRITICAL
+    qoaLogger.setLevel(log_level)
 
 ###################### DEFAULT METRIC ######################
 default_docker_metric = {
@@ -40,10 +60,10 @@ def load_config(file_path:str, format=0)->dict:
             with open('file_path', 'r') as f:
                 return yaml.safe_load(f)
         else:
-            logging.warning("Unsupported format")
+            qoaLogger.warning("Unsupported format")
             return None
     except Exception as e:
-        logging.error("Unable to load configuration")
+        qoaLogger.error("Unable to load configuration")
 
 def to_json(file_path:str, conf:dict):
     """
@@ -149,12 +169,12 @@ def system_report(client, interval:int, to_mb=True, to_gb=False, to_kb=False):
         try:
             report["sys_cpu_stats"] = get_sys_mem()
         except Exception as e:
-            print("[ERROR] - Error {} in report CPU stat: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in report CPU stat: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         try:
             report["sys_mem_stats"] = get_sys_mem()
         except Exception as e:
-            print("[ERROR] - Error {} in report memory stat: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in report memory stat: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         try:
             report["sys_net_stats"] = get_sys_net()
@@ -176,12 +196,12 @@ def system_report(client, interval:int, to_mb=True, to_gb=False, to_kb=False):
             report["sys_net_receive"]  = curr_net_value["receive"] - last_net_value["receive"]
             last_net_value = curr_net_value.copy()
         except Exception as e:
-            print("[ERROR] - Error {} in report network stat: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in report network stat: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         try:
             client.report(report=report)
         except Exception as e:
-            print("[ERROR] - Error {} in sent system report: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in sent system report: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         time.sleep(interval)
 
@@ -199,17 +219,17 @@ def sys_monitor(client, interval:int):
 #         try:
 #             report["proc_cpu_stats"] = get_proc_cpu()
 #         except Exception as e:
-#             print("[ERROR] - Error {} in report process cpu stat: {}".format(type(e),e.__traceback__))
+#             qoaLogger.error("Error {} in report process cpu stat: {}".format(type(e),e.__traceback__))
 #             traceback.print_exception(*sys.exc_info())
 #         try:
 #             report["proc_mem_stats"] = get_proc_mem()
 #         except Exception as e:
-#             print("[ERROR] - Error {} in report process memory stat: {}".format(type(e),e.__traceback__))
+#             qoaLogger.error("Error {} in report process memory stat: {}".format(type(e),e.__traceback__))
 #             traceback.print_exception(*sys.exc_info())
 #         try:
 #             client.report(report=report)
 #         except Exception as e:
-#             print("[ERROR] - Error {} in sent process report: {}".format(type(e),e.__traceback__))
+#             qoaLogger.error("Error {} in sent process report: {}".format(type(e),e.__traceback__))
 #             traceback.print_exception(*sys.exc_info())
 #         time.sleep(interval)
 
@@ -254,7 +274,7 @@ def get_docker_stats(client):
             stats[container.name]["cpu"]["percentage"] = get_cpu_stat(stat,"percentage")
             stats[container.name]["mem"]["used"] = get_mem_stat(stat,"used")
     except Exception as e:
-        print("[ERROR] - Error {} in query docker stat: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} in query docker stat: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
     return stats
 
@@ -262,7 +282,7 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
     try:
         client.addMetric(metrics)
     except Exception as e:
-        print("[ERROR] - Error {} in add docker metric: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} in add docker metric: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
     metric_list = list(metrics.keys())
     doc_client = docker.from_env()
@@ -281,7 +301,7 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
             mem_metric = client.getMetric('docker_memory_used')
             mem_metric.set(sum_memory)
         except Exception as e:
-            print("[ERROR] - Error {} in report docker stat: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in report docker stat: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
 
         try:
@@ -290,7 +310,7 @@ def docker_report(client, interval:int, metrics:dict = None, detail = False):
             else:
                 client.report(metrics=metric_list)
         except Exception as e:
-            print("[ERROR] - Error {} in send docker report: {}".format(type(e),e.__traceback__))
+            qoaLogger.error("Error {} in send docker report: {}".format(type(e),e.__traceback__))
             traceback.print_exception(*sys.exc_info())
         time.sleep(interval)
 
@@ -317,7 +337,7 @@ def mergeReport(f_report, i_report, prio=True):
                 else:
                     return i_report
     except Exception as e:
-        print("[ERROR] - Error {} in mergeReport: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} in mergeReport: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
     return f_report
 
@@ -326,7 +346,7 @@ def get_dict_at(dict, i=0):
         keys = list(dict.keys())
         return  keys[i], dict[keys[i]]
     except Exception as e:
-        print("[ERROR] - Error {} in get_dict_at: {}".format(type(e),e.__traceback__))
+        qoaLogger.error("Error {} in get_dict_at: {}".format(type(e),e.__traceback__))
         traceback.print_exception(*sys.exc_info())
 
 def get_file_dir(file, to_string=True):

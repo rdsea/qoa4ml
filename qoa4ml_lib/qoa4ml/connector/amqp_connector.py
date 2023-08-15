@@ -1,5 +1,4 @@
 import pika, uuid
-from .mess_logging import Mess_Logging
 
 class Amqp_Connector(object):
     # Init an amqp client handling the connection to amqp servier

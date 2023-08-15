@@ -1,4 +1,8 @@
 import pika, json
+import sys, pathlib
+p_dir = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(p_dir))
+from utils import qoaLogger
 
 class Amqp_Collector(object):
     # Init an amqp client handling the connection to amqp servier
@@ -34,7 +38,7 @@ class Amqp_Collector(object):
             self.host_object.message_processing(ch, method, props, body)
         else:
             mess = json.loads(str(body.decode("utf-8")))
-            print(mess)
+            qoaLogger.debug(mess)
 
     def start(self):
         # Start rabbit MQ
