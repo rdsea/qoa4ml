@@ -39,8 +39,8 @@ def eva_erronous(data, errors=None):
             
             total_count = data.count().to_numpy().flatten().sum()
             results = {}
-            results["Total Errors"] = error_df.to_numpy().flatten().sum()
-            results["Error Ratio"] = 100*error_df/total_count
+            results["totalErrors"] = error_df.to_numpy().flatten().sum()
+            results["errorRatio"] = 100*error_df/total_count
             return results
         else:
             qoaLogger.warning("Unsupported data: {}".format(type(data)))
@@ -62,8 +62,8 @@ def eva_duplicate(data):
             dc = DuplicateChecker(df=data)
             dcEva = dc.exact_duplicates()
             results = {}
-            results["Duplicate Ratio"] = 100*len(dcEva.index)/len(data.index)
-            results["Total Duplicate"] = len(dcEva.index)
+            results["duplicateRatio"] = 100*len(dcEva.index)/len(data.index)
+            results["totalDuplicate"] = len(dcEva.index)
             return results
         else:
             qoaLogger.warning("Unsupported data: {}".format(type(data)))
@@ -80,11 +80,11 @@ def eva_missing(data, null_count=True, correlations=False, predict=False, random
             mp = MissingsProfiler(df=data, random_state=random_state)
             results ={}
             if null_count:
-                results["Null Count"] = mp.null_count()
+                results["nullCount"] = mp.null_count()
             if correlations:
-                results["Correlations"] = mp.missing_correlations()
+                results["correlations"] = mp.missing_correlations()
             if predict:
-                results["Missing Prediction"]= mp.predict_missings()
+                results["missingPrediction"]= mp.predict_missings()
             return results
         else:
             qoaLogger.warning("Unsupported data: {}".format(type(data)))
@@ -159,9 +159,9 @@ def eva_none(data):
             valid_count = np.count_nonzero(~np.isnan(data))
             none_count = np.count_nonzero(np.isnan(data))
             results = {}
-            results["Total Valid"] = valid_count
-            results["Total None"] = none_count
-            results["None Ratio"] = valid_count/(valid_count+none_count)
+            results["totalValid"] = valid_count
+            results["totalNone"] = none_count
+            results["noneRatio"] = valid_count/(valid_count+none_count)
             return results
         else:
             qoaLogger.warning("Unsupported data: {}".format(type(data)))
