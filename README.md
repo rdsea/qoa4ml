@@ -2,29 +2,16 @@
 
 QoA4ML consists of a set of utilities and specs for supporting quality of analytics in ML services. Especially, we focus on ML services across edge-cloud continuum, which are built as a composition of services.
 
-## QoAML Specification
+## QoA4ML Specification
 
 The design of QoA4ML specification is in [language](language/)
 
-## Monitoring Client
-[QoA Client](qoa4ml_lib/qoa4ml/): an object that observes metrics, generates metric reports, and sends them to the Observation agent via a list of connectors (e.g., messaging connector: RabbitMQ).
+## QoA4ML Utilization
 
-Via this client, developers can call different monitoring probes to measure desired metrics and categorize them into data quality, service performance or inference quality.
+Developers can call many functions from a QoAClient and QoA4ML's [utilities](qoa4ml_lib/utils.py) to evaluate/report ML-specific attributes (e.g., data quality, inference performance), build the quality reports, and send them to the observation services.
+The QoAClient can be initiated with various configurations for specifying observation server and communication protocols (e.g., messaging) in different formats (e.g., json and yaml).
 
-To initiate a QoA Client, developers can specify a configuration file path or refer to a configuration as a dictionary, or give the registration service (URL) where the client can get its configuration.
-
-## Probes
-
-* [QoA4ML Probes](qoa4ml_lib/qoa4ml/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
-* Probe properties:
-  - Can be written in different languages (Python, GoLang)
-  - Can have different communications to monitoring systems (depending on probes and its ML support)
-  - Capture metrics with a clear definition/scope
-    - e.g., Response time for an ML stage (training) or a service call (of ML APIs)
-    - Thus output of probes must be correlated to objects to be monitored and the tenant
-  - Support high or low-level metrics/attributes
-    - depending on probes implementation
-  - Can be instrumented into source code or standlone
+The detail documents for QoA4ML utilization is presented in [qoa4ml_lib](qoa4ml_lib/)
   
 
 ## QoA4ML Reports
