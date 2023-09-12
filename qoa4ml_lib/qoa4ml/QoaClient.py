@@ -22,25 +22,31 @@ class QoaClient(object):
     # Init QoA Client
     def __init__(self, config_dict:dict=None, config_path: str=None, registration_url: str=None, logging_level=2, config_format = 0):
         """
-        The 'client' contains the information about the client and its configuration in form of dictionary
+        The 'config_dict' contains the information about the client and its configuration in form of dictionary
         Example: 
         { 
-            "client_id": "aaltosea1",
-            "component_id": "data_processing"
-        }
-        The 'connector' is the dictionary containing multiple connector configuration (amqp, mqtt, kafka)
-        Example: 
-        {
-            "amqp_connector":{
-                "class": "amqp",
-                "conf":{
-                    "end_point": "localhost",
-                    "exchange_name": "qoa4ml",
-                    "exchange_type": "topic",
-                    "out_routing_key": "qoa.report.ml"
+            "client":{
+                "client_id": "aaltosea4",
+                "instance_name": "ML02",
+                "stage_id": "ML",
+                "method": "REST",
+                "application": "test",
+                "role": "ml"
+            },
+            "connector":{
+                "amqp_connector":{
+                    "class": "amqp",
+                    "conf":{
+                        "end_point": "localhost",
+                        "exchange_name": "qoa4ml",
+                        "exchange_type": "topic",
+                        "out_routing_key": "qoa.report.ml"
+                    }
                 }
             }
         }
+        The 'connector' is the dictionary containing multiple connector configuration (amqp, mqtt, kafka)
+        If 'connector' is not define, developer must give 'registration_url'
         The 'registration_url' specify the service where the client register for monitoring service. If it's set, the client register with the service and receive connector configuration
         Example: "http://127.0.0.1:5001/registration"
         """

@@ -3,8 +3,62 @@
 ## Source code
 https://github.com/rdsea/QoA4ML
 
+
+## Monitoring Client
+[QoA Client](qoa4ml/): an object that observes metrics, generates metric reports, and sends them to the Observation service via a list of connectors (e.g., messaging connector: RabbitMQ).
+
+The developers only need to init a QoAClient at the beginning and use it to observe/evaluate metrics by self-instrumentation (calling its functions) at the right place in the source code.
+
+- To initiate a QoA Client, developers can specify a configuration file path or refer to a configuration as a dictionary, or give the registration service (URL) where the client can get its configuration.
+
+The `configuration` contains the information about the client and its configuration in form of dictionary
+
+Example: 
+```python
+clientConf = { 
+    "client":{
+        "client_id": "aaltosea1",
+        "instance_name": "ML02",
+        "stage_id": "ML",
+        "method": "REST",
+        "application": "test",
+        "role": "ml"
+    },
+    "connector":{
+        "amqp_connector":{
+            "class": "amqp",
+            "conf":{
+                "end_point": "localhost",
+                "exchange_name": "qoa4ml",
+                "exchange_type": "topic",
+                "out_routing_key": "qoa.report.ml"
+            }
+        }
+    }
+}
+qoaClient = QoaClient(config_dict=clientConf)
+```
+The `connector` is the dictionary containing multiple connector configuration (amqp, mqtt, kafka)
+If 'connector' is not define, developer must give 'registration_url'
+The 'registration_url' specify the service where the client register for monitoring service. If it's set, the client register with the service and receive connector configuration.
+For example: "http://localhost:5001/registration"
+
+- Via this client, developers can call different monitoring probes to measure desired metrics and categorize them into data quality, service performance or inference quality.
+    - By using our probes (e.g., `observeErronous`, `observeMissing`, and `observeInferenceMetric`), the metrics are already categorized in the quality report.
+    - For unsupported metrics or user-defined metrics, the developers can report them by using `observeMetric` providing metric's names and their expected categories. For example `qoaClient.observeMetric(metric_name="image_width", value=200, category=1)`.
+
+- Category: metrics are categorized into following groups:
+    - 0 - Quality: Performance (metrics for evaluating service performance e.g., response time, throughput)
+    - 1 - Quality: Data (metrics for evaluating data quality e.g., missing, duplicate, erroneous)
+    - 2 - Quality: Inference (metrics for evaluating quality of ML inference, measured from inferences e.g., accuracy, confidence)
+    - 3 - Resource: metrics for evaluating resource utilization e.g. CPU, Memory
+- To send the quality report to the observation service, the developers can call `report` from the QoAClient. For example: `qualityReport = qoaClient.report()`, the function will additionally return the `report` at current stage and save it to `qualityReport`
+- To aggregate reports from previous stage (in a pipeline) for building the computation graphs, the client can call `importPReport`. For example `qoaClient.importPReport(previousReport)`
+
+
 ## Probes
-* [QoA4ML Probes](https://github.com/rdsea/QoA4ML/tree/main/qoa4ml_lib/qoa4ml/probes.py): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
+
+* [QoA4ML Probes](qoa4ml/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
 * Probe properties:
   - Can be written in different languages (Python, GoLang)
   - Can have different communications to monitoring systems (depending on probes and its ML support)
@@ -15,7 +69,8 @@ https://github.com/rdsea/QoA4ML
     - depending on probes implementation
   - Can be instrumented into source code or standlone
 
-Provide some metric classes for collecting different types of metric: Counter, Gauge, Summary, Histogram
+## Metric
+We support some metric classes for collecting different types of metric: Counter, Gauge, Summary, Histogram
 
 - `Metric`: an original class providing some common functions on an metric object.
     - Attribute:
