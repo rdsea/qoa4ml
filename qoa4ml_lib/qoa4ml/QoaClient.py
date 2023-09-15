@@ -9,7 +9,7 @@ from threading import Thread
 import time, uuid, requests
 from datetime import datetime
 import os, sys, traceback, copy
-from .utils import get_proc_cpu, get_proc_mem, load_config, qoaLogger, set_logger_level
+from .qoaUtils import get_proc_cpu, get_proc_mem, load_config, qoaLogger, set_logger_level
 from .reports import QoaReport
 from .probes.dataquality import eva_duplicate, eva_erronous, eva_missing, eva_none, image_quality
 from .probes.mlquality import *
