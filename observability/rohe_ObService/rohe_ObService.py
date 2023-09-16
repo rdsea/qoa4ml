@@ -126,7 +126,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     config_file = args.conf
     if not config_file:
-        config_file = utils.get_parent_dir(__file__,2)+"/config/rohe_ObS/conf.json"
+        config_file = utils.get_parent_dir(__file__,2)+"/config/rohe_obs_conf.json"
         print(config_file)
     configuration = utils.load_config(config_file)
 
