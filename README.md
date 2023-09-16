@@ -36,6 +36,7 @@ Examples are in [examples](example/).
 The code is in [observability](observability/)
 
 ![The overal architecture of the Observability Service](img/qoa4mlos-overview.png)
+
 QoA4ML Monitor is a component monitoring QoA for a ML model which is deployed in a serving platform.
 
 * Monitoring Service: third party monitoring service used for managing monitoring data.
@@ -44,11 +45,11 @@ QoA4ML Monitor is a component monitoring QoA for a ML model which is deployed in
 
 ### Implementation using OPA
 
-[OPA engine](https://www.openpolicyagent.org/docs/latest/#running-opa) is used to implement the service for checking violation under (observability/qoa4mlopa/) 
+[OPA engine](https://www.openpolicyagent.org/docs/latest/#running-opa) is used to implement the service for checking violation under [qoa4mlopa](observability/qoa4mlopa/) 
 
 ### ROHE Implementation 
 
-Another new engine is currently developed under (observability/rohe_ObService/)
+Another new engine is currently developed under [rohe_ObService](observability/rohe_ObService/)
 
 ## References
 * Hong-Linh Truong, Minh-Tri Nguyen, ["QoA4ML -A Framework for Supporting Contracts in Machine Learning Services"](https://research.aalto.fi/files/65786264/main.pdf), [The 2021 IEEE International Conference on Web Services (ICWS 2021)](https://conferences.computer.org/icws/2021/), to appear.
