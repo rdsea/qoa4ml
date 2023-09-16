@@ -7,7 +7,9 @@ templates/profiling/.DS_Store
 *.jpg
 *.pt
 *.pyc
-
+*.egg-info
+*.whl
+*.gz
 __pycache__/
 # *.pyc
 *.pyo
