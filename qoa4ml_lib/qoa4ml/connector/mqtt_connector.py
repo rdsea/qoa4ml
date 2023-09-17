@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from utils import qoaLogger
+from qoaUtils import qoaLogger
 
 class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application

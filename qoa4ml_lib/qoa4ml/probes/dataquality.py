@@ -10,7 +10,7 @@ from PIL import Image
 import PIL, io
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from utils import qoaLogger, is_numpyarray, is_pddataframe
+from qoaUtils import qoaLogger, is_numpyarray, is_pddataframe
 
 # Define metric names, return formats: dictionary {metric name} {sub-element}
 # Return error/debugging

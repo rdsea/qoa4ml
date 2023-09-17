@@ -1,7 +1,7 @@
 import time, argparse, random, random, requests, json
 import pandas as pd
 from qoa4ml.qoa_client import Qoa_Client
-from qoa4ml import utils as qoa_utils
+from qoa4ml import qoaUtils as qoa_utils
 
 
 headers = {

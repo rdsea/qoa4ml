@@ -3,7 +3,7 @@ import time, os, pathlib
 import json
 import threading
 import numpy as np
-from qoa4ml import utils as qoa_utils
+from qoa4ml import qoaUtils as qoa_utils
 from qoa4ml import probes as qoa_probes
 from qoa4ml.qoa_client import Qoa_Client
 

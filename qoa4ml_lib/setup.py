@@ -2,7 +2,6 @@ from setuptools import find_packages, setup
 
 setup(
     name='qoa4ml',
-    #version='0.0.82',
     version=open('VERSION').read(),
     description='Quality of Analysis for Machine Learning',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
