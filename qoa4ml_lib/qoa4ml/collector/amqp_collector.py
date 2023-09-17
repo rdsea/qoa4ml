@@ -2,7 +2,7 @@ import pika, json
 import sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from from qoaUtils import qoaLogger
+from qoaUtils import qoaLogger
 
 class Amqp_Collector(object):
     # Init an amqp client handling the connection to amqp servier
