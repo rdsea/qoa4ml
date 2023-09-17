@@ -1,0 +1,19 @@
+modules/orchestration/deploymentManagement/.DS_Store
+.DS_Store
+test/
+modules/orchestration/temp/
+templates/profiling/.DS_Store
+*.DS_Store
+*.jpg
+*.pt
+*.pyc
+*.egg-info
+*.whl
+*.gz
+__pycache__/
+# *.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+.env
