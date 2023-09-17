@@ -1,6 +1,4 @@
 # Metrics are implemented based on these classes to be compatible with Prometheus
-import numpy as np
-
 class Metric(object):
     """
     This class defines the common attribute and provide basic function for handling a metric

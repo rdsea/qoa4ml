@@ -1,4 +1,3 @@
-import paho.mqtt.client as mqtt
 import sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
@@ -7,6 +6,9 @@ from qoaUtils import qoaLogger
 class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application
     def __init__(self, host_object, queue_info, broker_info, client_id): 
+        if 'mqtt' not in globals():
+            global mqtt
+            import paho.mqtt.client as mqtt
         # Init the host object to return message 
         self.host_object = host_object
         # Init the send/receive queue

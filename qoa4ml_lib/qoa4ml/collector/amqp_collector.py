@@ -1,4 +1,4 @@
-import pika, json
+import json
 import sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
@@ -7,6 +7,9 @@ from qoaUtils import qoaLogger
 class Amqp_Collector(object):
     # Init an amqp client handling the connection to amqp servier
     def __init__(self, configuration:dict, host_object:object=None):
+        if 'pika' not in globals():
+            global pika
+            import pika
         self.host_object = host_object  
         self.exchange_name = configuration["exchange_name"]
         self.exchange_type = configuration["exchange_type"]

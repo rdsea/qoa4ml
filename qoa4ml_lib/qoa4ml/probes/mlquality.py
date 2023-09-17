@@ -1,23 +1,28 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
-import pandas as pd 
+
 import numpy as np
 import traceback, sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 from qoaUtils import is_numpyarray, qoaLogger
 
-try:
-    import tensorflow as tf
-except Exception as e:
-    qoaLogger.error("Error {} when importing TensorFlow: {}".format(type(e),e.__traceback__))
-    traceback.print_exception(*sys.exc_info())
+
 
 
 ################################################ ML QUALITY ########################################################
+def import_tf():
+    if 'tf' not in globals():
+        global tf
+        try:
+            import tensorflow as tf
+        except Exception as e:
+            qoaLogger.error("Error {} when importing TensorFlow: {}".format(type(e),e.__traceback__))
+            traceback.print_exception(*sys.exc_info())
 
 def timeseries_metric(model):
     metrics = {}
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             for metric in model.metrics:
                 metrics[metric.name] = metric.result().numpy()
@@ -62,6 +67,7 @@ def ts_inference_loss(model):
 
 def training_metric(model):
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return model.history.history
         else:
@@ -73,6 +79,7 @@ def training_metric(model):
     
 def training_loss(model):
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Training Loss":model.history.history["loss"]}
         else:
@@ -84,6 +91,7 @@ def training_loss(model):
     
 def training_val_accuracy(model):
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Evaluate Accuracy":model.history.history["val_accuracy"]}
         else:
@@ -95,6 +103,7 @@ def training_val_accuracy(model):
 
 def training_accuracy(model):
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Train Accuracy": model.history.history["accuracy"]}
         else:
@@ -106,6 +115,7 @@ def training_accuracy(model):
     
 def training_val_loss(model):
     try:
+        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Evaluate Loss":model.history.history["val_loss"]}
         else:
@@ -121,6 +131,7 @@ def classification_confidence(data, score=True):
             return {"Confidence": 100 * np.max(data)}
         else:
             if is_numpyarray(data):
+                import_tf()
                 scores = tf.nn.softmax(data[0])
                 return {"Confidence":100 * np.max(scores)}
             else:

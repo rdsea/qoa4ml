@@ -1,18 +1,16 @@
-from typing import List
 from .connector.amqp_connector import Amqp_Connector
 from .connector.mqtt_connector import Mqtt_Connector
-from .connector.prom_connector import Prom_Connector
+from .probes.dataquality import eva_duplicate, eva_erronous, eva_missing, eva_none, image_quality
+from .probes.mlquality import *
 from .metric import Gauge, Counter, Summary, Histogram
 import json, uuid
 import threading
 from threading import Thread
 import time, uuid, requests
-from datetime import datetime
 import os, sys, traceback, copy
 from .qoaUtils import get_proc_cpu, get_proc_mem, load_config, qoaLogger, set_logger_level
 from .reports import QoaReport
-from .probes.dataquality import eva_duplicate, eva_erronous, eva_missing, eva_none, image_quality
-from .probes.mlquality import *
+
 
 headers = {
     'Content-Type': 'application/json'
