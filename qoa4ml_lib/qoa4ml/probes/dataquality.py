@@ -155,11 +155,11 @@ def image_quality(image):
         image = PIL.Image.fromarray(image)
     if isinstance(image,PIL.JpegImagePlugin.JpegImageFile) or isinstance(image,PIL.Image.Image):
         # qoaLogger.debug(dir(image)
-        quality["Image Width"] = image.width
-        quality["Image Height"] = image.height
-        quality["Image Size"] = image.size
-        quality["Color Mode"] = image.mode
-        quality["Color Channel"] = len(image.getbands())
+        quality["ImageWidth"] = image.width
+        quality["ImageHeight"] = image.height
+        quality["ImageSize"] = image.size
+        quality["ColorMode"] = image.mode
+        quality["ColorChannel"] = len(image.getbands())
     return quality
 
 def eva_none(data):
