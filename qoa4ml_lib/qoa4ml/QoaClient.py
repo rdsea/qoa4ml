@@ -202,7 +202,7 @@ class QoaClient(object):
         else:
             self.timerFlag = False
             responseTime = {"startTime":self.timerStart, "responseTime":time.time()-self.timerStart}
-            self.observeMetric("Response Time", responseTime, category=0)
+            self.observeMetric("responseTime", responseTime, category=0)
             return responseTime
 
 
