@@ -1,8 +1,11 @@
-import prometheus_client as pr
 _INF = float("inf")
 
 class Prom_Connector(object):
     def __init__(self,info):
+        if 'pr' not in globals():
+            global pr
+            import prometheus_client as pr
+
         self.info = info["metric"]
         self.port = info["port"]
         self.metrices = {}
