@@ -213,3 +213,9 @@ Connectors are implement with different protocols for sending report. Example: s
 ## Utilities
 A module provide some frequently used functions and some function to directly collect system metrics.
 
+## Note
+- `eva_duplicate`, `eva_erronous`, `eva_missing`, and `detect_outlier` probes are using ydata-quality library, which is only available for Python 3.8
+- For using ML quality probes, you may need to install a few more dependencies, e.g., tensorflow and Pillow.
+- QoaClient uses AMQP protocol by default. To use MQTT, you may need to install `paho-mqtt`.
+- To monitor Docker stats, you need to install [docker](https://docker-py.readthedocs.io/en/stable/) python client. 
+- To connect with Prometheus, you need to install [prometheus-client](https://pypi.org/project/prometheus-client/)
