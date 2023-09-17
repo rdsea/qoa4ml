@@ -1,0 +1,7 @@
+docker_py==1.10.6
+paho_mqtt==1.6.1
+Pillow==10.0.0
+prometheus-client==0.16.0
+setuptools==65.5.1
+tensorflow==2.13.0
+ydata-quality==0.1.0
