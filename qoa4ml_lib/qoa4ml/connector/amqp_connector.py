@@ -1,4 +1,4 @@
-import pika, uuid
+import uuid
 
 class Amqp_Connector(object):
     # Init an amqp client handling the connection to amqp servier
@@ -8,6 +8,9 @@ class Amqp_Connector(object):
         configuration: a dictionary include broker and queue information
         log: a bool flag for logging message if being set to True, default is False
         """
+        if 'pika' not in globals():
+            global pika
+            import pika
         self.conf = configuration
         self.exchange_name = configuration["exchange_name"]
         self.exchange_type = configuration["exchange_type"]
@@ -30,7 +33,7 @@ class Amqp_Connector(object):
     def send_data(self, body_mess, corr_id=None, routing_key=None,expiration=1000):
         # Sending data to desired destination
         # if sender is client, it will include the "reply_to" attribute to specify where to reply this message
-        # if sender is server, it will reply the message to "reply_to" via default exchange 
+        # if sender is server, it will reply the message to "reply_to" via default exchange
         if corr_id == None:
             corr_id = str(uuid.uuid4())
         if routing_key == None:

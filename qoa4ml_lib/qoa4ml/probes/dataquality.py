@@ -1,13 +1,9 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
-import pandas as pd 
+
+import pandas as pd  
 import numpy as np
 import traceback, sys, pathlib
-from ydata_quality.erroneous_data import ErroneousDataIdentifier
-from ydata_quality.missings import MissingsProfiler
-from ydata_quality.labelling import LabelInspector
-from ydata_quality.duplicates import DuplicateChecker
-from PIL import Image
-import PIL, io
+import io
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 from qoaUtils import qoaLogger, is_numpyarray, is_pddataframe
@@ -28,6 +24,9 @@ def eva_erronous(data, errors=None):
     sum: sum the result if set to True, otherwise return errors following the categories in list of 'errors'
     """
     try:
+        if 'ErroneousDataIdentifier' not in globals():
+            global ErroneousDataIdentifier
+            from ydata_quality.erroneous_data import ErroneousDataIdentifier
         if is_numpyarray(data):
             data = pd.DataFrame(data)
         if is_pddataframe(data):
@@ -56,6 +55,9 @@ def eva_duplicate(data):
     ratio: return percentage if set to True
     """
     try:
+        if 'DuplicateChecker' not in globals():
+            global DuplicateChecker
+            from ydata_quality.duplicates import DuplicateChecker
         if is_numpyarray(data):
             data = pd.DataFrame(data)
         if is_pddataframe(data):
@@ -74,6 +76,9 @@ def eva_duplicate(data):
 
 def eva_missing(data, null_count=True, correlations=False, predict=False, random_state=0):
     try:
+        if 'MissingsProfiler' not in globals():
+            global MissingsProfiler
+            from ydata_quality.missings import MissingsProfiler
         if is_numpyarray(data):
             data = pd.DataFrame(data)
         if is_pddataframe(data):
@@ -113,6 +118,9 @@ class Outlier_Detector(object):
                     results = {}
                     for label in labels:
                         try:
+                            if 'LabelInspector' not in globals():
+                                global LabelInspector
+                                from ydata_quality.labelling import LabelInspector
                             li = LabelInspector(df=data, label=label, random_state=random_state)
                             results[label] = li.outlier_detection(th=n,use_clusters=cluster)
                         except Exception as e:
@@ -137,11 +145,14 @@ class Outlier_Detector(object):
 
 
 def image_quality(image):
+    if 'PIL' not in globals():
+        global PIL
+        import PIL
     quality = {}
     if isinstance(image,bytes):
-        image = Image.open(io.BytesIO(image))
+        image = PIL.Image.open(io.BytesIO(image))
     if isinstance(image,np.ndarray):
-        image = Image.fromarray(image)
+        image = PIL.Image.fromarray(image)
     if isinstance(image,PIL.JpegImagePlugin.JpegImageFile) or isinstance(image,PIL.Image.Image):
         # qoaLogger.debug(dir(image)
         quality["Image Width"] = image.width
