@@ -4,7 +4,7 @@ from .connector.mqtt_connector import Mqtt_Connector
 from .connector.prom_connector import Prom_Connector
 from .metric import Gauge, Counter, Summary, Histogram
 import json, uuid, time, traceback,sys, copy
-from .utils import mergeReport, get_dict_at, load_config, qoaLogger
+from .qoaUtils import mergeReport, get_dict_at, load_config, qoaLogger
 
 
 class QoaReport(object):

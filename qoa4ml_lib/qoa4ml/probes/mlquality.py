@@ -4,7 +4,7 @@ import numpy as np
 import traceback, sys, pathlib
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from utils import is_numpyarray, qoaLogger
+from qoaUtils import is_numpyarray, qoaLogger
 
 try:
     import tensorflow as tf
