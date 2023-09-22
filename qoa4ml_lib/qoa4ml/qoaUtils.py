@@ -67,6 +67,8 @@ def load_config(file_path:str, format=0)->dict:
             return None
     except Exception as e:
         qoaLogger.error("Unable to load configuration")
+    
+    return None 
 
 def to_json(file_path:str, conf:dict):
     """
