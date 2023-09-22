@@ -41,20 +41,17 @@ default_docker_metric = {
 
 
 ###################### COMMON USED FUNCTION ######################
-def load_config(file_path:str, format=0)->dict:
+def load_config(file_path:str)->dict:
     """
     file_path: file path to load config
-    format:
-        0 - json
-        1 - yaml
-        other - To Do
+
     """
     try:
-        if format == 0:
+        if 'json' in file_path:
             with open(file_path, "r") as f:
                 return json.load(f)
-        elif format == 1:
-            with open('file_path', 'r') as f:
+        if ('yaml' in file_path) or ('yml' in file_path):
+            with open(file_path, 'r') as f:
                 return yaml.safe_load(f)
         else:
             qoaLogger.warning("Unsupported format")
