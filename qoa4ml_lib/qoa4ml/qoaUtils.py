@@ -41,6 +41,12 @@ default_docker_metric = {
 
 
 ###################### COMMON USED FUNCTION ######################
+def load_config_json(file_path:str):
+    return load_config(file_path=file_path,format=0)
+
+def load_config_yaml(file_path:str):
+    return load_config(file_path=file_path,format=1)
+    
 def load_config(file_path:str, format=0)->dict:
     """
     file_path: file path to load config
