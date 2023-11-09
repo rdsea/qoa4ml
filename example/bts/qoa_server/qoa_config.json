@@ -4,7 +4,7 @@
         "url": "195.148.22.62"
     },
     "queue_info": {
-        "client_id":"user3",
+        "userID":"user3",
         "exchange_name": "qoa_topic",
         "exchange_type": "topic",
         "in_queue": "in_request_qoa",

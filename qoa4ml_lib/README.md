@@ -17,9 +17,9 @@ Example:
 ```python
 clientConf = { 
     "client":{
-        "client_id": "aaltosea1",
+        "userID": "aaltosea1",
         "instance_name": "ML02",
-        "stage_id": "ML",
+        "stageID": "ML",
         "method": "REST",
         "application": "test",
         "role": "ml"
@@ -127,14 +127,14 @@ This module defines ``QoA_Report``, an object that provide functions to export m
     },
     "quality":{
         "data":{
-            "@stage_id":{
+            "@stageID":{
                 "@metric_name":{
                     "@instance_id": "@value"
                 }
             }
         },
         "performance":{
-            "@stage_id":{
+            "@stageID":{
                 "@metric_name":{
                     "@instance_id": "@value"
                 }

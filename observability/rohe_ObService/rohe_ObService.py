@@ -52,7 +52,7 @@ class Rohe_ObService(Resource):
                     
                 application_list[application_name]["client_count"] += 1
                 # TO DO
-                # Check client_id, role, stage_id, instance_name
+                # Check userID, role, stageID, instance_name
 
                 # Prepare connector for QoA Client
                 connector = self.connector_config.copy()
@@ -61,10 +61,10 @@ class Rohe_ObService(Resource):
                     i_config = connector_i["conf"]
                     i_config["exchange_name"] = str(application_name)+"_exchange"
                     i_config["out_routing_key"] = str(application_name)
-                    if "client_id" in args:
-                        i_config["out_routing_key"] = i_config["out_routing_key"]+"."+args["client_id"]
-                    if "stage_id" in args:
-                        i_config["out_routing_key"] = i_config["out_routing_key"]+"."+args["stage_id"]
+                    if "userID" in args:
+                        i_config["out_routing_key"] = i_config["out_routing_key"]+"."+args["userID"]
+                    if "stageID" in args:
+                        i_config["out_routing_key"] = i_config["out_routing_key"]+"."+args["stageID"]
                     if "instance_name" in args:
                         i_config["out_routing_key"] = i_config["out_routing_key"]+"."+args["instance_name"]
                     i_config["out_routing_key"] = i_config["out_routing_key"]+".client"+str(application_list[application_name]["client_count"])

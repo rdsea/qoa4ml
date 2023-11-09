@@ -24,9 +24,9 @@ class QoaClient(object):
         Example: 
         { 
             "client":{
-                "client_id": "aaltosea4",
+                "userID": "aaltosea4",
                 "instance_name": "ML02",
-                "stage_id": "ML",
+                "stageID": "ML",
                 "method": "REST",
                 "application": "test",
                 "role": "ml"
@@ -62,7 +62,7 @@ class QoaClient(object):
         self.connectorList = {}
         self.timerFlag = False
         self.method = self.clientConf["method"]
-        self.stageID = self.clientConf["stage_id"]
+        self.stageID = self.clientConf["stageID"]
         self.procMonitorFlag = 0
         self.inferenceFlag = False
 
@@ -335,7 +335,7 @@ class QoaClient(object):
         # self.timerFlag = False
         self.timer_start = 0
         # self.method = client_conf["method"]
-        # self.stageID = client_conf["stage_id"]
+        # self.stageID = client_conf["stageID"]
         # self.instanceID  = os.environ.get('INSTANCE_ID')
         # if not self.instanceID:
         #     print("INSTANCE_ID is not defined")

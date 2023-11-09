@@ -2,9 +2,9 @@
     "qoa_service": {
         "client_info": {
             "application": "bts",
-            "client_id": "aaltosea1",
+            "userID": "aaltosea1",
             "instance_name": "LSTM Prediction Raps 01",
-            "stage_id": "Inference",
+            "stageID": "Inference",
             "method": "LSTM",
             "roles": "server"
         },

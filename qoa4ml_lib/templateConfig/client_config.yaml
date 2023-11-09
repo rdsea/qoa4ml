@@ -1,9 +1,9 @@
 ---
 #client configuration
 client:
-  client_id: aaltosea1
+  userID: aaltosea1
   instance_name: data_handling01
-  stage_id: Gateway
+  stageID: Gateway
   method: REST
   application: test
   role: ml

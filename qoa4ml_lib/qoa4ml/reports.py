@@ -78,9 +78,9 @@ class QoaReport(object):
     
     def observeMetric(self, metric):
         metricReport = {}
-        metricReport[self.clientConfig["stage_id"]] = {}
-        metricReport[self.clientConfig["stage_id"]][metric.name] = {}
-        metricReport[self.clientConfig["stage_id"]][metric.name][self.clientConfig["instances_id"]] = metric.value
+        metricReport[self.clientConfig["stageID"]] = {}
+        metricReport[self.clientConfig["stageID"]][metric.name] = {}
+        metricReport[self.clientConfig["stageID"]][metric.name][self.clientConfig["instances_id"]] = metric.value
 
         if metric.category == 0:
             if "performance" not in self.qualityReport:
