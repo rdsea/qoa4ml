@@ -5,7 +5,7 @@ from qoaUtils import qoaLogger
 
 class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application
-    def __init__(self, host_object, queue_info, broker_info, client_id): 
+    def __init__(self, host_object, queue_info, broker_info, userID): 
         if 'mqtt' not in globals():
             global mqtt
             import paho.mqtt.client as mqtt
@@ -15,7 +15,7 @@ class Mqtt_Connector(object):
         self.pub_queue = queue_info["in_queue"]
         self.sub_queue = queue_info["out_queue"]
         # Create the mqtt client
-        self.client = mqtt.Client(client_id=client_id, clean_session=False, userdata=None, transport="tcp")
+        self.client = mqtt.Client(userID=userID, clean_session=False, userdata=None, transport="tcp")
         # Set some functional method
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
