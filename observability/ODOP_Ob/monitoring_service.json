@@ -1,0 +1,12 @@
+{
+  "monitoring_service": {
+    "subscribeUrl": "http://localhost:8001/subscribe",
+    "reportUrl": "http://localhost:8001/report"
+  },
+  "metrics": [
+    "cpu_usage",
+    "gpu_usage",
+    "memory_used"
+  ],
+  "frequency": 1
+}

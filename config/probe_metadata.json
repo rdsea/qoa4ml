@@ -1,0 +1,29 @@
+{
+  "node_name": "aaltosea_HPC",
+  "metadata": {
+    "cpu": {
+      "frequency": {
+        "value": 5,
+        "unit": "GHz"
+      },
+      "thread": 4
+    },
+    "gpu": {
+      "device_1": {
+        "frequency": {
+          "value": 1582,
+          "unit": "MHz"
+        },
+        "core": 3584,
+        "mem": {
+          "capacity": 8,
+          "unit": "Gb"
+        }
+      }
+    },
+    "mem": {
+      "capacity": 512,
+      "unit": "Gb"
+    }
+  }
+}

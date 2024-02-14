@@ -2,7 +2,7 @@ import json, psutil, time, os, yaml, logging
 from threading import Thread
 import traceback,sys, pathlib
 
-from pynvml import nvmlDeviceGetCount, nvmlDeviceGetHandleByIndex, nvmlInit, \
+from .pynvml_forked import nvmlDeviceGetCount, nvmlDeviceGetHandleByIndex, nvmlInit, \
 nvmlShutdown, nvmlDeviceGetUtilizationRates, nvmlDeviceGetMemoryInfo, nvmlDeviceGetNumGpuCores, nvmlDeviceGetMaxClockInfo
 import logging
 
@@ -85,6 +85,13 @@ def get_sys_cpu():
         info[key] = getattr(stats,key)
     for key in cpu_time._fields:
         info[key] = getattr(cpu_time,key)
+    return info
+
+def get_sys_cpu_util():
+    info = {}
+    core_utils = psutil.cpu_percent(interval=0.1, percpu=True)
+    for core_num, core_util in enumerate(core_utils): 
+        info[f"core_{core_num}"] = core_util
     return info
 
 def get_sys_mem():
@@ -381,32 +388,15 @@ def is_pddataframe(obj):
         import pandas as pd
     return type(obj) == pd.DataFrame
 
-def get_sys_gpu():
-    metadata = {}
-    usage = {}
-    
+def get_sys_gpu_usage():
+    usage = {} 
     nvmlInit()
     deviceCount = nvmlDeviceGetCount()
     
     for i in range(deviceCount):
         handle = nvmlDeviceGetHandleByIndex(i)
         util = nvmlDeviceGetUtilizationRates(handle)
-        mem = nvmlDeviceGetMemoryInfo(handle)
-        cores = nvmlDeviceGetNumGpuCores(handle)
-        clock = nvmlDeviceGetMaxClockInfo(handle, 0)
-        
-        metadata[f"device_{i+1}"] = {
-            "frequency": {
-                "value": clock,
-                "unit": "MHz"
-            },
-            "core": cores,
-            "mem": {
-                "capacity": convert_to_gbyte(mem.total),
-                "unit": "Gb"
-            }
-        }
-        
+        mem = nvmlDeviceGetMemoryInfo(handle) 
         usage[f"device_{i+1}"] = {
             "core": {
                 "value": util.gpu,
@@ -420,5 +410,28 @@ def get_sys_gpu():
     
     nvmlShutdown()
     
-    return {"metadata": metadata, "usage": usage}
+    return usage
 
+def get_sys_gpu_metadata():
+    metadata = {}
+    nvmlInit()
+    deviceCount = nvmlDeviceGetCount()
+
+    for i in range(deviceCount):
+        handle = nvmlDeviceGetHandleByIndex(i)
+        cores = nvmlDeviceGetNumGpuCores(handle)
+        clock = nvmlDeviceGetMaxClockInfo(handle, 0)
+        mem = nvmlDeviceGetMemoryInfo(handle)
+        metadata[f"device_{i+1}"] = {
+            "frequency": {
+                "value": clock,
+                "unit": "MHz"
+            },
+            "core": cores,
+            "mem": {
+                "capacity": convert_to_gbyte(mem.total),
+                "unit": "Gb"
+            }
+        }
+    nvmlShutdown()
+    return metadata
