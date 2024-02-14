@@ -2,6 +2,8 @@ import json, psutil, time, os, yaml, logging
 from threading import Thread
 import traceback,sys, pathlib
 
+from pynvml import nvmlDeviceGetCount, nvmlDeviceGetHandleByIndex, nvmlInit, \
+nvmlShutdown, nvmlDeviceGetUtilizationRates, nvmlDeviceGetMemoryInfo, nvmlDeviceGetNumGpuCores, nvmlDeviceGetMaxClockInfo
 import logging
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.INFO)
@@ -378,3 +380,45 @@ def is_pddataframe(obj):
         global pd 
         import pandas as pd
     return type(obj) == pd.DataFrame
+
+def get_sys_gpu():
+    metadata = {}
+    usage = {}
+    
+    nvmlInit()
+    deviceCount = nvmlDeviceGetCount()
+    
+    for i in range(deviceCount):
+        handle = nvmlDeviceGetHandleByIndex(i)
+        util = nvmlDeviceGetUtilizationRates(handle)
+        mem = nvmlDeviceGetMemoryInfo(handle)
+        cores = nvmlDeviceGetNumGpuCores(handle)
+        clock = nvmlDeviceGetMaxClockInfo(handle, 0)
+        
+        metadata[f"device_{i+1}"] = {
+            "frequency": {
+                "value": clock,
+                "unit": "MHz"
+            },
+            "core": cores,
+            "mem": {
+                "capacity": convert_to_gbyte(mem.total),
+                "unit": "Gb"
+            }
+        }
+        
+        usage[f"device_{i+1}"] = {
+            "core": {
+                "value": util.gpu,
+                "unit": "percentage"
+            },
+            "mem": {
+                "value": convert_to_mbyte(mem.used),
+                "unit": "Mb"
+            }
+        }
+    
+    nvmlShutdown()
+    
+    return {"metadata": metadata, "usage": usage}
+
