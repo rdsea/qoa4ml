@@ -54,7 +54,7 @@ class SysMonitoringProbe:
         response = requests.post(self.obsServiceUrl, json=data)
         if response.status_code == 200:
             registerInfo = json.loads(response.text)
-            self.monitoringServiceUrl = registerInfo["monitoring_service"]["reportUrl"]
+            self.monitoringServiceUrl = registerInfo["reportUrl"]
             self.metrics = registerInfo["metrics"]
             self.frequency = registerInfo["frequency"]
         else:

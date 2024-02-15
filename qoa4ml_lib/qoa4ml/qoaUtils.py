@@ -89,7 +89,7 @@ def get_sys_cpu():
 
 def get_sys_cpu_util():
     info = {}
-    core_utils = psutil.cpu_percent(interval=0.1, percpu=True)
+    core_utils = psutil.cpu_percent(percpu=True)
     for core_num, core_util in enumerate(core_utils): 
         info[f"core_{core_num}"] = core_util
     return info
