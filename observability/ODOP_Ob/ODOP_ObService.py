@@ -84,7 +84,8 @@ async def metric(resourceUsage: ResourceUsage):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+odopObsService = ODOPObsService()
+app.include_router(odopObsService.router)
+
 if __name__ == "__main__":
-    odopObsService = ODOPObsService()
-    app.include_router(odopObsService.router)
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run("ODOP_ObService:app", host="localhost", port=8000, reload=True)
