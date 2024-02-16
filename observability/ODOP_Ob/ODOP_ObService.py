@@ -7,6 +7,7 @@ import requests
 import time
 import uvicorn
 import pymongo
+
 app = FastAPI()
 
 
@@ -28,8 +29,6 @@ class ResourceUsage(BaseModel):
     mem: dict
 
 
-
-
 class ODOPObsService:
     def __init__(self, filePath: str = "./Obs_Service_conf.json") -> None:
         self.filePath = filePath
@@ -43,7 +42,11 @@ class ODOPObsService:
                 self.obsServiceConf["monitoring_service"]["subscribeUrl"]
             )
             self.db_config = self.obsServiceConf["database"]
-            self.mongo_client = pymongo.MongoClient(self.db_config["url"], tls=True, tlsCertificateKeyFile=self.db_config["certificatePath"])
+            self.mongo_client = pymongo.MongoClient(
+                self.db_config["url"],
+                tls=True,
+                tlsCertificateKeyFile=self.db_config["certificatePath"],
+            )
             self.db = self.mongo_client[self.db_config["db_name"]]
             self.collection = self.db[self.db_config["collection"]]
         else:

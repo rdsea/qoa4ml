@@ -1,15 +1,23 @@
 from qoa4ml import qoaUtils
+from tinydb import TinyDB
 import psutil
 import requests, json, time
+#import shelve
+import threading
 
 
 class SysMonitoringProbe:
-    def __init__(self, **kwargs) -> None:
-        self.conf = kwargs
+    def __init__(self, conf: dict) -> None:
+        self.conf = conf
         # TODO: find somehow to get node name
         self.node_name = "aaltosea_test"
-        self.obsServiceUrl = "http://localhost:8000/register"
-        self.isRegisted = False
+        self.frequency = self.conf["frequency"]
+        if self.conf["requireRegister"]:
+            self.obsServiceUrl = self.conf["obsServiceUrl"]
+        self.cpuMetadata = self.getCpuMetadata()
+        self.gpuMetadata = self.getGpuMetadata()
+        self.memMetadata = self.getMemMetadata()
+        #self.db = shelve.open("./logs/test_shelf.db")
 
     def getCpuMetadata(self):
         cpu_freq = psutil.cpu_freq()
@@ -20,8 +28,7 @@ class SysMonitoringProbe:
 
     def getCpuUsage(self):
         report = qoaUtils.get_sys_cpu_util()
-
-        return {"usage": report, "unit": "percentage"}
+        return {"value": report, "unit": "percentage"}
 
     def getGpuMetadata(self):
         report = qoaUtils.get_sys_gpu_metadata()
@@ -39,9 +46,7 @@ class SysMonitoringProbe:
 
     def getMemUsage(self):
         mem = qoaUtils.get_sys_mem()
-        return {
-            "usage": {"value": qoaUtils.convert_to_mbyte(mem["used"]), "unit": "Mb"}
-        }
+        return {"value": qoaUtils.convert_to_mbyte(mem["used"]), "unit": "Mb"}
 
     def register(self):
         cpuMetadata = self.getCpuMetadata()
@@ -59,25 +64,44 @@ class SysMonitoringProbe:
             self.frequency = registerInfo["frequency"]
         else:
             raise Exception(f"Can't register probe {self.node_name}")
+    
+    def writeToDb(self, report: dict, timestamp: int): 
+    #self.db[str(timestamp)] = report
+        pass
 
-    def report(self):
+    def createReport(self):
+        timestamp = time.time()
         cpuUsage = self.getCpuUsage()
         gpuUsage = self.getGpuUsage()
         memUsage = self.getMemUsage()
         report = {
             "node_name": self.node_name,
-            "cpu": cpuUsage,
-            "gpu": {"usage": gpuUsage},
-            "mem": memUsage,
+            "cpu": {"metadata": self.cpuMetadata, "usage": cpuUsage},
+            "gpu": {"metadata": self.gpuMetadata, "usage": gpuUsage},
+            "mem": {"metadata": self.memMetadata, "usage": memUsage},
         }
-        response = requests.post(self.monitoringServiceUrl, json=report)
+        self.writeToDb(report, int(timestamp))
+        print(f"Latency {(time.time() - timestamp)*1000}")
 
+    def reporting(self):
+        while True:
+            self.createReport()
+            time.sleep(1)
+
+    def startReporting(self):
+        self.reportThread = threading.Thread(target=self.reporting)
+        self.reportThread.start()
+
+    def stopReporting(self):
+        pass
+
+    def truncateDb(self, timestampRange: range):
+        #for timestamp in timestampRange:
+        #    del self.db[str(timestamp)]
+        pass
 
 if __name__ == "__main__":
-    sysMonitoringProbe = SysMonitoringProbe()
-    sysMonitoringProbe.register()
-    i = 0
-    while True:
-        sysMonitoringProbe.report()
-        time.sleep(1 / sysMonitoringProbe.frequency)
-        i = i + 1
+    conf = json.load(open("./probe_conf.json"))
+    sysMonitoringProbe = SysMonitoringProbe(conf)
+    sysMonitoringProbe.startReporting()
+

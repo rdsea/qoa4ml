@@ -9,6 +9,11 @@ import logging
 logging.basicConfig(format='%(asctime)s:%(levelname)s -- %(message)s', level=logging.INFO)
 
 qoaLogger = logging.getLogger()
+HAS_NVIDIA_GPU = True
+try: 
+    nvmlInit()
+except: 
+    HAS_NVIDIA_GPU = False
 
 def set_logger_level(logging_level):
     if logging_level == 0:
@@ -91,7 +96,7 @@ def get_sys_cpu_util():
     info = {}
     core_utils = psutil.cpu_percent(percpu=True)
     for core_num, core_util in enumerate(core_utils): 
-        info[f"core_{core_num}"] = core_util
+        info[f"core_{core_num+1}"] = core_util
     return info
 
 def get_sys_mem():
@@ -390,7 +395,8 @@ def is_pddataframe(obj):
 
 def get_sys_gpu_usage():
     usage = {} 
-    nvmlInit()
+    if not HAS_NVIDIA_GPU: 
+        return None
     deviceCount = nvmlDeviceGetCount()
     
     for i in range(deviceCount):
@@ -414,7 +420,8 @@ def get_sys_gpu_usage():
 
 def get_sys_gpu_metadata():
     metadata = {}
-    nvmlInit()
+    if not HAS_NVIDIA_GPU: 
+        return None
     deviceCount = nvmlDeviceGetCount()
 
     for i in range(deviceCount):

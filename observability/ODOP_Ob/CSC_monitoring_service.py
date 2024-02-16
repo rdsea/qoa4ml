@@ -46,5 +46,5 @@ async def subscribe(serviceUrl: ServiceUrl):
 if __name__ == "__main__":
     # start_subscription()
 
-    uvicorn.run(app, host="localhost", port=8001) 
+    uvicorn.run(app, host="localhost", port=8001)
     uvicorn.run("CSC_monitoring_service:app", host="localhost", port=8001, reload=True)
