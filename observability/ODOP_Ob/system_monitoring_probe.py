@@ -15,7 +15,9 @@ class SysMonitoringProbe:
         self.cpuMetadata = self.getCpuMetadata()
         self.gpuMetadata = self.getGpuMetadata()
         self.memMetadata = self.getMemMetadata()
-        #self.db = shelve.open("./logs/test_shelf.db")
+        self.currentReport = None
+        self.started = False
+        # self.db = shelve.open("./logs/test_shelf.db")
 
     def getCpuMetadata(self):
         cpu_freq = psutil.cpu_freq()
@@ -62,9 +64,9 @@ class SysMonitoringProbe:
             self.frequency = registerInfo["frequency"]
         else:
             raise Exception(f"Can't register probe {self.node_name}")
-    
-    def writeToDb(self, report: dict, timestamp: int): 
-    #self.db[str(timestamp)] = report
+
+    def writeToDb(self, report: dict, timestamp: int):
+        # self.db[str(timestamp)] = report
         pass
 
     def createReport(self):
@@ -74,32 +76,36 @@ class SysMonitoringProbe:
         memUsage = self.getMemUsage()
         report = {
             "node_name": self.node_name,
+            "timestamp": int(timestamp),
             "cpu": {"metadata": self.cpuMetadata, "usage": cpuUsage},
             "gpu": {"metadata": self.gpuMetadata, "usage": gpuUsage},
             "mem": {"metadata": self.memMetadata, "usage": memUsage},
         }
         self.currentReport = report
-        print(f"Latency {(time.time() - timestamp)*1000}")
+        print(f"Latency {(time.time() - timestamp)*1000}ms")
 
     def reporting(self):
-        while True:
+        while self.started:
             self.createReport()
             time.sleep(1)
 
     def startReporting(self):
+        self.started = True
         self.reportThread = threading.Thread(target=self.reporting)
+        self.reportThread.daemon = True
         self.reportThread.start()
 
     def stopReporting(self):
-        pass
+        self.started = False 
+        self.reportThread.join()
 
-    def truncateDb(self, timestampRange: range):
-        #for timestamp in timestampRange:
-        #    del self.db[str(timestamp)]
-        pass
 
-#if __name__ == "__main__":
-#    conf = json.load(open("./probe_conf.json"))
-#    sysMonitoringProbe = SysMonitoringProbe(conf)
-#    sysMonitoringProbe.startReporting()
 
+if __name__ == "__main__":
+    conf = json.load(open("./probe_conf.json"))
+
+    sysMonitoringProbe = SysMonitoringProbe(conf)
+    while True:
+        sysMonitoringProbe.createReport()
+        time.sleep(1)
+        

@@ -414,8 +414,6 @@ def get_sys_gpu_usage():
             }
         }
     
-    nvmlShutdown()
-    
     return usage
 
 def get_sys_gpu_metadata():
@@ -440,5 +438,4 @@ def get_sys_gpu_metadata():
                 "unit": "Gb"
             }
         }
-    nvmlShutdown()
     return metadata

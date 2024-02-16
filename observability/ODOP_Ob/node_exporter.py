@@ -1,40 +1,25 @@
-# examples/things.py
-
-# Let's get this party started!
-from wsgiref.simple_server import make_server
-
 import falcon
+import falcon.asgi
+import json
+from system_monitoring_probe import SysMonitoringProbe
 
+class MetricsResource:
+    def __init__(self, probe):
+        self.probe = probe
 
-# Falcon follows the REST architectural style, meaning (among
-# other things) that you think in terms of resources and state
-# transitions, which map to HTTP verbs.
-class MetricsExporter:
-    def on_get(self, req, resp):
-        """Handles GET requests"""
-        resp.status = falcon.HTTP_200  # This is the default status
-        resp.content_type = falcon.MEDIA_TEXT  # Default is JSON, so override
-        resp.text = (
-            '\nTwo things awe me most, the starry sky '
-            'above me and the moral law within me.\n'
-            '\n'
-            '    ~ Immanuel Kant\n\n'
-        )
+    async def on_get(self, req, resp):
+        try:
+            report = self.probe.currentReport
+            resp.media = report
+        except Exception as e:
+            raise falcon.HTTPBadRequest(description=str(e))
 
-
-# falcon.App instances are callable WSGI apps
-# in larger applications the app is created in a separate file
-app = falcon.App()
+probe_conf = json.load(open("./probe_conf.json"))
+system_monitoring_probe = SysMonitoringProbe(probe_conf)
+app = falcon.asgi.App()
 
 # Resources are represented by long-lived class instances
-metrics = MetricsExporter()
 
 # things will handle all requests to the '/things' URL path
-app.add_route('/metrics', metrics)
-
-if __name__ == '__main__':
-    with make_server('', 8080, app) as httpd:
-        print('Serving on port 8080...')
-
-        # Serve until process is killed
-        httpd.serve_forever()
+metrics_resource = MetricsResource(system_monitoring_probe)
+app.add_route("/metrics", metrics_resource)
