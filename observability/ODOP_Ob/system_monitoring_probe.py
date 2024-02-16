@@ -1,8 +1,6 @@
 from qoa4ml import qoaUtils
-from tinydb import TinyDB
 import psutil
 import requests, json, time
-#import shelve
 import threading
 
 
@@ -80,7 +78,7 @@ class SysMonitoringProbe:
             "gpu": {"metadata": self.gpuMetadata, "usage": gpuUsage},
             "mem": {"metadata": self.memMetadata, "usage": memUsage},
         }
-        self.writeToDb(report, int(timestamp))
+        self.currentReport = report
         print(f"Latency {(time.time() - timestamp)*1000}")
 
     def reporting(self):
@@ -100,8 +98,8 @@ class SysMonitoringProbe:
         #    del self.db[str(timestamp)]
         pass
 
-if __name__ == "__main__":
-    conf = json.load(open("./probe_conf.json"))
-    sysMonitoringProbe = SysMonitoringProbe(conf)
-    sysMonitoringProbe.startReporting()
+#if __name__ == "__main__":
+#    conf = json.load(open("./probe_conf.json"))
+#    sysMonitoringProbe = SysMonitoringProbe(conf)
+#    sysMonitoringProbe.startReporting()
 
