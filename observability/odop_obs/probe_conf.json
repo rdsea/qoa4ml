@@ -1,0 +1,9 @@
+{
+  "metrics": [
+    "cpu_usage",
+    "gpu_usage",
+    "memory_used"
+  ],
+  "frequency": 1,
+  "requireRegister": false
+}

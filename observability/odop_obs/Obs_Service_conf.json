@@ -1,0 +1,19 @@
+{
+  "monitoring_service": {
+    "subscribeUrl": "http://localhost:8001/subscribe",
+    "reportUrl": "http://localhost:8001/report",
+    "metrics": [
+      "cpu_usage",
+      "gpu_usage",
+      "memory_used"
+    ],
+    "frequency": 1
+  },
+  "ObsServiceUrl": "http://localhost:8000/metric",
+  "database": {
+    "url": "mongodb+srv://odop.pcirpzh.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority",
+    "certificatePath": "./X509-cert-1932152070944653001.pem",
+    "db_name": "odop_observation",
+    "collection": "registration"
+  }
+}
