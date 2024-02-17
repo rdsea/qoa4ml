@@ -123,6 +123,24 @@ def report_proc_cpu(process):
     report['num_thread'] = process.num_threads()
 
     return report
+
+def report_proc_child_cpu(process: psutil.Process):
+    child_processes = process.children()
+    child_processes_count = len(child_processes)
+    child_processes_cpu = {}
+
+    for id,child_proc in enumerate(child_processes):
+        cpu_time = child_proc.cpu_times()
+        child_processes_cpu[f"child_{id}"] = cpu_time.user + cpu_time.system
+
+    total_cpu_usage = sum(child_processes_cpu.values())
+    return {
+        "childProcess": child_processes_count,
+        "value": child_processes_cpu,
+        "total": total_cpu_usage,
+        "unit": "cputime" 
+    }
+
     
 def get_proc_cpu(pid = None):
     if (pid == None):
