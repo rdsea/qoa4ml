@@ -1,7 +1,21 @@
-from qoa4ml import qoaUtils
-import psutil
-import requests, json, time
-import threading
+from qoa4ml.qoaUtils import (
+    get_sys_cpu_util,
+    get_sys_mem,
+    convert_to_gbyte,
+    get_sys_mem,
+    convert_to_mbyte,
+    get_sys_cpu_metadata,
+)
+
+from qoa4ml.gpuUtils import (
+    get_sys_gpu_metadata,
+    get_sys_gpu_usage,
+)
+
+import json, time
+
+from threading import Thread
+
 
 
 class SysMonitoringProbe:
@@ -17,38 +31,33 @@ class SysMonitoringProbe:
         self.memMetadata = self.getMemMetadata()
         self.currentReport = None
         self.started = False
-        # self.db = shelve.open("./logs/test_shelf.db")
 
     def getCpuMetadata(self):
-        cpu_freq = psutil.cpu_freq()
-        frequency = {"value": cpu_freq.max / 1000, "unit": "GHz"}
-        cpu_threads = psutil.cpu_count(logical=True)
-
-        return {"frequency": frequency, "thread": cpu_threads}
+        return get_sys_cpu_metadata()
 
     def getCpuUsage(self):
-        report = qoaUtils.get_sys_cpu_util()
+        report = get_sys_cpu_util()
         return {"value": report, "unit": "percentage"}
 
     def getGpuMetadata(self):
-        report = qoaUtils.get_sys_gpu_metadata()
+        report = get_sys_gpu_metadata()
         return report
 
     def getGpuUsage(self):
-        report = qoaUtils.get_sys_gpu_usage()
+        report = get_sys_gpu_usage()
         return report
 
     def getMemMetadata(self):
-        mem = qoaUtils.get_sys_mem()
-        return {
-            "mem": {"capacity": qoaUtils.convert_to_gbyte(mem["total"]), "unit": "Gb"}
-        }
+        mem = get_sys_mem()
+        return {"mem": {"capacity": convert_to_gbyte(mem["total"]), "unit": "Gb"}}
 
     def getMemUsage(self):
-        mem = qoaUtils.get_sys_mem()
-        return {"value": qoaUtils.convert_to_mbyte(mem["used"]), "unit": "Mb"}
+        mem = get_sys_mem()
+        return {"value": convert_to_mbyte(mem["used"]), "unit": "Mb"}
 
     def register(self):
+        import requests
+
         cpuMetadata = self.getCpuMetadata()
         gpuMetadata = self.getGpuMetadata()
         memMetadata = self.getMemMetadata()
@@ -64,10 +73,6 @@ class SysMonitoringProbe:
             self.frequency = registerInfo["frequency"]
         else:
             raise Exception(f"Can't register probe {self.node_name}")
-
-    def writeToDb(self, report: dict, timestamp: int):
-        # self.db[str(timestamp)] = report
-        pass
 
     def createReport(self):
         timestamp = time.time()
@@ -91,14 +96,13 @@ class SysMonitoringProbe:
 
     def startReporting(self):
         self.started = True
-        self.reportThread = threading.Thread(target=self.reporting)
+        self.reportThread = Thread(target=self.reporting)
         self.reportThread.daemon = True
         self.reportThread.start()
 
     def stopReporting(self):
-        self.started = False 
+        self.started = False
         self.reportThread.join()
-
 
 
 if __name__ == "__main__":
@@ -108,4 +112,3 @@ if __name__ == "__main__":
     while True:
         sysMonitoringProbe.createReport()
         time.sleep(1)
-        
