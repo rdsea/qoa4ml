@@ -6,5 +6,8 @@
   ],
   "frequency": 1,
   "requireRegister": false,
-  "pid": 5432
+  "pid": [
+    4898,
+    4667
+  ]
 }

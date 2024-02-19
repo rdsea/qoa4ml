@@ -13,6 +13,7 @@ import json
 import time
 from probe import Probe
 
+
 class SystemMonitoringProbe(Probe):
     def __init__(self, config: dict) -> None:
         super().__init__(config)

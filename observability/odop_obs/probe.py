@@ -1,6 +1,8 @@
 import time, json
 from threading import Thread
-class Probe: 
+
+
+class Probe:
     __slots__ = [
         "config",
         "node_name",
@@ -15,6 +17,7 @@ class Probe:
         "monitoring_service_url",
         "metrics",
     ]
+
     def __init__(self, config: dict) -> None:
         self.config = config
         self.frequency = self.config["frequency"]
@@ -24,6 +27,7 @@ class Probe:
 
     def register(self, cpu_metadata: dict, gpu_metadata: dict, mem_metadata: dict):
         import requests
+
         cpu_metadata = cpu_metadata
         gpu_metadata = gpu_metadata
         mem_metadata = mem_metadata
@@ -41,7 +45,7 @@ class Probe:
             raise Exception(f"Can't register probe {self.node_name}")
 
     def create_report(self):
-        pass 
+        pass
 
     def reporting(self):
         while self.started:
