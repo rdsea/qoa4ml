@@ -1,5 +1,8 @@
 import time, json
 from threading import Thread
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+import requests
 
 
 class Probe:
@@ -16,6 +19,7 @@ class Probe:
         "report_thread",
         "monitoring_service_url",
         "metrics",
+        "report_url"
     ]
 
     def __init__(self, config: dict) -> None:
@@ -24,9 +28,9 @@ class Probe:
         self.current_report = None
         self.started = False
         self.report_thread = None
+        self.report_url = config["request_url"]
 
     def register(self, cpu_metadata: dict, gpu_metadata: dict, mem_metadata: dict):
-        import requests
 
         cpu_metadata = cpu_metadata
         gpu_metadata = gpu_metadata
@@ -61,3 +65,7 @@ class Probe:
     def stop_reporting(self):
         self.started = False
         self.report_thread.join()
+
+    def send_report(self, report: dict):  
+        response = requests.post(self.report_url, json=report)
+        print(response.text)

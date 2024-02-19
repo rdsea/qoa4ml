@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException, status
 from pydantic import BaseModel
 import json
 import os
@@ -8,14 +8,30 @@ import time
 
 app = FastAPI()
 
+class ProcessReport(BaseModel):
+    metadata: dict 
+    timestamp: int
+    usage: dict 
 
-class ODOPObsService:
-    def __init__(
-        self, system_monitoring_probe_conf: dict, process_monitoring_probe_conf: dict
-    ) -> None:
-        self.router = APIRouter()
-        sef
+class NodeReport(BaseModel): 
+    node_name: str
+    timestamp: int 
+    cpu: dict 
+    gpu: dict 
+    mem: dict
 
+@app.post("/metrics/process", status_code=status.HTTP_200_OK)
+async def metric_process(report: ProcessReport):
+    try:
+        print(report)
+        return "Received"
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-odopObsService = ODOPObsService()
-app.include_router(odopObsService.router)
+@app.post("/metrics/node", status_code=status.HTTP_200_OK)
+async def metric_node(report: NodeReport):
+    try:
+        print(report)
+        return "Received"
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

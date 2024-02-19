@@ -60,8 +60,8 @@ class SystemMonitoringProbe(Probe):
             "mem": {"metadata": self.mem_metadata, "usage": mem_usage},
         }
         self.current_report = report
+        self.send_report(self.current_report)
         print(f"Latency {(time.time() - timestamp) * 1000}ms")
-
 
 if __name__ == "__main__":
     conf = json.load(open("./probe_conf.json"))

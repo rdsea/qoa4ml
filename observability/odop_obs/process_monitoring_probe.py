@@ -1,54 +1,48 @@
 import psutil
 from qoa4ml.qoaUtils import convert_to_mbyte, report_proc_child_cpu, report_proc_mem
 import json
-import time
+import time, os
 from probe import Probe
 
 
 class ProcessMonitoringProbe(Probe):
     def __init__(self, config: dict) -> None:
         super().__init__(config)
-        self.pids = config["pid"]
-        for pid in self.pids:
-            if not psutil.pid_exists(pid):
-                raise Exception(f"No process with pid {pid}")
-        self.processes = [psutil.Process(pid) for pid in self.pids]
+        if "pid" not in config.keys():
+            self.pid = os.getpid()
+        else:
+            self.pid = config["pid"]
+            if not psutil.pid_exists(self.pid):
+                raise Exception(f"No process with pid {self.pid}")
+        self.process = psutil.Process(self.pid)
         if self.config["requireRegister"]:
             self.obs_service_url = self.config["obsServiceUrl"]
 
     def get_cpu_usage(self):
-        report = []
-        for process in self.processes:
-            process_usage = report_proc_child_cpu(process)
-            report.append(process_usage)
-        return report
+        process_usage = report_proc_child_cpu(self.process)
+        return process_usage
 
     def get_mem_usage(self):
-        report = []
-        for process in self.processes:
-            data = report_proc_mem(process)
-            report.append(
-                {
-                    "rss": {"value": convert_to_mbyte(data["rss"]), "unit": "Mb"},
-                    "vms": {"value": convert_to_mbyte(data["vms"]), "unit": "Mb"},
-                }
-            )
-        return report
+        data = report_proc_mem(self.process)
+        return {
+            "rss": {"value": convert_to_mbyte(data["rss"]), "unit": "Mb"},
+            "vms": {"value": convert_to_mbyte(data["vms"]), "unit": "Mb"},
+        }
 
     def create_report(self):
         timestamp = time.time()
         cpu_usage = self.get_cpu_usage()
         mem_usage = self.get_mem_usage()
-        report = []
-        for process, cpu_usage, mem_usage in zip(self.processes, cpu_usage, mem_usage):
-            report.append(
-                {
-                    "metadata": {"pid": process.pid, "user": process.username()},
-                    "usage": {"cpu": cpu_usage, "mem": mem_usage},
-                }
-            )
+        report = {
+            "metadata": {"pid": self.pid, "user": self.process.username()},
+            "timestamp": int(timestamp),
+            "usage": {"cpu": cpu_usage, "mem": mem_usage},
+        }
+
         self.current_report = report
+        self.send_report(self.current_report)
         print(f"Latency {(time.time() - timestamp) * 1000}ms")
+
 
 
 if __name__ == "__main__":

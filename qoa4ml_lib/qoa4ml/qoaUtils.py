@@ -124,22 +124,30 @@ def report_proc_cpu(process):
 
     return report
 
-def report_proc_child_cpu(process: psutil.Process):
+def report_proc_child_cpu(process: psutil.Process, flatten = False):
     child_processes = process.children()
     child_processes_count = len(child_processes)
     child_processes_cpu = {}
 
     for id,child_proc in enumerate(child_processes):
         cpu_time = child_proc.cpu_times()
-        child_processes_cpu[f"child_{id}"] = cpu_time.user + cpu_time.system
+        child_processes_cpu[f"child_{id}"] = float(cpu_time.user + cpu_time.system)
 
     total_cpu_usage = sum(child_processes_cpu.values())
-    return {
-        "childProcess": child_processes_count,
-        "value": child_processes_cpu,
-        "total": total_cpu_usage,
-        "unit": "cputime" 
-    }
+    if not flatten:
+        return {
+            "childProcess": child_processes_count,
+            "value": child_processes_cpu,
+            "total": total_cpu_usage,
+            "unit": "cputime" 
+        }
+    else: 
+        return {
+            "childProcess": child_processes_count,
+            "total": total_cpu_usage,
+            "unit": "cputime", 
+            **child_processes_cpu
+        }
 
     
 def get_proc_cpu(pid = None):

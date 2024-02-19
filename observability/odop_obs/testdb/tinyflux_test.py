@@ -1,9 +1,7 @@
 from tinyflux import TinyFlux, Point
-from tinyflux.storages import MemoryStorage
 import time, datetime
 
-db = TinyFlux(storage=MemoryStorage)
-
+db = TinyFlux("./db.csv")
 p1 = Point(
     time=datetime.datetime.now(),
     tags={"city": "LA"},
@@ -15,8 +13,8 @@ p2 = Point(
     tags={"city": "SF"},
     fields={"aqi": 128},
 )
-for i in range(0, 31536000):
-    db.insert(p1)
-
 while True:
-    pass
+    start = time.time()
+    db.insert(p1)
+    print(f"latency {(time.time() - start)*1000}ms")
+    time.sleep(1)

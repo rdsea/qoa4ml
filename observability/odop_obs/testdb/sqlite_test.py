@@ -3,22 +3,15 @@ import time
 
 # 10MB
 if __name__ == "__main__":
-    conn = sqlite3.connect(":memory:")
+    conn = sqlite3.connect(":memory")
 
     c = conn.cursor()
 
-    c.execute(
-        """CREATE TEMPORARY TABLE IF NOT EXISTS temp_fruits (type TEXT, count INTEGER)"""
-    )
+    c.execute("""CREATE TABLE IF NOT EXISTS temp_fruits (type TEXT, count INTEGER)""")
 
-    while True:
+    for i in range(0, 2592000):
         c.execute("INSERT INTO temp_fruits VALUES ('apple', 7)")
-        c.execute("INSERT INTO temp_fruits VALUES ('peach', 3)")
 
         conn.commit()
 
-        c.execute("SELECT * FROM temp_fruits")
-        for row in c.fetchall():
-            print(row)
-
-        time.sleep(10)
+    time.sleep(1000)
