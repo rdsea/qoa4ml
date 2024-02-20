@@ -136,14 +136,14 @@ def report_proc_child_cpu(process: psutil.Process, flatten = False):
     total_cpu_usage = sum(child_processes_cpu.values())
     if not flatten:
         return {
-            "childProcess": child_processes_count,
+            "child_process": child_processes_count,
             "value": child_processes_cpu,
             "total": total_cpu_usage,
             "unit": "cputime" 
         }
     else: 
         return {
-            "childProcess": child_processes_count,
+            "child_process": child_processes_count,
             "total": total_cpu_usage,
             "unit": "cputime", 
             **child_processes_cpu

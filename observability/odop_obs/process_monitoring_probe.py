@@ -19,14 +19,15 @@ class ProcessMonitoringProbe(Probe):
             self.obs_service_url = self.config["obsServiceUrl"]
 
     def get_cpu_usage(self):
-        process_usage = report_proc_child_cpu(self.process)
+        process_usage = report_proc_child_cpu(self.process, True)
+        del process_usage["unit"]
         return process_usage
 
     def get_mem_usage(self):
         data = report_proc_mem(self.process)
         return {
-            "rss": {"value": convert_to_mbyte(data["rss"]), "unit": "Mb"},
-            "vms": {"value": convert_to_mbyte(data["vms"]), "unit": "Mb"},
+            "rss": convert_to_mbyte(data["rss"]),
+            "vms": convert_to_mbyte(data["vms"]),
         }
 
     def create_report(self):
@@ -34,15 +35,15 @@ class ProcessMonitoringProbe(Probe):
         cpu_usage = self.get_cpu_usage()
         mem_usage = self.get_mem_usage()
         report = {
-            "metadata": {"pid": self.pid, "user": self.process.username()},
+            "metadata": {"pid": str(self.pid), "user": self.process.username()},
             "timestamp": int(timestamp),
-            "usage": {"cpu": cpu_usage, "mem": mem_usage},
+            "cpu_usage": cpu_usage,
+            "mem_usage": mem_usage,
         }
 
         self.current_report = report
-        self.send_report(self.current_report)
+        #self.send_report(self.current_report)
         print(f"Latency {(time.time() - timestamp) * 1000}ms")
-
 
 
 if __name__ == "__main__":

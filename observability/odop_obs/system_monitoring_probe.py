@@ -29,7 +29,7 @@ class SystemMonitoringProbe(Probe):
 
     def get_cpu_usage(self):
         report = get_sys_cpu_util()
-        return {"value": report, "unit": "percentage"}
+        return report
 
     def get_gpu_metadata(self):
         report = get_sys_gpu_metadata()
@@ -45,7 +45,7 @@ class SystemMonitoringProbe(Probe):
 
     def get_mem_usage(self):
         mem = get_sys_mem()
-        return {"value": convert_to_mbyte(mem["used"]), "unit": "Mb"}
+        return {"mem_usage" : convert_to_mbyte(mem["used"])}
 
     def create_report(self):
         timestamp = time.time()
@@ -55,13 +55,14 @@ class SystemMonitoringProbe(Probe):
         report = {
             "node_name": self.node_name,
             "timestamp": int(timestamp),
-            "cpu": {"metadata": self.cpu_metadata, "usage": cpu_usage},
-            "gpu": {"metadata": self.gpu_metadata, "usage": gpu_usage},
-            "mem": {"metadata": self.mem_metadata, "usage": mem_usage},
+            "cpu_usage": cpu_usage,
+            "gpu_usage": gpu_usage,
+            "mem_usage": mem_usage,
         }
         self.current_report = report
         self.send_report(self.current_report)
         print(f"Latency {(time.time() - timestamp) * 1000}ms")
+
 
 if __name__ == "__main__":
     conf = json.load(open("./probe_conf.json"))

@@ -6,5 +6,5 @@
   ],
   "frequency": 1,
   "requireRegister": false,
-  "request_url": "http://127.0.0.1:8000/metrics/node"
+  "request_url": "http://127.0.0.1:8000/metrics/system"
 }

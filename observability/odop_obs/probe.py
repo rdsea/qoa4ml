@@ -19,7 +19,7 @@ class Probe:
         "report_thread",
         "monitoring_service_url",
         "metrics",
-        "report_url"
+        "report_url",
     ]
 
     def __init__(self, config: dict) -> None:
@@ -31,7 +31,6 @@ class Probe:
         self.report_url = config["request_url"]
 
     def register(self, cpu_metadata: dict, gpu_metadata: dict, mem_metadata: dict):
-
         cpu_metadata = cpu_metadata
         gpu_metadata = gpu_metadata
         mem_metadata = mem_metadata
@@ -66,6 +65,6 @@ class Probe:
         self.started = False
         self.report_thread.join()
 
-    def send_report(self, report: dict):  
+    def send_report(self, report: dict):
         response = requests.post(self.report_url, json=report)
         print(response.text)

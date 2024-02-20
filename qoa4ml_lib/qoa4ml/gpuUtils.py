@@ -17,17 +17,8 @@ def get_sys_gpu_usage():
         handle = nvmlDeviceGetHandleByIndex(i)
         util = nvmlDeviceGetUtilizationRates(handle)
         mem = nvmlDeviceGetMemoryInfo(handle) 
-        usage[f"device_{i+1}"] = {
-            "core": {
-                "value": util.gpu,
-                "unit": "percentage"
-            },
-            "mem": {
-                "value": mem.used/1024./1024,
-                "unit": "Mb"
-            }
-        }
-    
+        usage[f"device_{i+1}_core"] = util.gpu
+        usage[f"device_{i+1}_mem"] = mem.used/1024./1024
     return usage
 
 def get_sys_gpu_metadata():
