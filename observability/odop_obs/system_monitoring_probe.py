@@ -60,7 +60,7 @@ class SystemMonitoringProbe(Probe):
             "mem_usage": mem_usage,
         }
         self.current_report = report
-        self.send_report(self.current_report)
+        self.send_report_socket(self.current_report)
         print(f"Latency {(time.time() - timestamp) * 1000}ms")
 
 

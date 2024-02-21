@@ -2,8 +2,10 @@ import time, json
 from threading import Thread
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-import requests
+import requests, pickle, socket
 
+HOST = '127.0.0.1'
+PORT = 12345
 
 class Probe:
     __slots__ = [
@@ -66,5 +68,15 @@ class Probe:
         self.report_thread.join()
 
     def send_report(self, report: dict):
+        start = time.time()
         response = requests.post(self.report_url, json=report)
-        print(response.text)
+        print(f"Sending data latency {(time.time() - start)*1000}ms")
+
+    def send_report_socket(self, report: dict):
+        start = time.time()
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((HOST, PORT))
+        serialized_dict = pickle.dumps(report)
+        client_socket.sendall(serialized_dict)
+        client_socket.close()
+        print(f"Sending data latency {(time.time() - start)*1000}ms")
