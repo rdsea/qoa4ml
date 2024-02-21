@@ -45,7 +45,7 @@ class SystemMonitoringProbe(Probe):
 
     def get_mem_usage(self):
         mem = get_sys_mem()
-        return {"mem_usage" : convert_to_mbyte(mem["used"])}
+        return {"mem_usage": convert_to_mbyte(mem["used"])}
 
     def create_report(self):
         timestamp = time.time()
@@ -65,7 +65,7 @@ class SystemMonitoringProbe(Probe):
 
 
 if __name__ == "__main__":
-    conf = json.load(open("./probe_conf.json"))
+    conf = json.load(open("./system_probe_conf.json"))
 
     sys_monitoring_probe = SystemMonitoringProbe(conf)
     del conf

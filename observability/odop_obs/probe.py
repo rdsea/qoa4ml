@@ -4,8 +4,9 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import requests, pickle, socket
 
-HOST = '127.0.0.1'
+HOST = "127.0.0.1"
 PORT = 12345
+
 
 class Probe:
     __slots__ = [
@@ -22,11 +23,13 @@ class Probe:
         "monitoring_service_url",
         "metrics",
         "report_url",
+        "monitoring_interval",
     ]
 
     def __init__(self, config: dict) -> None:
         self.config = config
         self.frequency = self.config["frequency"]
+        self.monitoring_interval = 1.0 / self.frequency
         self.current_report = None
         self.started = False
         self.report_thread = None
@@ -55,7 +58,7 @@ class Probe:
     def reporting(self):
         while self.started:
             self.create_report()
-            time.sleep(1)
+            time.sleep(self.monitoring_interval)
 
     def start_reporting(self):
         self.started = True

@@ -1,8 +1,9 @@
 import socket
-import pickle
+import pickle, time
 from pydantic import BaseModel, ValidationError
-from tinyflux import TinyFlux, Point
+from tinyflux import TinyFlux, Point, TimeQuery
 from datetime import datetime
+
 
 class ProcessReport(BaseModel):
     metadata: dict
@@ -10,12 +11,14 @@ class ProcessReport(BaseModel):
     cpu_usage: dict
     mem_usage: dict
 
+
 class SystemReport(BaseModel):
     node_name: str
     timestamp: int
     cpu_usage: dict
     gpu_usage: dict
     mem_usage: dict
+
 
 class NodeExporter:
     def __init__(self, config):
@@ -34,11 +37,14 @@ class NodeExporter:
         server_socket.listen(5)
 
         print("Node Exporter server listening on", (host, port))
-
+        last_print = time.time()
         while True:
             client_socket, addr = server_socket.accept()
             print("Connected to", addr)
             self.handle_client(client_socket)
+            if time.time() - last_print > 1:
+                node_exporter.query_get_lastest_timestamp()
+                last_print = time.time()
 
     def handle_client(self, client_socket):
         data = b""
@@ -54,7 +60,6 @@ class NodeExporter:
                 report = SystemReport(**report_dict)
             else:
                 report = ProcessReport(**report_dict)
-            print(report)
             self.process_report(report)
         except ValidationError as e:
             print("Validation error:", e)
@@ -65,21 +70,20 @@ class NodeExporter:
 
     def process_report(self, report):
         try:
-            if isinstance(report, SystemReport): 
-                fields = {
-                    **report.cpu_usage, 
-                    **report.gpu_usage, 
-                    **report.mem_usage
-                }
-                self.insert_metric(report.timestamp, {"node_name": report.node_name}, fields)
-            else: 
-                fields = {
-                    **report.cpu_usage, 
-                    **report.mem_usage
-                }
+            if isinstance(report, SystemReport):
+                fields = {**report.cpu_usage, **report.gpu_usage, **report.mem_usage}
+                self.insert_metric(
+                    report.timestamp, {"node_name": report.node_name}, fields
+                )
+            else:
+                fields = {**report.cpu_usage, **report.mem_usage}
                 self.insert_metric(report.timestamp, report.metadata, fields)
         except Exception as e:
             print("Error processing report:", e)
+
+    def query_get_lastest_timestamp(self):
+        time_query = TimeQuery()
+        print(len(self.db.search(time_query > datetime.fromtimestamp(time.time() - 1))))
 
 
 if __name__ == "__main__":
