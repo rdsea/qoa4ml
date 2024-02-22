@@ -9,7 +9,7 @@ from qoa4ml.gpuUtils import (
     get_sys_gpu_metadata,
     get_sys_gpu_usage,
 )
-import json
+import yaml
 import time
 from probe import Probe
 
@@ -28,8 +28,8 @@ class SystemMonitoringProbe(Probe):
         return get_sys_cpu_metadata()
 
     def get_cpu_usage(self):
-        report = get_sys_cpu_util()
-        return report
+        value = get_sys_cpu_util()
+        return {"value": value, "unit": "percentage"}
 
     def get_gpu_metadata(self):
         report = get_sys_gpu_metadata()
@@ -45,7 +45,7 @@ class SystemMonitoringProbe(Probe):
 
     def get_mem_usage(self):
         mem = get_sys_mem()
-        return {"mem_usage": convert_to_mbyte(mem["used"])}
+        return {"value": convert_to_mbyte(mem["used"]), "unit": "Mb"}
 
     def create_report(self):
         timestamp = time.time()
@@ -55,17 +55,29 @@ class SystemMonitoringProbe(Probe):
         report = {
             "node_name": self.node_name,
             "timestamp": int(timestamp),
-            "cpu_usage": cpu_usage,
-            "gpu_usage": gpu_usage,
-            "mem_usage": mem_usage,
+            "cpu": {
+                "metadata": self.cpu_metadata,
+                "usage": cpu_usage,
+            },
+            "gpu": {
+                "metadata": self.gpu_metadata,
+                "usage": gpu_usage,
+            },
+            "mem": {
+                "metadata": self.mem_metadata,
+                "usage": mem_usage,
+            },
         }
         self.current_report = report
+        self.write_log(
+           (time.time() - timestamp) * 1000,
+           self.logging_path + "calculating_system_metric_latency.txt",
+        )
         self.send_report_socket(self.current_report)
-        print(f"Latency {(time.time() - timestamp) * 1000}ms")
 
 
 if __name__ == "__main__":
-    conf = json.load(open("./system_probe_conf.json"))
+    conf = yaml.safe_load(open("./system_probe_conf.yaml"))
 
     sys_monitoring_probe = SystemMonitoringProbe(conf)
     del conf

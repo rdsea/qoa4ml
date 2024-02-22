@@ -24,6 +24,7 @@ class Probe:
         "metrics",
         "report_url",
         "monitoring_interval",
+        "logging_path",
     ]
 
     def __init__(self, config: dict) -> None:
@@ -34,6 +35,7 @@ class Probe:
         self.started = False
         self.report_thread = None
         self.report_url = config["request_url"]
+        self.logging_path = config["logging_path"]
 
     def register(self, cpu_metadata: dict, gpu_metadata: dict, mem_metadata: dict):
         cpu_metadata = cpu_metadata
@@ -82,4 +84,11 @@ class Probe:
         serialized_dict = pickle.dumps(report)
         client_socket.sendall(serialized_dict)
         client_socket.close()
-        print(f"Sending data latency {(time.time() - start)*1000}ms")
+        self.write_log(
+            (time.time() - start) * 1000, self.logging_path + "report_latency.txt"
+        )
+
+    def write_log(self, latency, filepath: str):
+        with open(filepath, "a") as file:
+            # Append the number to the file
+            file.write(str(latency) + "\n")

@@ -14,3 +14,4 @@ modules/orchestration/temp/
 .ipynb_checkpoints/
 .env
 *.pem
+observability/odop_obs/logs/*.txt

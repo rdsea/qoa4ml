@@ -1,4 +1,5 @@
 import psutil
+import yaml
 from qoa4ml.qoaUtils import convert_to_mbyte, report_proc_child_cpu, report_proc_mem
 import json
 import time, os
@@ -19,15 +20,15 @@ class ProcessMonitoringProbe(Probe):
             self.obs_service_url = self.config["obsServiceUrl"]
 
     def get_cpu_usage(self):
-        process_usage = report_proc_child_cpu(self.process, True)
+        process_usage = report_proc_child_cpu(self.process)
         del process_usage["unit"]
         return process_usage
 
     def get_mem_usage(self):
         data = report_proc_mem(self.process)
         return {
-            "rss": convert_to_mbyte(data["rss"]),
-            "vms": convert_to_mbyte(data["vms"]),
+            "rss": {"value": convert_to_mbyte(data["rss"]), "unit": "Mb"},
+            "vms": {"value": convert_to_mbyte(data["vms"]), "unit": "Mb"},
         }
 
     def create_report(self):
@@ -37,17 +38,36 @@ class ProcessMonitoringProbe(Probe):
         report = {
             "metadata": {"pid": str(self.pid), "user": self.process.username()},
             "timestamp": int(timestamp),
-            "cpu_usage": cpu_usage,
-            "mem_usage": mem_usage,
+            "usage": {"cpu": cpu_usage, "mem": mem_usage},
         }
 
-        self.current_report = report
+        self.current_report = self.flatten(report)
+        self.write_log(
+            (time.time() - timestamp) * 1000,
+            self.logging_path + "calculating_process_metric_latency.txt",
+        )
         self.send_report_socket(self.current_report)
-        print(f"Latency {(time.time() - timestamp) * 1000}ms")
+
+    def flatten(self, report: dict):
+        cpu_usage = report["usage"]["cpu"]
+        mem_usage = report["usage"]["mem"]
+        return {
+            "metadata": {**report["metadata"]},
+            "timestamp": report["timestamp"],
+            "cpu_usage": {
+                "child_process": cpu_usage["child_process"],
+                **cpu_usage["value"],
+                "total": cpu_usage["total"],
+            },
+            "mem_usage": {
+                "rss": mem_usage["rss"]["value"],
+                "vms": mem_usage["vms"]["value"],
+            },
+        }
 
 
 if __name__ == "__main__":
-    conf = json.load(open("./proces_probe_conf.json"))
+    conf = yaml.safe_load(open("./process_probe_conf.yaml"))
 
     process_monitoring_probe = ProcessMonitoringProbe(conf)
     del conf

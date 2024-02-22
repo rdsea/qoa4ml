@@ -1,8 +1,12 @@
 import socket
-import pickle, time
+import pickle
+from threading import Thread
+import time
 from pydantic import BaseModel, ValidationError
+from tinyflux.storages import MemoryStorage
 from tinyflux import TinyFlux, Point, TimeQuery
 from datetime import datetime
+from fastapi import FastAPI
 
 
 class ProcessReport(BaseModel):
@@ -23,7 +27,9 @@ class SystemReport(BaseModel):
 class NodeExporter:
     def __init__(self, config):
         self.config = config
+        # self.db = TinyFlux(storage=MemoryStorage)
         self.db = TinyFlux("./db.csv")
+        self.last_timestamp = time.time()
 
     def insert_metric(self, timestamp: int, tags: dict, fields: dict):
         datapoint = Point(
@@ -43,7 +49,7 @@ class NodeExporter:
             print("Connected to", addr)
             self.handle_client(client_socket)
             if time.time() - last_print > 1:
-                node_exporter.query_get_lastest_timestamp()
+                self.query_get_lastest_timestamp()
                 last_print = time.time()
 
     def handle_client(self, client_socket):
@@ -73,19 +79,39 @@ class NodeExporter:
             if isinstance(report, SystemReport):
                 fields = {**report.cpu_usage, **report.gpu_usage, **report.mem_usage}
                 self.insert_metric(
-                    report.timestamp, {"node_name": report.node_name}, fields
+                    report.timestamp,
+                    {
+                        "type": "node",
+                        "node_name": report.node_name,
+                    },
+                    fields,
                 )
             else:
                 fields = {**report.cpu_usage, **report.mem_usage}
-                self.insert_metric(report.timestamp, report.metadata, fields)
+                self.insert_metric(
+                    report.timestamp, {"type": "process", **report.metadata}, fields
+                )
         except Exception as e:
             print("Error processing report:", e)
 
     def query_get_lastest_timestamp(self):
         time_query = TimeQuery()
-        print(len(self.db.search(time_query > datetime.fromtimestamp(time.time() - 1))))
+        data = self.db.search(
+            time_query > datetime.fromtimestamp(self.last_timestamp - 1)
+        )
+        self.last_timestamp = time.time()
+        return [(datapoint.tags, datapoint.fields) for datapoint in data]
 
 
-if __name__ == "__main__":
-    node_exporter = NodeExporter({})
-    node_exporter.start_server("127.0.0.1", 12345)
+node_exporter = NodeExporter({})
+node_exporter_handle_client_thread = Thread(
+    target=node_exporter.start_server, args=("127.0.0.1", 12345)
+)
+node_exporter_handle_client_thread.daemon = True
+node_exporter_handle_client_thread.start()
+app = FastAPI()
+
+
+@app.get("/latest_timestamp")
+async def get_latest_timestamp():
+    return {"latest_timestamp": node_exporter.query_get_lastest_timestamp()}

@@ -1,0 +1,8 @@
+metrics:
+  - cpu_usage
+  - gpu_usage
+  - memory_used
+frequency: 1
+requireRegister: false
+request_url: "http://127.0.0.1:8000/metrics/system"
+logging_path: "/home/nguu0123/git/research/QoA4ML/observability/odop_obs/logs/"
