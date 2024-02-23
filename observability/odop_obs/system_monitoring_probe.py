@@ -70,8 +70,8 @@ class SystemMonitoringProbe(Probe):
         }
         self.current_report = report
         self.write_log(
-           (time.time() - timestamp) * 1000,
-           self.logging_path + "calculating_system_metric_latency.txt",
+            (time.time() - timestamp) * 1000,
+            self.logging_path + "calculating_system_metric_latency.txt",
         )
         self.send_report_socket(self.current_report)
 
@@ -81,6 +81,6 @@ if __name__ == "__main__":
 
     sys_monitoring_probe = SystemMonitoringProbe(conf)
     del conf
+    sys_monitoring_probe.start_reporting()
     while True:
-        sys_monitoring_probe.create_report()
         time.sleep(1)

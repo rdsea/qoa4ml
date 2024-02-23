@@ -84,9 +84,9 @@ class Probe:
         serialized_dict = pickle.dumps(report)
         client_socket.sendall(serialized_dict)
         client_socket.close()
-        self.write_log(
-            (time.time() - start) * 1000, self.logging_path + "report_latency.txt"
-        )
+        # self.write_log(
+        #    (time.time() - start) * 1000, self.logging_path + "report_latency.txt"
+        # )
 
     def write_log(self, latency, filepath: str):
         with open(filepath, "a") as file:

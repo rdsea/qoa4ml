@@ -41,29 +41,12 @@ class ProcessMonitoringProbe(Probe):
             "usage": {"cpu": cpu_usage, "mem": mem_usage},
         }
 
-        self.current_report = self.flatten(report)
+        self.current_report = report
         self.write_log(
             (time.time() - timestamp) * 1000,
             self.logging_path + "calculating_process_metric_latency.txt",
         )
         self.send_report_socket(self.current_report)
-
-    def flatten(self, report: dict):
-        cpu_usage = report["usage"]["cpu"]
-        mem_usage = report["usage"]["mem"]
-        return {
-            "metadata": {**report["metadata"]},
-            "timestamp": report["timestamp"],
-            "cpu_usage": {
-                "child_process": cpu_usage["child_process"],
-                **cpu_usage["value"],
-                "total": cpu_usage["total"],
-            },
-            "mem_usage": {
-                "rss": mem_usage["rss"]["value"],
-                "vms": mem_usage["vms"]["value"],
-            },
-        }
 
 
 if __name__ == "__main__":
