@@ -9,7 +9,7 @@ from tinyflux.storages import MemoryStorage
 from tinyflux import TinyFlux, Point, TimeQuery
 from datetime import datetime
 from fastapi import FastAPI
-from flatten_dict import flatten
+from flatten_dict import flatten, unflatten
 
 
 class ProcessReport(BaseModel):
@@ -93,7 +93,7 @@ class NodeExporter:
                     fields,
                 )
             else:
-                metadata = flatten(report.metadata, "dot")
+                metadata = flatten({"metadata": report.metadata}, "dot")
                 timestamp = report.timestamp
                 del report.metadata, report.timestamp
                 fields = self.convert_unit(flatten(report.__dict__, "dot"))
@@ -127,7 +127,7 @@ class NodeExporter:
             time_query > datetime.fromtimestamp(self.last_timestamp - 1)
         )
         self.last_timestamp = time.time()
-        return [(datapoint.tags, datapoint.fields) for datapoint in data]
+        return [unflatten({**datapoint.tags, **datapoint.fields}, 'dot') for datapoint in data]
 
 
 node_exporter = NodeExporter({}, yaml.safe_load(open("./unit_conversion.yaml")))
