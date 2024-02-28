@@ -1,3 +1,4 @@
+import math
 import time, json
 from threading import Thread
 from urllib.parse import urlencode
@@ -25,17 +26,19 @@ class Probe:
         "report_url",
         "monitoring_interval",
         "logging_path",
+        "max_latency"
     ]
 
     def __init__(self, config: dict) -> None:
         self.config = config
         self.frequency = self.config["frequency"]
         self.monitoring_interval = 1.0 / self.frequency
-        self.current_report = None
         self.started = False
         self.report_thread = None
         self.report_url = config["request_url"]
         self.logging_path = config["logging_path"]
+        self.current_report = {}
+        self.max_latency = 0.0
 
     def register(self, cpu_metadata: dict, gpu_metadata: dict, mem_metadata: dict):
         cpu_metadata = cpu_metadata
@@ -58,9 +61,14 @@ class Probe:
         pass
 
     def reporting(self):
+        current_time = time.time()
+        time.sleep(math.ceil(current_time) - current_time )
         while self.started:
+            start = time.time()
             self.create_report()
-            time.sleep(self.monitoring_interval)
+            self.send_report_socket(self.current_report)
+            self.max_latency = max(time.time() - start, self.max_latency)
+            time.sleep(round(time.time()) + self.monitoring_interval - self.max_latency - time.time())
 
     def start_reporting(self):
         self.started = True
@@ -79,11 +87,14 @@ class Probe:
 
     def send_report_socket(self, report: dict):
         start = time.time()
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((HOST, PORT))
-        serialized_dict = pickle.dumps(report)
-        client_socket.sendall(serialized_dict)
-        client_socket.close()
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((HOST, PORT))
+            serialized_dict = pickle.dumps(report)
+            client_socket.sendall(serialized_dict)
+            client_socket.close()
+        except ConnectionRefusedError:
+            print("connection refuse")
         # self.write_log(
         #    (time.time() - start) * 1000, self.logging_path + "report_latency.txt"
         # )

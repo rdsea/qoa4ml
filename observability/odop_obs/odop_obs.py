@@ -1,5 +1,6 @@
-from observability.odop_obs.process_monitoring_probe import ProcessMonitoringProbe
-from observability.odop_obs.system_monitoring_probe import SystemMonitoringProbe
+import multiprocessing, subprocess
+from process_monitoring_probe import ProcessMonitoringProbe
+from system_monitoring_probe import SystemMonitoringProbe
 
 
 class OdopObs:
@@ -10,14 +11,15 @@ class OdopObs:
         self.system_probe = SystemMonitoringProbe(self.system_config)
 
     def start(self):
-        pass
+        self.exporter_process = multiprocessing.Process(target=self.start_exporter)
+        self.exporter_process.start()
+        self.system_probe.start_reporting()
+        self.process_probe.start_reporting()
 
-    def start_process_monitoring(self):
-        pass
-
-    def start_system_monitoring(self):
-        pass
+    def start_exporter(self):
+        subprocess.run(["uvicorn", "exporter:app", "--port", "8000"])
 
     def stop(self):
         self.process_probe.stop_reporting()
         self.system_probe.stop_reporting()
+        self.exporter_process.kill()

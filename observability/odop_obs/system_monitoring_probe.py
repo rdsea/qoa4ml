@@ -1,3 +1,4 @@
+import math
 from qoa4ml.qoaUtils import (
     get_sys_cpu_util,
     get_sys_mem,
@@ -54,7 +55,7 @@ class SystemMonitoringProbe(Probe):
         mem_usage = self.get_mem_usage()
         report = {
             "node_name": self.node_name,
-            "timestamp": int(timestamp),
+            "timestamp": round(timestamp),
             "cpu": {
                 "metadata": self.cpu_metadata,
                 "usage": cpu_usage,
@@ -73,7 +74,6 @@ class SystemMonitoringProbe(Probe):
             (time.time() - timestamp) * 1000,
             self.logging_path + "calculating_system_metric_latency.txt",
         )
-        self.send_report_socket(self.current_report)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import math
 import socket
 import pickle
 from threading import Thread
@@ -14,16 +15,20 @@ from flatten_dict import flatten, unflatten
 
 class ProcessReport(BaseModel):
     metadata: dict
-    timestamp: int
+    timestamp: float
     usage: dict
 
 
 class SystemReport(BaseModel):
     node_name: str
-    timestamp: int
+    timestamp: float
     cpu: dict
     gpu: dict
     mem: dict
+
+
+class Request(BaseModel):
+    timestamp: float
 
 
 class NodeExporter:
@@ -34,11 +39,11 @@ class NodeExporter:
         self.db = TinyFlux("./db.csv")
         self.last_timestamp = time.time()
 
-    def insert_metric(self, timestamp: int, tags: dict, fields: dict):
+    def insert_metric(self, timestamp: float, tags: dict, fields: dict):
         datapoint = Point(
             time=datetime.fromtimestamp(timestamp), tags=tags, fields=fields
         )
-        self.db.insert(datapoint)
+        self.db.insert(datapoint, compact_key_prefixes=True)
 
     def start_server(self, host, port):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,9 +56,6 @@ class NodeExporter:
             client_socket, addr = server_socket.accept()
             print("Connected to", addr)
             self.handle_client(client_socket)
-            if time.time() - last_print > 1:
-                self.query_get_lastest_timestamp()
-                last_print = time.time()
 
     def handle_client(self, client_socket):
         data = b""
@@ -123,11 +125,11 @@ class NodeExporter:
 
     def query_get_lastest_timestamp(self):
         time_query = TimeQuery()
-        data = self.db.search(
-            time_query > datetime.fromtimestamp(self.last_timestamp - 1)
-        )
-        self.last_timestamp = time.time()
-        return [unflatten({**datapoint.tags, **datapoint.fields}, 'dot') for datapoint in data]
+        data = self.db.search(time_query >= datetime.fromtimestamp(math.floor(time.time())))
+        return [
+            unflatten({**datapoint.tags, **datapoint.fields}, "dot")
+            for datapoint in data
+        ]
 
 
 node_exporter = NodeExporter({}, yaml.safe_load(open("./unit_conversion.yaml")))
@@ -139,6 +141,6 @@ node_exporter_handle_client_thread.start()
 app = FastAPI()
 
 
-@app.get("/latest_timestamp")
-async def get_latest_timestamp():
-    return {"latest_timestamp": node_exporter.query_get_lastest_timestamp()}
+@app.get("/metrics")
+async def get_latest_timestamp(request: Request):
+    return node_exporter.query_get_lastest_timestamp()

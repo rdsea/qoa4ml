@@ -1,3 +1,4 @@
+import math
 import psutil
 import yaml
 from qoa4ml.qoaUtils import convert_to_mbyte, report_proc_child_cpu, report_proc_mem
@@ -37,7 +38,7 @@ class ProcessMonitoringProbe(Probe):
         mem_usage = self.get_mem_usage()
         report = {
             "metadata": {"pid": str(self.pid), "user": self.process.username()},
-            "timestamp": int(timestamp),
+            "timestamp": round(timestamp),
             "usage": {"cpu": cpu_usage, "mem": mem_usage},
         }
 
@@ -46,7 +47,6 @@ class ProcessMonitoringProbe(Probe):
             (time.time() - timestamp) * 1000,
             self.logging_path + "calculating_process_metric_latency.txt",
         )
-        self.send_report_socket(self.current_report)
 
 
 if __name__ == "__main__":
