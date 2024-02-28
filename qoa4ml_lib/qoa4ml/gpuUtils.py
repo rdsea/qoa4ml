@@ -11,7 +11,11 @@ def get_sys_gpu_usage():
     usage = {} 
     if not HAS_NVIDIA_GPU: 
         return {}
-    deviceCount = nvmlDeviceGetCount()
+    try:    
+        deviceCount = nvmlDeviceGetCount()
+    except : 
+        nvmlInit()
+        deviceCount = nvmlDeviceGetCount()
     
     for i in range(deviceCount):
         handle = nvmlDeviceGetHandleByIndex(i)
@@ -25,7 +29,11 @@ def get_sys_gpu_metadata():
     metadata = {}
     if not HAS_NVIDIA_GPU: 
         return {}
-    deviceCount = nvmlDeviceGetCount()
+    try:    
+        deviceCount = nvmlDeviceGetCount()
+    except : 
+        nvmlInit()
+        deviceCount = nvmlDeviceGetCount()
 
     for i in range(deviceCount):
         handle = nvmlDeviceGetHandleByIndex(i)

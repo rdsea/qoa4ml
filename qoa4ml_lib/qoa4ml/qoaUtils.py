@@ -126,7 +126,7 @@ def report_proc_cpu(process):
 
 def report_proc_child_cpu(process: psutil.Process):
     #WARNING: this children function takes a lot of time
-    child_processes = process.children()
+    child_processes = process.children(recursive=True)
     child_processes_count = len(child_processes)
     child_processes_cpu = {}
     process_cpu_time = process.cpu_times()
