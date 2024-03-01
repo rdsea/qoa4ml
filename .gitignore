@@ -15,3 +15,5 @@ modules/orchestration/temp/
 .env
 *.pem
 observability/odop_obs/logs/*.txt
+observability/odop_obs/tinyflux/*.csv
+

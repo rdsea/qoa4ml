@@ -1,10 +1,14 @@
 import math
-import psutil
-import yaml
+import psutil, logging
+import yaml, argparse
 from qoa4ml.qoaUtils import convert_to_mbyte, report_proc_child_cpu, report_proc_mem
 import json
 import time, os
-from probe import Probe
+from core.probe import Probe
+
+logging.basicConfig(
+    format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
+)
 
 
 class ProcessMonitoringProbe(Probe):
@@ -43,17 +47,23 @@ class ProcessMonitoringProbe(Probe):
         }
 
         self.current_report = report
-        self.write_log(
-            (time.time() - timestamp) * 1000,
-            self.logging_path + "calculating_process_metric_latency.txt",
-        )
+        if self.log_latency_flag:
+            self.write_log(
+                (time.time() - timestamp) * 1000,
+                self.latency_logging_path + "calculating_process_metric_latency.txt",
+            )
 
 
 if __name__ == "__main__":
-    conf = yaml.safe_load(open("./process_probe_conf.yaml"))
-
-    process_monitoring_probe = ProcessMonitoringProbe(conf)
-    del conf
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c", "--config", help="config path", default="config/process_probe_conf.yaml"
+    )
+    args = parser.parse_args()
+    config_file = args.config
+    config = yaml.safe_load(open(config_file))
+    process_monitoring_probe = ProcessMonitoringProbe(config)
+    del config
     process_monitoring_probe.start_reporting()
     while True:
         time.sleep(10)
