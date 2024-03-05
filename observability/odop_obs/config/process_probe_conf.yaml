@@ -1,10 +1,6 @@
-metrics:
-  - cpu_usage
-  - gpu_usage
-  - memory_used
 frequency: 1
 requireRegister: false
-request_url: "http://127.0.0.1:8000/metrics/process"
-logging_path: "logs/"
+log_latency_flag: true
+latency_logging_path: "logs/"
 aggregator_host: "127.0.0.1"
 aggregator_port: 12345

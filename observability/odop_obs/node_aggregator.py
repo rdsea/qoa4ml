@@ -3,23 +3,23 @@ import socket
 import pickle
 import argparse
 from threading import Thread
-import time, logging, traceback
-import sys, os
-import odop_utils
+from datetime import datetime
+import time
+import logging
+import sys
+from typing import Union
 import yaml
 from pydantic import ValidationError
-from tinyflux.storages import MemoryStorage
-from tinyflux import TinyFlux, Point, TimeQuery
-from datetime import datetime
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
-from core.common import SystemReport, ProcessReport
+from tinyflux import TinyFlux, Point, TimeQuery
+from .core.common import SystemReport, ProcessReport, ODOP_PATH
+from . import odop_utils
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
 )
 
-from core.common import ODOP_PATH
 
 sys.path.append(ODOP_PATH)
 DEFAULT_DATABASE_FOLDER = ODOP_PATH + "tinyflux/"
@@ -31,8 +31,6 @@ class NodeAggregator:
     def __init__(self, config):
         self.config = config
         self.unit_conversion = self.config["unit_conversion"]
-        # self.db = TinyFlux(storage=MemoryStorage)
-        print(DEFAULT_DATABASE_FOLDER)
         self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + str(self.config["database_path"]))
         self.server_thread = Thread(
             target=self.start_handling, args=(self.config["host"], self.config["port"])
@@ -56,7 +54,7 @@ class NodeAggregator:
         server_socket.bind((host, port))
         server_socket.listen(self.config["backlog_number"])
         while self.execution_flag:
-            client_socket, addr = server_socket.accept()
+            client_socket, _ = server_socket.accept()
             self.handle_client(client_socket)
 
     def handle_client(self, client_socket):
@@ -67,51 +65,40 @@ class NodeAggregator:
                 break
             data += packet
 
-        report_dict = pickle.loads(data)
+        report = pickle.loads(data)
         try:
-            if "node_name" in report_dict:
-                report = SystemReport(**report_dict)
-            else:
-                report = ProcessReport(**report_dict)
             self.process_report(report)
         except ValidationError as e:
-            logging.error("ValidationError: ", e)
-        except Exception as e:
-            logging.error(
-                msg="Can't parse metric report", exc_info=traceback.print_exc()
-            )
+            logging.exception("ValidationError: %s ", e)
 
         client_socket.close()
 
-    def process_report(self, report):
-        try:
-            if isinstance(report, SystemReport):
-                node_name = report.node_name
-                timestamp = report.timestamp
-                del report.node_name, report.timestamp
-                fields = self.convert_unit(
-                    flatten(report.__dict__, self.config["data_separator"])
-                )
-                self.insert_metric(
-                    timestamp,
-                    {
-                        "type": "node",
-                        "node_name": node_name,
-                    },
-                    fields,
-                )
-            else:
-                metadata = flatten(
-                    {"metadata": report.metadata}, self.config["data_separator"]
-                )
-                timestamp = report.timestamp
-                del report.metadata, report.timestamp
-                fields = self.convert_unit(
-                    flatten(report.__dict__, self.config["data_separator"])
-                )
-                self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
-        except Exception as e:
-            print("Error processing report:", e)
+    def process_report(self, report: Union[SystemReport, ProcessReport]):
+        if isinstance(report, SystemReport):
+            node_name = report.metadata.node_name
+            timestamp = report.timestamp
+            del report.metadata, report.timestamp
+            fields = self.convert_unit(
+                flatten(report.dict(exclude_none=True), self.config["data_separator"])
+            )
+            self.insert_metric(
+                timestamp,
+                {
+                    "type": "node",
+                    "node_name": node_name,
+                },
+                fields,
+            )
+        else:
+            metadata = flatten(
+                {"metadata": report.metadata.dict()}, self.config["data_separator"]
+            )
+            timestamp = report.timestamp
+            del report.metadata, report.timestamp
+            fields = self.convert_unit(
+                flatten(report.dict(exclude_none=True), self.config["data_separator"])
+            )
+            self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
 
     def convert_unit(self, report: dict):
         converted_report = report
@@ -166,8 +153,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     config_file = args.config
-    config = yaml.safe_load(open(ODOP_PATH + config_file))
-    node_aggregator = NodeAggregator(config)
+    with open(ODOP_PATH + config_file, encoding="utf-8") as file:
+        node_aggregator_config = yaml.safe_load(file)
+    node_aggregator = NodeAggregator(node_aggregator_config)
     node_aggregator.start()
     while True:
         time.sleep(1)

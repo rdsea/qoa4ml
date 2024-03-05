@@ -1,6 +1,10 @@
+import argparse
+import logging
+import yaml
 from fastapi import FastAPI
-import uvicorn, argparse, yaml, time, os, logging, sys
-from node_aggregator import NodeAggregator
+import uvicorn
+from .node_aggregator import NodeAggregator
+from .core.common import ODOP_PATH
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -26,6 +30,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     config_file = args.config
-    config = yaml.safe_load(open(ODOP_PATH + config_file))
-    exporter = Exporter(config)
+    with open(ODOP_PATH + config_file, encoding="utf-8") as file:
+        exporter_config = yaml.safe_load(file)
+    exporter = Exporter(exporter_config)
     exporter.start()

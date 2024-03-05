@@ -22,6 +22,8 @@ def main(directory):
             table.append(process_file(file_path))
     headers = ["File", "Average", "P99", "Min", "Max"]
     print(tabulate(table, headers=headers, tablefmt="grid"))
+    with open("result.txt", "w") as f:
+        f.write(tabulate(table, headers=headers, tablefmt="grid"))
 
 
 if __name__ == "__main__":

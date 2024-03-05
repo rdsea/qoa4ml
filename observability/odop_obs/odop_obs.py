@@ -1,26 +1,34 @@
-import multiprocessing, subprocess, os
-
-import yaml, argparse, sys
+import multiprocessing
+import argparse
+import sys
+from typing import Optional
+import yaml
 
 from .core.common import ODOP_PATH
+from .process_monitoring_probe import ProcessMonitoringProbe
+from .system_monitoring_probe import SystemMonitoringProbe
+from .exporter import Exporter
 
 sys.path.append(ODOP_PATH)
-from process_monitoring_probe import ProcessMonitoringProbe
-from system_monitoring_probe import SystemMonitoringProbe
-from exporter import Exporter
 
 
 class OdopObs:
-    def __init__(self, config: dict) -> None:
-        self.process_config = config["process"]
-        self.system_config = config["system"]
-        self.exporter_config = config["exporter"]
-        self.process_probe = ProcessMonitoringProbe(self.process_config)
-        self.system_probe = SystemMonitoringProbe(self.system_config)
-        self.exporter = Exporter(self.exporter_config)
+    def __init__(
+        self, config: Optional[dict] = None, config_path: Optional[str] = None
+    ) -> None:
+        if not config and not config_path:
+            raise ValueError("config or config_path must not be empty")
+        if config_path:
+            with open(config_path, encoding="utf-8") as file:
+                self.config = yaml.safe_load(file)
+        elif config:
+            self.config = config
+        self.process_probe = ProcessMonitoringProbe(self.config["process"])
+        self.system_probe = SystemMonitoringProbe(self.config["system"])
+        self.exporter = Exporter(self.config["exporter"])
+        self.monitoring_process = multiprocessing.Process(target=self.start_monitoring)
 
     def start(self):
-        self.monitoring_process = multiprocessing.Process(target=self.start_monitoring)
         self.monitoring_process.start()
 
     def start_monitoring(self):
@@ -40,9 +48,8 @@ if __name__ == "__main__":
         "-c", "--config", help="config path", default="config/odop_obs_conf.yaml"
     )
     args = parser.parse_args()
-    config_file = args.config
-    config = yaml.safe_load(open(ODOP_PATH + config_file))
-    odop_obs = OdopObs(config)
+    config_file_path = args.config
+    odop_obs = OdopObs(config_path=config_file_path)
     try:
         odop_obs.start()
     except KeyboardInterrupt:

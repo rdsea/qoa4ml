@@ -1,4 +1,7 @@
-import os, argparse
+import os
+import time
+import argparse
+import yaml
 from qoa4ml.qoaUtils import (
     get_sys_cpu_util,
     get_sys_mem,
@@ -10,9 +13,8 @@ from qoa4ml.gpuUtils import (
     get_sys_gpu_metadata,
     get_sys_gpu_usage,
 )
-import yaml
-import time
-from core.probe import Probe
+from odop.odop_obs.core.common import ResourceReport, SystemMetadata, SystemReport
+from .core.probe import Probe
 
 NODE_NAME = os.getenv("NODE_NAME")
 if not NODE_NAME:
@@ -25,9 +27,10 @@ class SystemMonitoringProbe(Probe):
         self.node_name = NODE_NAME  # TODO: find somehow to get node name
         if self.config["requireRegister"]:
             self.obs_service_url = self.config["obsServiceUrl"]
-        self.cpu_metadata = self.get_cpu_metadata()
-        self.gpu_metadata = self.get_gpu_metadata()
-        self.mem_metadata = self.get_mem_metadata()
+        self.cpu_report = ResourceReport(metadata=self.get_cpu_metadata(), usage={})
+        self.gpu_report = ResourceReport(metadata=self.get_gpu_metadata(), usage={})
+        self.mem_report = ResourceReport(metadata=self.get_mem_metadata(), usage={})
+        self.metadata = SystemMetadata(node_name=self.node_name)
 
     def get_cpu_metadata(self):
         return get_sys_cpu_metadata()
@@ -54,26 +57,16 @@ class SystemMonitoringProbe(Probe):
 
     def create_report(self):
         timestamp = time.time()
-        cpu_usage = self.get_cpu_usage()
-        gpu_usage = self.get_gpu_usage()
-        mem_usage = self.get_mem_usage()
-        report = {
-            "node_name": self.node_name,
-            "timestamp": round(timestamp),
-            "cpu": {
-                "metadata": self.cpu_metadata,
-                "usage": cpu_usage,
-            },
-            "gpu": {
-                "metadata": self.gpu_metadata,
-                "usage": gpu_usage,
-            },
-            "mem": {
-                "metadata": self.mem_metadata,
-                "usage": mem_usage,
-            },
-        }
-        self.current_report = report
+        self.cpu_report.usage = self.get_cpu_usage()
+        self.gpu_report.usage = self.get_gpu_usage()
+        self.mem_report.usage = self.get_mem_usage()
+        self.current_report = SystemReport(
+            metadata=self.metadata,
+            timestamp=round(timestamp),
+            cpu=self.cpu_report,
+            gpu=self.gpu_report,
+            mem=self.mem_report,
+        )
         if self.log_latency_flag:
             self.write_log(
                 (time.time() - timestamp) * 1000,
@@ -84,14 +77,15 @@ class SystemMonitoringProbe(Probe):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--config", help="config path", default="config/process_probe_conf.yaml"
+        "-c", "--config", help="config path", default="config/system_probe_config.yaml"
     )
     args = parser.parse_args()
     config_file = args.config
-    config = yaml.safe_load(open(config_file))
+    with open(config_file, encoding="utf-8") as file:
+        system_probe_config = yaml.safe_load(file)
 
-    sys_monitoring_probe = SystemMonitoringProbe(config)
-    del config
+    sys_monitoring_probe = SystemMonitoringProbe(system_probe_config)
+    del system_probe_config
     sys_monitoring_probe.start_reporting()
     while True:
         time.sleep(1)
