@@ -1,0 +1,105 @@
+{
+  "stage_reports": [
+    {
+      "stage_name": "MLInference Aggregate",
+      "metric_reports": [
+        {
+          "metric_name": "object_height2",
+          "value": [
+            {
+              "instance_id": "5e4f82e8-f2ff-45a8-8809-140f98253e4d",
+              "value": 345.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stage_name": "MLInference Ensemble",
+      "metric_reports": [
+        {
+          "metric_name": "object_height",
+          "value": [
+            {
+              "instance_id": "78c2f055-721b-4867-85ff-f90494b5dd7b",
+              "value": 52.0
+            }
+          ]
+        },
+        {
+          "metric_name": "object_height3",
+          "value": [
+            {
+              "instance_id": "8ae48ecc-b2f0-482f-9845-a03ab05764cb",
+              "value": 654.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stage_name": "DataProcessing",
+      "metric_reports": [
+        {
+          "metric_name": "image_width",
+          "value": [
+            {
+              "instance_id": "22e0af69-3fe2-4451-9d63-b3f627e3a676",
+              "value": 100.0
+            }
+          ]
+        },
+        {
+          "metric_name": "image_height",
+          "value": [
+            {
+              "instance_id": "22e0af69-3fe2-4451-9d63-b3f627e3a676",
+              "value": 242.0
+            }
+          ]
+        },
+        {
+          "metric_name": "object_width",
+          "value": [
+            {
+              "instance_id": "22e0af69-3fe2-4451-9d63-b3f627e3a676",
+              "value": 40.0
+            }
+          ]
+        },
+        {
+          "metric_name": "object_height",
+          "value": [
+            {
+              "instance_id": "22e0af69-3fe2-4451-9d63-b3f627e3a676",
+              "value": 52.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stage_name": "Gateway",
+      "metric_reports": [
+        {
+          "metric_name": "image_width",
+          "value": [
+            {
+              "instance_id": "40a7fd9b-84cb-4c4f-9531-af91c05b9f77",
+              "value": 20.0
+            }
+          ]
+        },
+        {
+          "metric_name": "image_height",
+          "value": [
+            {
+              "instance_id": "40a7fd9b-84cb-4c4f-9531-af91c05b9f77",
+              "value": 42.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
