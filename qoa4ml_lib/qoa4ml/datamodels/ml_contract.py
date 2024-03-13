@@ -1,51 +1,7 @@
 from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-
-
-# TODO: fill those enum
-class StakeholderRoleEnum(Enum):
-    pass
-
-
-class ResourceEnum(Enum):
-    pass
-
-
-class ServiceAPIEnum(Enum):
-    pass
-
-
-class InfrastructureEnum(Enum):
-    pass
-
-
-class ProcessorEnum(Enum):
-    pass
-
-
-class DataTypeEnum(Enum):
-    pass
-
-
-class DataFormatEnum(Enum):
-    pass
-
-
-class DevelopmentEnvironmentEnum(Enum):
-    pass
-
-
-class ServingPlatformEnum(Enum):
-    pass
-
-
-class ModelCategoryEnum(Enum):
-    pass
-
-
-class InferenceModeEnum(Enum):
-    pass
+from .enum import *
 
 
 class Stakeholder(BaseModel):
@@ -85,22 +41,6 @@ class ResourceConstraint(BaseModel):
     ml_specs: MLSpecs
 
 
-class OperatorEnum(Enum):
-    pass
-
-
-class CostUnitEnum(Enum):
-    pass
-
-
-class MetricNameEnum(Enum):
-    response_time = "responseTime"
-
-
-class MetricCategoryEnum(Enum):
-    pass
-
-
 class Metric(BaseModel):
     metric_name: MetricNameEnum
     record: dict | float | int
@@ -112,7 +52,7 @@ class Condition(Enum):
     metric: Metric
 
 
-#TODO: use BaseConstraint
+# TODO: use BaseConstraint
 class CostConstraint(BaseModel):
     operator: OperatorEnum
     unit: CostUnitEnum
