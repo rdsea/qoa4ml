@@ -1,25 +1,7 @@
 from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-import json
-
-
-class InstanceReport(BaseModel):
-    instance_id: str
-    value: float | Dict[str, float]
-
-
-class MetricNameEnum(Enum):
-    response_time = "responseTime"
-
-
-class StageNameEnum(Enum):
-    ml_inference_aggregate_stage = ""
-
-
-class MethodEnum(Enum):
-    REST = "REST"
-
+from .enum import *
 
 class Metric(BaseModel):
     metric_name: MetricNameEnum
