@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-from .enum import *
+from datamodel_enum import *
+import json
 
 
 class Stakeholder(BaseModel):
@@ -114,3 +115,9 @@ class MLContract(BaseModel):
     stakeholders: List[Stakeholder]
     resources: ResourceConstraint
     quality: QualityConstraint
+
+with open("ml_contract_model.json", "w") as file:
+    json.dump(MLContract.model_json_schema(), file
+
+    )
+
