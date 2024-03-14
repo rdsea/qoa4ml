@@ -1,11 +1,8 @@
 from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-from .enum import *
-
-class Metric(BaseModel):
-    metric_name: MetricNameEnum
-    record: dict | float | int
+from datamodel_enum import *
+from common_models import *
 
 
 class Microservice(BaseModel):
