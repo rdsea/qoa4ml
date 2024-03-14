@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel
 from datamodel_enum import *
 import json
+from common_models import *
 
 
 class Stakeholder(BaseModel):
@@ -41,63 +42,32 @@ class ResourceConstraint(BaseModel):
     data_specs: DataSpecs
     ml_specs: MLSpecs
 
-
-class Metric(BaseModel):
-    metric_name: MetricNameEnum
-    record: dict | float | int
-    category: MetricCategoryEnum
-
-
-class Condition(Enum):
-    operator: OperatorEnum
-    metric: Metric
-
-
-# TODO: use BaseConstraint
-class CostConstraint(BaseModel):
-    operator: OperatorEnum
-    unit: CostUnitEnum
-    value: float
-    # TODO: fix naming
-    condition: List[Condition]
-
+class CostConstraint(BaseConstraint):
+    name: str = "cost_constraint"
 
 class InterpretabilityConstraint(BaseModel):
     explainability: dict
 
 
-class FairnessConstraint(BaseModel):
-    bias: dict
+class FairnessConstraint(BaseConstraint):
+    name: str = "fairness_constraint"
 
 
-class PrivacyConstraint(BaseModel):
+class PrivacyConstraint():
     risks: dict
 
 
 class SecurityConstraint(BaseModel):
     encryption: dict
 
-
-class BaseConstraint(BaseModel):
-    id: str
-    metric: Metric
-    operator: OperatorEnum
-    condition: List[Condition]
-
-
-# TODO: can have additional attributed
 class MLSpecificConstraint(BaseConstraint):
-    pass
-
-
-# TODO: can have additional attributed
+    name: str = "ml_specific_constraint"
+    
 class DataConstraint(BaseConstraint):
-    pass
+    name: str = "data_constaint"
 
-
-# TODO: can have additional attributed
 class ServiceConstraint(BaseConstraint):
-    pass
+    name: str = "service_constraint"
 
 
 class QualityConstraint(BaseModel):
@@ -115,9 +85,4 @@ class MLContract(BaseModel):
     stakeholders: List[Stakeholder]
     resources: ResourceConstraint
     quality: QualityConstraint
-
-with open("ml_contract_model.json", "w") as file:
-    json.dump(MLContract.model_json_schema(), file
-
-    )
 

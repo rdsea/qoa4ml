@@ -1,10 +1,11 @@
 from enum import Enum
 
 
-class MetricNameEnum(Enum):
+class ServiceMetricNameEnum(Enum):
     response_time = "response_time"
     reliability = "reliability"
     completeness = "completeness"
+
 
 class MlSpecificMetricNameEnum(Enum):
     confidence = "confidence"
@@ -13,6 +14,7 @@ class MlSpecificMetricNameEnum(Enum):
     recall = "recall"
     auc = "auc"
     mse = "mse"
+
 
 class StageNameEnum(Enum):
     ml_inference_aggregate = "ml_inference_aggregate"
@@ -101,10 +103,21 @@ class InferenceModeEnum(Enum):
 
 
 class OperatorEnum(Enum):
-    min = "min"
-    max = "max"
-    avg = "average"
     range = "range"
+    leq = "less_equal"
+    geq = "greater_equal"
+    lt = "less_than"
+    gt = "greater_than"
+    eq = "equal"
+
+class AggregateFunctionEnum(Enum):
+    MIN = "MIN"
+    MAX = "MAX"
+    AVG = "AVERAGE"
+    SUM = "SUM"
+    COUNT = "COUNT"
+    OR = "OR"
+    AND = "AND"
 
 
 class CostUnitEnum(Enum):
