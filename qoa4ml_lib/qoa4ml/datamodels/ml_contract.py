@@ -1,9 +1,19 @@
-from enum import Enum
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-from datamodel_enum import *
-import json
-from common_models import *
+from datamodel_enum import (
+    StakeholderRoleEnum,
+    ResourceEnum,
+    ServiceAPIEnum,
+    InfrastructureEnum,
+    ProcessorEnum,
+    DataTypeEnum,
+    DataFormatEnum,
+    DevelopmentEnvironmentEnum,
+    ServingPlatformEnum,
+    ModelCategoryEnum, 
+    InferenceModeEnum
+)
+from common_models import BaseConstraint
 
 
 class Stakeholder(BaseModel):
@@ -42,8 +52,10 @@ class ResourceConstraint(BaseModel):
     data_specs: DataSpecs
     ml_specs: MLSpecs
 
+
 class CostConstraint(BaseConstraint):
     name: str = "cost_constraint"
+
 
 class InterpretabilityConstraint(BaseModel):
     explainability: dict
@@ -53,18 +65,21 @@ class FairnessConstraint(BaseConstraint):
     name: str = "fairness_constraint"
 
 
-class PrivacyConstraint():
+class PrivacyConstraint:
     risks: dict
 
 
 class SecurityConstraint(BaseModel):
     encryption: dict
 
+
 class MLSpecificConstraint(BaseConstraint):
     name: str = "ml_specific_constraint"
-    
+
+
 class DataConstraint(BaseConstraint):
     name: str = "data_constaint"
+
 
 class ServiceConstraint(BaseConstraint):
     name: str = "service_constraint"
@@ -85,4 +100,3 @@ class MLContract(BaseModel):
     stakeholders: List[Stakeholder]
     resources: ResourceConstraint
     quality: QualityConstraint
-

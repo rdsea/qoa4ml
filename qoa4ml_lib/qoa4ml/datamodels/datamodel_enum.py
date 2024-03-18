@@ -110,6 +110,7 @@ class OperatorEnum(Enum):
     gt = "greater_than"
     eq = "equal"
 
+
 class AggregateFunctionEnum(Enum):
     MIN = "MIN"
     MAX = "MAX"

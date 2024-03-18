@@ -1,23 +1,27 @@
-from abc import ABC
+from typing import List, Optional, Union
 from pydantic import BaseModel
-from typing import Dict, List, Optional
-from datamodel_enum import *
+import datamodel_enum
+
 
 class Metric(BaseModel):
-    metric_name: ServiceMetricNameEnum | MlSpecificMetricNameEnum
-    records: List[dict | float | int]
+    metric_name: Union[
+        datamodel_enum.ServiceMetricNameEnum, datamodel_enum.MlSpecificMetricNameEnum
+    ]
+    records: List[Union[dict, float, int]] = []
+    unit: Optional[str] = None
+
 
 class Condition(BaseModel):
-    operator: OperatorEnum
-    value: dict | float | int
-    unit: Optional[str]
+    operator: datamodel_enum.OperatorEnum
+    value: Union[dict, float, int]
+
 
 class MetricConstraint(BaseModel):
     metrics: Metric
     condition: Condition
-    aggregate_function: AggregateFunctionEnum
+    aggregate_function: datamodel_enum.AggregateFunctionEnum
+
 
 class BaseConstraint(BaseModel):
-    name: str 
+    name: str
     constraint_list: List[MetricConstraint]
-    

@@ -1,19 +1,18 @@
-from enum import Enum
-from typing import Dict, List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel
-from datamodel_enum import *
-from common_models import *
+from datamodel_enum import StageNameEnum
+from common_models import Metric
 
 
 class Microservice(BaseModel):
     id: str
     name: str
-    stage: Optional[str]
+    stage: Optional[str] = None
 
 
 class MicroserviceInstance(BaseModel):
     id: str
-    microservice: Microservice
+    microservice: List[Microservice]
     functionality: str
 
 
@@ -35,10 +34,9 @@ class StageReport(BaseModel):
 
 class InferenceInstance(MicroserviceInstance):
     metrics: List[Metric]
-    prediction: dict | float
+    prediction: Union[dict, float]
 
 
-# TODO: test if InferenceInstance can be used in LinkedInstance
 class InferenceGraph(BaseModel):
     end_point: InferenceInstance
     linked_list: List[LinkedInstance]
@@ -51,5 +49,5 @@ class InferenceQuality(BaseModel):
 
 
 class InferenceReport(BaseModel):
-    execution_graph: ExecutionGraph | None
-    quality: InferenceQuality | None
+    execution_graph: Optional[ExecutionGraph] = None
+    quality: Optional[InferenceQuality] = None
