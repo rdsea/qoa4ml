@@ -1,4 +1,4 @@
-import time, traceback,sys, copy
+import time, traceback, sys, copy
 from .qoaUtils import mergeReport, get_dict_at, load_config, qoaLogger
 
 
@@ -22,13 +22,15 @@ class QoaReport(object):
         self.qualityReport = report["quality"]
         self.computationGraph = report["computationGraph"]
         self.metadata = report["metadata"]
-    
+
     def processPReport(self, pReport):
         report = copy.deepcopy(pReport)
         self.reportList.append(report)
         self.previousReportInstance.append(report["computationGraph"]["last_instance"])
         if "inference" in report["quality"]:
-            self.previousInference.append(report["quality"]["inference"]["last_inference"])
+            self.previousInference.append(
+                report["quality"]["inference"]["last_inference"]
+            )
 
     def importPReport(self, reports):
         try:
@@ -38,58 +40,75 @@ class QoaReport(object):
             else:
                 self.processPReport(reports)
         except Exception as e:
-            qoaLogger.error("Error {} in importPReport: {}".format(type(e),e.__traceback__))
+            qoaLogger.error(
+                "Error {} in importPReport: {}".format(type(e), e.__traceback__)
+            )
             traceback.print_exception(*sys.exc_info())
-        
-        
+
     def buildComputationGraph(self):
         try:
             self.computationGraph["instances"] = {}
             self.computationGraph["instances"][self.clientConfig["instances_id"]] = {}
-            self.computationGraph["instances"][self.clientConfig["instances_id"]]["instance_name"] = self.clientConfig["instance_name"]
-            self.computationGraph["instances"][self.clientConfig["instances_id"]]["method"] = self.clientConfig["method"]
-            self.computationGraph["instances"][self.clientConfig["instances_id"]]["previous_instance"] = self.previousReportInstance
+            self.computationGraph["instances"][self.clientConfig["instances_id"]][
+                "instance_name"
+            ] = self.clientConfig["instance_name"]
+            self.computationGraph["instances"][self.clientConfig["instances_id"]][
+                "method"
+            ] = self.clientConfig["method"]
+            self.computationGraph["instances"][self.clientConfig["instances_id"]][
+                "previous_instance"
+            ] = self.previousReportInstance
             for report in self.reportList:
                 i_graph = report["computationGraph"]
                 self.computationGraph = mergeReport(self.computationGraph, i_graph)
             self.computationGraph["last_instance"] = self.clientConfig["instances_id"]
         except Exception as e:
-            qoaLogger.error("Error {} in buildComputationGraph: {}".format(type(e),e.__traceback__))
+            qoaLogger.error(
+                "Error {} in buildComputationGraph: {}".format(type(e), e.__traceback__)
+            )
             traceback.print_exception(*sys.exc_info())
         return self.computationGraph
-    
+
     def buildQualityReport(self):
         for report in self.reportList:
             i_quality = report["quality"]
-            self.qualityReport = mergeReport(self.qualityReport,i_quality)
+            self.qualityReport = mergeReport(self.qualityReport, i_quality)
         return self.qualityReport
 
-    def generateReport(self, metric:list=None,reset=True):
+    def generateReport(self, metric: list = None, reset=True):
         # Todo: only report on specific metrics
         self.report["computationGraph"] = self.buildComputationGraph()
         self.report["quality"] = self.buildQualityReport()
         self.report["metadata"] = copy.deepcopy(self.clientConfig)
         self.report["metadata"]["timestamp"] = time.time()
-        self.report["metadata"]["runtime"] = self.report["metadata"]["timestamp"] - self.initTime
+        self.report["metadata"]["runtime"] = (
+            self.report["metadata"]["timestamp"] - self.initTime
+        )
         report = copy.deepcopy(self.report)
         if reset:
             self.reset()
         return report
-    
+
     def observeMetric(self, metric):
         metricReport = {}
         metricReport[self.clientConfig["stageID"]] = {}
         metricReport[self.clientConfig["stageID"]][metric.name] = {}
-        metricReport[self.clientConfig["stageID"]][metric.name][self.clientConfig["instances_id"]] = metric.value
+        metricReport[self.clientConfig["stageID"]][metric.name][
+            self.clientConfig["instances_id"]
+        ] = metric.value
 
         if metric.category == 0:
             if "performance" not in self.qualityReport:
                 self.qualityReport["performance"] = {}
-            self.qualityReport["performance"] = mergeReport(self.qualityReport["performance"],metricReport)
+            self.qualityReport["performance"] = mergeReport(
+                self.qualityReport["performance"], metricReport
+            )
         elif metric.category == 1:
             if "data" not in self.qualityReport:
                 self.qualityReport["data"] = {}
-            self.qualityReport["data"] = mergeReport(self.qualityReport["data"],metricReport)
+            self.qualityReport["data"] = mergeReport(
+                self.qualityReport["data"], metricReport
+            )
         # elif metric.category == 2:
         #     key,value = get_dict_at(metricReport)
         #     metricReport[key]["source"] = self.previousInference
@@ -99,15 +118,16 @@ class QoaReport(object):
         #     self.qualityReport["inference"]["last_inference"] = key
 
     def observeInferenceMetric(self, infReport, dependency=None):
-
-        key,value = get_dict_at(infReport)
+        key, value = get_dict_at(infReport)
         if dependency != None:
             infReport[key]["source"] = dependency
         else:
             infReport[key]["source"] = self.previousInference
         if "inference" not in self.qualityReport:
             self.qualityReport["inference"] = {}
-        self.qualityReport["inference"] = mergeReport(self.qualityReport["inference"],infReport)
+        self.qualityReport["inference"] = mergeReport(
+            self.qualityReport["inference"], infReport
+        )
         self.qualityReport["inference"]["last_inference"] = key
 
     def sortComputationGraph(self):
@@ -117,19 +137,17 @@ class QoaReport(object):
         while len(source) != 0:
             new_source = []
             for ikey in source:
-                instanceList.update({ikey:rank})
-                new_source.extend(self.computationGraph["instances"][ikey]["previous_instance"])
+                instanceList.update({ikey: rank})
+                new_source.extend(
+                    self.computationGraph["instances"][ikey]["previous_instance"]
+                )
             source = new_source
             rank += 1
         return instanceList
-
-
-
 
     def getMetric(self, metric_name):
         metricReport = []
         for stage in self.qualityReport:
             if metric_name in self.qualityReport[stage]:
                 pass
-            # Todo 
-        
+            # Todo
