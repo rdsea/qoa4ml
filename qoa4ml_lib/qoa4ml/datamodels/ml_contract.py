@@ -47,7 +47,7 @@ class MLSpecs(BaseModel):
     inference_modes: List[InferenceModeEnum]
 
 
-class ResourceConstraint(BaseModel):
+class ResourceSpecs(BaseModel):
     services_specs: List[MicroserviceSpecs]
     data_specs: DataSpecs
     ml_specs: MLSpecs
@@ -98,5 +98,5 @@ class QualityConstraint(BaseModel):
 
 class MLContract(BaseModel):
     stakeholders: List[Stakeholder]
-    resources: ResourceConstraint
+    resources: ResourceSpecs
     quality: QualityConstraint
