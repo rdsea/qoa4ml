@@ -110,6 +110,7 @@ class OperatorEnum(Enum):
     gt = "greater_than"
     eq = "equal"
 
+
 class AggregateFunctionEnum(Enum):
     MIN = "MIN"
     MAX = "MAX"
@@ -118,6 +119,7 @@ class AggregateFunctionEnum(Enum):
     COUNT = "COUNT"
     OR = "OR"
     AND = "AND"
+    PRODUCT = "PRODUCT"
 
 
 class CostUnitEnum(Enum):
