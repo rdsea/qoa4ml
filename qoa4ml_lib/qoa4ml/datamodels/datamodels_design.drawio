@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-03-14T14:21:15.264Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="g1chbrYxg343O1Q5gBmX" version="23.1.5" type="device">
+<mxfile host="Electron" modified="2024-03-14T14:35:57.074Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="yzmvWe6Y2bA2h80ujn8s" version="23.1.5" type="device">
   <diagram name="Page-1" id="rWRLr1abRW5AiF0Z2IhQ">
     <mxGraphModel dx="1195" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -10,7 +10,7 @@
         <mxCell id="jtfP5A6I0CTqdnniDnRa-2" value="metric_name: ServiceMetric | MlSpecificMetric | DataQualityMetric" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="jtfP5A6I0CTqdnniDnRa-1">
           <mxGeometry y="26" width="290" height="44" as="geometry" />
         </mxCell>
-        <mxCell id="jtfP5A6I0CTqdnniDnRa-3" value="value: List[dict | float | int]" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="jtfP5A6I0CTqdnniDnRa-1">
+        <mxCell id="jtfP5A6I0CTqdnniDnRa-3" value="records: List[dict | float | int]" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1" parent="jtfP5A6I0CTqdnniDnRa-1">
           <mxGeometry y="70" width="290" height="30" as="geometry" />
         </mxCell>
         <mxCell id="jtfP5A6I0CTqdnniDnRa-5" value="Condition" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;" vertex="1" parent="1">
