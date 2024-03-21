@@ -132,3 +132,8 @@ class MetricCategoryEnum(Enum):
     service = "service"
     data = "data"
     ml_specific = "ml_specific"
+
+
+class CgroupVersionEnum(Enum):
+    v1 = "cgroupv1"
+    v2 = "cgroupv2"
