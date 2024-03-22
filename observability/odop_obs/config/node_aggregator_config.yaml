@@ -5,6 +5,7 @@ query_method: "GET"
 backlog_number: 5
 socket_package_size: 4096
 data_separator: "dot"
+environment: "HPC"
 unit_conversion:
   cpu: 
     usage:

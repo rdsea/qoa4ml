@@ -1,7 +1,6 @@
 import os
 import time
-import argparse
-import yaml
+import importlib
 from qoa4ml.qoaUtils import (
     get_sys_cpu_util,
     get_sys_mem,
@@ -13,7 +12,6 @@ from qoa4ml.gpuUtils import (
     get_sys_gpu_metadata,
     get_sys_gpu_usage,
 )
-from odop.odop_obs.core.common import ResourceReport, SystemMetadata, SystemReport
 from .core.probe import Probe
 
 NODE_NAME = os.getenv("NODE_NAME")
@@ -27,10 +25,15 @@ class SystemMonitoringProbe(Probe):
         self.node_name = NODE_NAME  # TODO: find somehow to get node name
         if self.config["requireRegister"]:
             self.obs_service_url = self.config["obsServiceUrl"]
-        self.cpu_report = ResourceReport(metadata=self.get_cpu_metadata(), usage={})
-        self.gpu_report = ResourceReport(metadata=self.get_gpu_metadata(), usage={})
-        self.mem_report = ResourceReport(metadata=self.get_mem_metadata(), usage={})
-        self.metadata = SystemMetadata(node_name=self.node_name)
+        self.environment = config["environment"]
+        self.cpu_metadata = self.get_cpu_metadata()
+        self.gpu_metadata = self.get_gpu_metadata()
+        self.mem_metadata = self.get_mem_metadata()
+        if self.environment == "HPC":
+            self.metadata = {"node_name": self.node_name}
+        else:
+            self.custom_model = importlib.import_module("core.custom_model")
+            self.metadata = self.custom_model.SystemMetadata(node_name=self.node_name)
 
     def get_cpu_metadata(self):
         return get_sys_cpu_metadata()
@@ -57,16 +60,41 @@ class SystemMonitoringProbe(Probe):
 
     def create_report(self):
         timestamp = time.time()
-        self.cpu_report.usage = self.get_cpu_usage()
-        self.gpu_report.usage = self.get_gpu_usage()
-        self.mem_report.usage = self.get_mem_usage()
-        self.current_report = SystemReport(
-            metadata=self.metadata,
-            timestamp=round(timestamp),
-            cpu=self.cpu_report,
-            gpu=self.gpu_report,
-            mem=self.mem_report,
-        )
+        cpu_usage = self.get_cpu_usage()
+        gpu_usage = self.get_gpu_usage()
+        mem_usage = self.get_mem_usage()
+        if self.environment == "HPC":
+            self.current_report = {
+                "type": "system",
+                "metadata": {**self.metadata},
+                "timestamp": round(timestamp),
+                "cpu": {
+                    "metadata": self.cpu_metadata,
+                    "usage": cpu_usage,
+                },
+                "gpu": {
+                    "metadata": self.gpu_metadata,
+                    "usage": gpu_usage,
+                },
+                "mem": {
+                    "metadata": self.mem_metadata,
+                    "usage": mem_usage,
+                },
+            }
+        else:
+            self.current_report = self.custom_model.SystemReport(
+                metadata=self.custom_model.SystemMetadata(node_name=self.node_name),
+                timestamp=round(timestamp),
+                cpu=self.custom_model.ResourceReport(
+                    metadata=self.cpu_metadata, usage=cpu_usage
+                ),
+                gpu=self.custom_model.ResourceReport(
+                    metadata=self.gpu_metadata, usage=gpu_usage
+                ),
+                mem=self.custom_model.ResourceReport(
+                    metadata=self.mem_metadata, usage=mem_usage
+                ),
+            )
         if self.log_latency_flag:
             self.write_log(
                 (time.time() - timestamp) * 1000,
@@ -75,9 +103,11 @@ class SystemMonitoringProbe(Probe):
 
 
 if __name__ == "__main__":
+    argparse = importlib.import_module("argparse")
+    yaml = importlib.import_module("yaml")
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--config", help="config path", default="config/system_probe_config.yaml"
+        "-c", "--config", help="config path", default="config/system_probe_conf.yaml"
     )
     args = parser.parse_args()
     config_file = args.config

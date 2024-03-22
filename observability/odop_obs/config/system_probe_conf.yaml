@@ -4,3 +4,4 @@ latency_logging_path: "logs/"
 log_latency_flag: true
 aggregator_host: "127.0.0.1"
 aggregator_port: 12345
+environment: "HPC"

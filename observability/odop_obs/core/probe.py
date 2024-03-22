@@ -1,12 +1,10 @@
 import math
 import pickle
 import socket
-import sys
-from typing import Union
 from threading import Thread
 import logging
 import time
-from .common import ODOP_PATH, ProcessReport, SystemReport
+from .common import ODOP_PATH
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -16,17 +14,10 @@ logging.basicConfig(
 class Probe:
     __slots__ = [
         "config",
-        "node_name",
         "frequency",
-        "obs_service_url",
-        "cpu_metadata",
-        "gpu_metadata",
-        "mem_metadata",
         "current_report",
         "execution_flag",
         "report_thread",
-        "monitoring_service_url",
-        "metrics",
         "monitoring_interval",
         "latency_logging_path",
         "max_latency",
@@ -42,7 +33,6 @@ class Probe:
         self.log_latency_flag = self.config["log_latency_flag"]
         if self.log_latency_flag:
             self.latency_logging_path = ODOP_PATH + config["latency_logging_path"]
-        self.current_report: Union[SystemReport, ProcessReport]
         self.max_latency = 0.0
 
     def create_report(self):

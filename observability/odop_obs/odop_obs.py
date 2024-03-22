@@ -1,8 +1,7 @@
+import importlib
 import multiprocessing
-import argparse
 import sys
 from typing import Optional
-import yaml
 
 from .core.common import ODOP_PATH
 from .process_monitoring_probe import ProcessMonitoringProbe
@@ -19,6 +18,7 @@ class OdopObs:
         if not config and not config_path:
             raise ValueError("config or config_path must not be empty")
         if config_path:
+            yaml = importlib.import_module("yaml")
             with open(config_path, encoding="utf-8") as file:
                 self.config = yaml.safe_load(file)
         elif config:
@@ -43,6 +43,8 @@ class OdopObs:
 
 
 if __name__ == "__main__":
+    yaml = importlib.import_module("yaml")
+    argparse = importlib.import_module("argparse")
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c", "--config", help="config path", default="config/odop_obs_conf.yaml"

@@ -1,19 +1,16 @@
+import importlib
 import math
 import socket
 import pickle
-import argparse
 from threading import Thread
 from datetime import datetime
 import time
 import logging
 import sys
-from typing import Union
-import yaml
-from pydantic import ValidationError
 from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
 from tinyflux import TinyFlux, Point, TimeQuery
-from .core.common import SystemReport, ProcessReport, ODOP_PATH
+from .core.common import ODOP_PATH
 from . import odop_utils
 
 logging.basicConfig(
@@ -35,6 +32,9 @@ class NodeAggregator:
         self.server_thread = Thread(
             target=self.start_handling, args=(self.config["host"], self.config["port"])
         )
+        self.environment = config["environment"]
+        if self.environment != "HPC":
+            self.custom_model = importlib.import_module("core.custom_model")
         self.server_thread.daemon = True
         self.execution_flag = False
         self.router = APIRouter()
@@ -66,39 +66,74 @@ class NodeAggregator:
             data += packet
 
         report = pickle.loads(data)
-        try:
-            self.process_report(report)
-        except ValidationError as e:
-            logging.exception("ValidationError: %s ", e)
+        self.process_report(report)
 
         client_socket.close()
 
-    def process_report(self, report: Union[SystemReport, ProcessReport]):
-        if isinstance(report, SystemReport):
-            node_name = report.metadata.node_name
-            timestamp = report.timestamp
-            del report.metadata, report.timestamp
-            fields = self.convert_unit(
-                flatten(report.dict(exclude_none=True), self.config["data_separator"])
-            )
-            self.insert_metric(
-                timestamp,
-                {
-                    "type": "node",
-                    "node_name": node_name,
-                },
-                fields,
-            )
+    def process_report(self, report):
+        if self.environment == "HPC":
+            if report["type"] == "system":
+                del report["type"]
+                metadata = flatten(
+                    {"metadata": report["metadata"]}, self.config["data_separator"]
+                )
+                timestamp = report["timestamp"]
+                del report["metadata"], report["timestamp"]
+                fields = self.convert_unit(
+                    flatten(report, self.config["data_separator"])
+                )
+                self.insert_metric(
+                    timestamp,
+                    {"type": "node", **metadata},
+                    fields,
+                )
+            elif report["type"] == "process":
+                del report["type"]
+                metadata = flatten(
+                    {"metadata": report["metadata"]}, self.config["data_separator"]
+                )
+                timestamp = report["timestamp"]
+                del report["metadata"], report["timestamp"]
+                fields = self.convert_unit(
+                    flatten(report, self.config["data_separator"])
+                )
+                self.insert_metric(
+                    timestamp,
+                    {"type": "process", **metadata},
+                    fields,
+                )
+            else:
+                logging.error("Value Error: Unkown report type")
         else:
-            metadata = flatten(
-                {"metadata": report.metadata.dict()}, self.config["data_separator"]
-            )
-            timestamp = report.timestamp
-            del report.metadata, report.timestamp
-            fields = self.convert_unit(
-                flatten(report.dict(exclude_none=True), self.config["data_separator"])
-            )
-            self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
+            if isinstance(report, self.custom_model.SystemReport):
+                node_name = report.metadata.node_name
+                timestamp = report.timestamp
+                del report.metadata, report.timestamp
+                fields = self.convert_unit(
+                    flatten(
+                        report.dict(exclude_none=True), self.config["data_separator"]
+                    )
+                )
+                self.insert_metric(
+                    timestamp,
+                    {
+                        "type": "node",
+                        "node_name": node_name,
+                    },
+                    fields,
+                )
+            elif isinstance(report, self.custom_model.ProcessReport):
+                metadata = flatten(
+                    {"metadata": report.metadata.dict()}, self.config["data_separator"]
+                )
+                timestamp = report.timestamp
+                del report.metadata, report.timestamp
+                fields = self.convert_unit(
+                    flatten(
+                        report.dict(exclude_none=True), self.config["data_separator"]
+                    )
+                )
+                self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
 
     def convert_unit(self, report: dict):
         converted_report = report
@@ -121,13 +156,54 @@ class NodeAggregator:
                         ]
         return converted_report
 
+    def revert_unit(self, converted_report: dict):
+        original_report = converted_report.copy()
+        for key, value in converted_report.items():
+            if "unit" in key:
+                if "frequency" in key:
+                    for original_unit, converted_unit in self.unit_conversion[
+                        "frequency"
+                    ].items():
+                        if converted_unit == value:
+                            original_report[key] = original_unit
+                            break
+                elif "mem" in key:
+                    for original_unit, converted_unit in self.unit_conversion[
+                        "mem"
+                    ].items():
+                        if converted_unit == value:
+                            original_report[key] = original_unit
+                            break
+                elif "cpu" in key:
+                    if "usage" in key:
+                        for original_unit, converted_unit in self.unit_conversion[
+                            "cpu"
+                        ]["usage"].items():
+                            if converted_unit == value:
+                                original_report[key] = original_unit
+                                break
+                elif "gpu" in key:
+                    if "usage" in key:
+                        for original_unit, converted_unit in self.unit_conversion[
+                            "gpu"
+                        ]["usage"].items():
+                            if converted_unit == value:
+                                original_report[key] = original_unit
+                                break
+        return original_report
+
     def get_lastest_timestamp(self):
         time_query = TimeQuery()
         timestamp = datetime.fromtimestamp(math.floor(time.time()))
         data = self.db.search(time_query >= timestamp)
         return [
             unflatten(
-                {**datapoint.tags, **datapoint.fields}, self.config["data_separator"]
+                {
+                    "timestamp": datetime.timestamp(datapoint.time),
+                    **datapoint.tags,
+                    **datapoint.fields,
+                },
+                self.config["data_separator"],
             )
             for datapoint in data
         ]
@@ -144,6 +220,8 @@ class NodeAggregator:
 
 
 if __name__ == "__main__":
+    yaml = importlib.import_module("yaml")
+    argparse = importlib.import_module("argparse")
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",

@@ -1,20 +1,23 @@
 process:
   frequency: 1
   requireRegister: false
-  log_latency_flag: true
+  log_latency_flag: false
   latency_logging_path: "logs/"
   aggregator_host: "127.0.0.1"
   aggregator_port: 12345
+  environment: "HPC"
 system:
   frequency: 1
   requireRegister: false
   latency_logging_path: "logs/"
-  log_latency_flag: true
+  log_latency_flag: false
   aggregator_host: "127.0.0.1"
   aggregator_port: 12345
+  environment: "HPC"
 exporter:
   host: "127.0.0.1"
   port: 8000
+  environment: "HPC"
   node_aggregator:
     host: "127.0.0.1"
     port: 12345
@@ -23,6 +26,7 @@ exporter:
     backlog_number: 5
     socket_package_size: 4096
     data_separator: "dot"
+    environment: "HPC"
     unit_conversion:
       cpu: 
         usage:
