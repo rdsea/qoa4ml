@@ -119,6 +119,7 @@ class AggregateFunctionEnum(Enum):
     COUNT = "COUNT"
     OR = "OR"
     AND = "AND"
+    PRODUCT = "PRODUCT"
 
 
 class CostUnitEnum(Enum):
