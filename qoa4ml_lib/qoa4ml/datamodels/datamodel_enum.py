@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 
 class ServiceMetricNameEnum(Enum):
@@ -14,6 +15,19 @@ class MlSpecificMetricNameEnum(Enum):
     recall = "recall"
     auc = "auc"
     mse = "mse"
+
+
+class ResourcesUtilizationMetricNameEnum(Enum):
+    cpu = "cpu_usage"
+    memory = "memory_usage"
+
+
+MetricNameEnum = Union[
+    ServiceMetricNameEnum,
+    MlSpecificMetricNameEnum,
+    ResourcesUtilizationMetricNameEnum,
+    str,
+]
 
 
 class DataQualityEnum(Enum):
@@ -140,3 +154,17 @@ class MetricCategoryEnum(Enum):
     service = "service"
     data = "data"
     ml_specific = "ml_specific"
+    quality = "quality"
+    inference = "inference"
+
+
+class CgroupVersionEnum(Enum):
+    v1 = "cgroupv1"
+    v2 = "cgroupv2"
+
+
+class MetricClassEnum(Enum):
+    gauge = "Gauge"
+    coutner = "Counter"
+    summary = "Summary"
+    histogram = "Histogram"
