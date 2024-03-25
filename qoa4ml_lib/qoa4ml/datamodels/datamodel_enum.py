@@ -22,6 +22,9 @@ class ResourcesUtilizationMetricNameEnum(Enum):
     memory = "memory_usage"
 
 
+print(ResourcesUtilizationMetricNameEnum.memory == "cpu_usage")
+
+
 MetricNameEnum = Union[
     ServiceMetricNameEnum,
     MlSpecificMetricNameEnum,

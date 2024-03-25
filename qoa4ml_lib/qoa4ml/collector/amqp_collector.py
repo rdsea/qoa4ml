@@ -1,30 +1,33 @@
 import json
-import sys, pathlib
+import sys
+import pathlib
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 from qoaUtils import qoaLogger
+from datamodels.configs import AMQPCollectorConfig
 
 
 class Amqp_Collector(object):
     # Init an amqp client handling the connection to amqp servier
-    def __init__(self, configuration: dict, host_object: object = None):
+    # FIX: what is host object?
+    def __init__(self, configuration: AMQPCollectorConfig, host_object: object = None):
         if "pika" not in globals():
             global pika
             import pika
         self.host_object = host_object
-        self.exchange_name = configuration["exchange_name"]
-        self.exchange_type = configuration["exchange_type"]
-        self.in_routing_key = configuration["in_routing_key"]
+        self.exchange_name = configuration.exchange_name
+        self.exchange_type = configuration.exchange_type
+        self.in_routing_key = configuration.in_routing_key
 
         # Connect to RabbitMQ host
-        if "amqps://" in configuration["end_point"]:
+        if "amqps://" in configuration.end_point:
             self.in_connection = pika.BlockingConnection(
-                pika.URLParameters(configuration["end_point"])
+                pika.URLParameters(configuration.end_point)
             )
         else:
             self.in_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=configuration["end_point"])
+                pika.ConnectionParameters(host=configuration.end_point)
             )
 
         # Create a channel
@@ -37,7 +40,7 @@ class Amqp_Collector(object):
 
         # Declare a queue to receive prediction response
         self.queue = self.in_channel.queue_declare(
-            queue=configuration["in_queue"], exclusive=False
+            queue=configuration.in_queue, exclusive=False
         )
         self.queue_name = self.queue.method.queue
         # Binding the exchange to the queue with specific routing

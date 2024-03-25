@@ -9,7 +9,6 @@ from .datamodel_enum import (
     StageNameEnum,
     MetricNameEnum,
 )
-from .common_models import Metric
 
 
 class Client(BaseModel):
@@ -37,6 +36,20 @@ class AMQPConnectorConfig(BaseModel):
     out_routing_key: str
 
 
+class MQTTConnectorConfig(BaseModel):
+    in_queue: str
+    out_queue: str
+    broker_url: str
+    broker_port: int
+    broker_keepalive: int
+    client_id: str
+
+
+class PrometheusConnectorConfig(BaseModel):
+    pass
+
+
+# TODO: test if loading the config, the type of the config can be found
 CollectorConfigClass = Union[AMQPCollectorConfig, Dict]
 ConnectorConfigClass = Union[AMQPConnectorConfig, Dict]
 
