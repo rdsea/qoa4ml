@@ -1,13 +1,16 @@
 from abc import ABC
 from pydantic import BaseModel
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from datamodel_enum import *
 
 
 class Metric(BaseModel):
-    metric_name: ServiceMetricNameEnum | MlSpecificMetricNameEnum | str
-    records: List[dict | float | int]
+    metric_name: MetricNameEnum
     unit: Optional[str]
+
+
+class MetricRecord(Metric):
+    records: List[Union[dict, float, int]]
 
 
 class Condition(BaseModel):

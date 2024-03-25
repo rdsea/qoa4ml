@@ -1,25 +1,24 @@
-from enum import Enum
-from typing import Dict, List, Optional
+from typing import List, Optional
 from pydantic import BaseModel
-from datamodel_enum import *
-from common_models import *
+from .datamodel_enum import *
+from .common_models import *
 
 
-class Microservice(BaseModel):
+class MicroserviceInstance(BaseModel):
     id: str
     name: str
     stage: Optional[str]
 
 
-class MicroserviceInstance(BaseModel):
+class Microservice(BaseModel):
     id: str
-    microservice: Microservice
+    microservice: List[MicroserviceInstance]
     functionality: str
 
 
 class LinkedInstance(BaseModel):
     previous: List[MicroserviceInstance]
-    microservice_instance: MicroserviceInstance
+    microservice: Microservice
 
 
 class ExecutionGraph(BaseModel):
