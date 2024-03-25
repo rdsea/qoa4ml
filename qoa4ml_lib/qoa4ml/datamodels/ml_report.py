@@ -4,21 +4,21 @@ from datamodel_enum import StageNameEnum
 from common_models import Metric
 
 
-class Microservice(BaseModel):
+class MicroserviceInstance(BaseModel):
     id: str
     name: str
     stage: Optional[str] = None
 
 
-class MicroserviceInstance(BaseModel):
+class Microservice(BaseModel):
     id: str
-    microservice: List[Microservice]
+    microservice: List[MicroserviceInstance]
     functionality: str
 
 
 class LinkedInstance(BaseModel):
     previous: List[MicroserviceInstance]
-    microservice_instance: MicroserviceInstance
+    microservice: Microservice
 
 
 class ExecutionGraph(BaseModel):

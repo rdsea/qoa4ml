@@ -1,13 +1,12 @@
 from typing import List, Optional, Union
 from pydantic import BaseModel
-from datamodel_enum import (
+from .datamodel_enum import (
     ServiceMetricNameEnum,
     MlSpecificMetricNameEnum,
     DataQualityEnum,
     OperatorEnum,
     AggregateFunctionEnum,
 )
-
 
 
 class Metric(BaseModel):
@@ -19,23 +18,12 @@ class Metric(BaseModel):
 class Condition(BaseModel):
     operator: OperatorEnum
     value: Union[dict, float, int]
-=======
-    metric_name: ServiceMetricNameEnum | MlSpecificMetricNameEnum | str
-    records: List[dict | float | int]
-    unit: Optional[str]
-
-
-class Condition(BaseModel):
-    operator: OperatorEnum
-    value: dict | float | int
->>>>>>> c0719ca (update)
 
 
 class MetricConstraint(BaseModel):
     metrics: Metric
     condition: Condition
     aggregate_function: AggregateFunctionEnum
-
 
 
 class BaseConstraint(BaseModel):
