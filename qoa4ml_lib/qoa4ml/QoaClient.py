@@ -1,3 +1,4 @@
+from qoa4ml.datamodels.datamodel_enum import ServiceAPIEnum
 from .connector.amqp_connector import Amqp_Connector
 from .connector.mqtt_connector import Mqtt_Connector
 from .probes.dataquality import (
@@ -22,6 +23,12 @@ from .qoaUtils import (
     set_logger_level,
 )
 from .reports import QoaReport
+from .datamodels.configs import (
+    AMQPCollectorConfig,
+    AMQPConnectorConfig,
+    ConnectorConfig,
+    MQTTConnectorConfig,
+)
 
 
 headers = {"Content-Type": "application/json"}
@@ -150,12 +157,22 @@ class QoaClient(object):
             "POST", url, headers=headers, data=json.dumps(self.clientConf)
         )
 
-    def initConnector(self, configuration: dict):
+    def initConnector(self, configuration: ConnectorConfig):
         # init connector from configuration
-        if configuration["class"] == "amqp":
-            return Amqp_Connector(configuration["conf"])
-        if configuration["class"] == "mqtt":
-            return Mqtt_Connector(configuration["conf"])
+        if configuration.connector_class == ServiceAPIEnum.amqp:
+            if type(configuration.config) is AMQPConnectorConfig:
+                return Amqp_Connector(configuration.config)
+            else:
+                raise RuntimeError(
+                    "Connector config for AMQP Connector must be of type AMQPConnectorConfig"
+                )
+        if configuration.connector_class == ServiceAPIEnum.mqtt:
+            if type(configuration.config) is MQTTConnectorConfig:
+                return Mqtt_Connector(configuration.config)
+            else:
+                raise RuntimeError(
+                    "Connector config for MQTT Connector must be of type MQTTConnectorConfig"
+                )
 
     def addMetric(self, metric_conf: dict):
         # Add multiple metrics
