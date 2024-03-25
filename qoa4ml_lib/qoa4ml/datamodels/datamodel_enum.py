@@ -16,6 +16,11 @@ class MlSpecificMetricNameEnum(Enum):
     mse = "mse"
 
 
+class DataQualityEnum(Enum):
+    image_size = "image_size"
+    object_size = "object_size"
+
+
 class StageNameEnum(Enum):
     ml_inference_aggregate = "ml_inference_aggregate"
     ml_inference_ensemble = "ml_inference_ensemble"
@@ -76,6 +81,9 @@ class DataFormatEnum(Enum):
     csv = "csv"
     json = "json"
     avro = "avro"
+    png = "png"
+    jpg = "jpg"
+    mp4 = "mp4"
 
 
 class DevelopmentEnvironmentEnum(Enum):
