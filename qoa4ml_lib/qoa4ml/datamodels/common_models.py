@@ -1,7 +1,7 @@
 from abc import ABC
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Union
-from datamodel_enum import *
+from .datamodel_enum import *
 
 
 class Metric(BaseModel):

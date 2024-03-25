@@ -53,8 +53,8 @@ class ConnectorConfig(BaseModel):
 
 class ClientConfig(BaseModel):
     client: Client
-    collector: List[CollectorConfig]
-    connector: List[ConnectorConfig]
+    collector: CollectorConfig
+    connector: ConnectorConfig
 
 
 class MetricConfig(Metric):
@@ -65,3 +65,8 @@ class MetricConfig(Metric):
     category: Optional[List[MetricCategoryEnum]] = None
     # NOTE: for getting the metric key when calling external libs like psutil
     key: Optional[str] = None
+
+
+class GroupMetricConfig(BaseModel):
+    name: str
+    metric_configs: List[MetricConfig]
