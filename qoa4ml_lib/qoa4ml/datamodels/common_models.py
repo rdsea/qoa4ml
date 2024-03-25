@@ -1,4 +1,4 @@
-from abc import ABC
+from typing import List, Optional, Union
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Union
 from .datamodel_enum import *
@@ -15,7 +15,7 @@ class MetricRecord(Metric):
 
 class Condition(BaseModel):
     operator: OperatorEnum
-    value: dict | float | int
+    value: Union[dict, float, int]
 
 
 class MetricConstraint(BaseModel):

@@ -1,14 +1,27 @@
-from typing import Dict, List, Optional
+from typing import List
+
+from common_models import BaseConstraint
+from datamodel_enum import (
+    DataFormatEnum,
+    DataTypeEnum,
+    DevelopmentEnvironmentEnum,
+    InferenceModeEnum,
+    InfrastructureEnum,
+    ModelCategoryEnum,
+    ProcessorEnum,
+    ResourceEnum,
+    ServiceAPIEnum,
+    ServingPlatformEnum,
+    StakeholderRoleEnum,
+)
 from pydantic import BaseModel
-from datamodel_enum import *
-from .common_models import *
 
 
 class Stakeholder(BaseModel):
     id: str
     name: str
-    roles: StakeholderRoleEnum
-    provisioning: ResourceEnum
+    roles: List[StakeholderRoleEnum]
+    provisioning: List[ResourceEnum]
 
 
 class MicroserviceSpecs(BaseModel):
@@ -35,7 +48,7 @@ class MLSpecs(BaseModel):
     inference_modes: List[InferenceModeEnum]
 
 
-class ResourceConstraint(BaseModel):
+class ResourceSpecs(BaseModel):
     services_specs: List[MicroserviceSpecs]
     data_specs: DataSpecs
     ml_specs: MLSpecs
@@ -86,5 +99,5 @@ class QualityConstraint(BaseModel):
 
 class MLContract(BaseModel):
     stakeholders: List[Stakeholder]
-    resources: ResourceConstraint
+    resources: ResourceSpecs
     quality: QualityConstraint

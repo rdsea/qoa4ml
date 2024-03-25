@@ -18,6 +18,9 @@ class MlSpecificMetricNameEnum(Enum):
 
 
 MetricNameEnum = Union[ServiceMetricNameEnum, MlSpecificMetricNameEnum, str]
+class DataQualityEnum(Enum):
+    image_size = "image_size"
+    object_size = "object_size"
 
 
 class StageNameEnum(Enum):
@@ -80,6 +83,9 @@ class DataFormatEnum(Enum):
     csv = "csv"
     json = "json"
     avro = "avro"
+    png = "png"
+    jpg = "jpg"
+    mp4 = "mp4"
 
 
 class DevelopmentEnvironmentEnum(Enum):
