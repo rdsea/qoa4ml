@@ -1,26 +1,27 @@
-from typing import Dict, List, Optional
-from pydantic import BaseModel
+from typing import List
+
+from common_models import BaseConstraint
 from datamodel_enum import (
-    StakeholderRoleEnum,
+    DataFormatEnum,
+    DataTypeEnum,
+    DevelopmentEnvironmentEnum,
+    InferenceModeEnum,
+    InfrastructureEnum,
+    ModelCategoryEnum,
+    ProcessorEnum,
     ResourceEnum,
     ServiceAPIEnum,
-    InfrastructureEnum,
-    ProcessorEnum,
-    DataTypeEnum,
-    DataFormatEnum,
-    DevelopmentEnvironmentEnum,
     ServingPlatformEnum,
-    ModelCategoryEnum, 
-    InferenceModeEnum
+    StakeholderRoleEnum,
 )
-from common_models import BaseConstraint
+from pydantic import BaseModel
 
 
 class Stakeholder(BaseModel):
     id: str
     name: str
-    roles: StakeholderRoleEnum
-    provisioning: ResourceEnum
+    roles: List[StakeholderRoleEnum]
+    provisioning: List[ResourceEnum]
 
 
 class MicroserviceSpecs(BaseModel):

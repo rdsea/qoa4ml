@@ -1,20 +1,23 @@
 from typing import List, Optional, Union
 from pydantic import BaseModel
-import datamodel_enum
+from datamodel_enum import (
+    ServiceMetricNameEnum,
+    MlSpecificMetricNameEnum,
+    DataQualityEnum,
+    OperatorEnum,
+    AggregateFunctionEnum,
+)
 
 
 
 class Metric(BaseModel):
-<<<<<<< HEAD
-    metric_name: Union[
-        datamodel_enum.ServiceMetricNameEnum, datamodel_enum.MlSpecificMetricNameEnum
-    ]
+    metric_name: Union[ServiceMetricNameEnum, MlSpecificMetricNameEnum, DataQualityEnum]
     records: List[Union[dict, float, int]] = []
     unit: Optional[str] = None
 
 
 class Condition(BaseModel):
-    operator: datamodel_enum.OperatorEnum
+    operator: OperatorEnum
     value: Union[dict, float, int]
 =======
     metric_name: ServiceMetricNameEnum | MlSpecificMetricNameEnum | str
@@ -31,10 +34,13 @@ class Condition(BaseModel):
 class MetricConstraint(BaseModel):
     metrics: Metric
     condition: Condition
-    aggregate_function: datamodel_enum.AggregateFunctionEnum
+    aggregate_function: AggregateFunctionEnum
 
 
 
 class BaseConstraint(BaseModel):
     name: str
     constraint_list: List[MetricConstraint]
+
+
+# TODO: can have image size class
