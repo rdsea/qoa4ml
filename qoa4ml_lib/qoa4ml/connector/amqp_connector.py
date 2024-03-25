@@ -1,9 +1,16 @@
 import uuid
+import sys
+import pathlib
+
+p_dir = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(p_dir))
+
+from datamodels.configs import AMQPConnectorConfig
 
 
 class Amqp_Connector(object):
     # Init an amqp client handling the connection to amqp servier
-    def __init__(self, configuration: dict, log: bool = False):
+    def __init__(self, configuration: AMQPConnectorConfig, log: bool = False):
         """
         AMQP connector
         configuration: a dictionary include broker and queue information
@@ -13,19 +20,19 @@ class Amqp_Connector(object):
             global pika
             import pika
         self.conf = configuration
-        self.exchange_name = configuration["exchange_name"]
-        self.exchange_type = configuration["exchange_type"]
-        self.out_routing_key = configuration["out_routing_key"]
+        self.exchange_name = configuration.exchange_name
+        self.exchange_type = configuration.exchange_type
+        self.out_routing_key = configuration.out_routing_key
         self.log_flag = log
 
         # Connect to RabbitMQ host
-        if "amqps://" in configuration["end_point"]:
+        if "amqps://" in configuration.end_point:
             self.out_connection = pika.BlockingConnection(
-                pika.URLParameters(configuration["end_point"])
+                pika.URLParameters(configuration.end_point)
             )
         else:
             self.out_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=configuration["end_point"])
+                pika.ConnectionParameters(host=configuration.end_point)
             )
 
         # Create a channel
