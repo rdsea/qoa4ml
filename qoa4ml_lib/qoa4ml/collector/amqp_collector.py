@@ -1,6 +1,8 @@
 import json
 import sys
 import pathlib
+from typing import Optional
+from .host_object import HostObject
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
@@ -10,8 +12,11 @@ from datamodels.configs import AMQPCollectorConfig
 
 class Amqp_Collector(object):
     # Init an amqp client handling the connection to amqp servier
-    # FIX: what is host object?
-    def __init__(self, configuration: AMQPCollectorConfig, host_object: object = None):
+    def __init__(
+        self,
+        configuration: AMQPCollectorConfig,
+        host_object: Optional[HostObject] = None,
+    ):
         if "pika" not in globals():
             global pika
             import pika
