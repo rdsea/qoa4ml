@@ -170,4 +170,3 @@ class MetricClassEnum(Enum):
     gauge = "Gauge"
     coutner = "Counter"
     summary = "Summary"
-    histogram = "Histogram"
