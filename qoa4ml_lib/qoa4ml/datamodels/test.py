@@ -1,8 +1,6 @@
 from common_models import Metric
-from datamodel_enum import (DataQualityEnum, ServiceMetricNameEnum,
-                            StageNameEnum)
-from ml_report import (ExecutionGraph, InferenceGraph, InferenceInstance,
-                       StageReport)
+from datamodel_enum import DataQualityEnum, ServiceMetricNameEnum, StageNameEnum
+from ml_report import ExecutionGraph, InferenceGraph, InferenceInstance, StageReport
 
 service_quality = [
     StageReport(
