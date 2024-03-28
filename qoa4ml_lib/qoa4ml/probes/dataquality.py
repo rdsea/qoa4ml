@@ -133,8 +133,7 @@ class Outlier_Detector(object):
                         try:
                             if "LabelInspector" not in globals():
                                 global LabelInspector
-                                from ydata_quality.labelling import \
-                                    LabelInspector
+                                from ydata_quality.labelling import LabelInspector
                             li = LabelInspector(
                                 df=data, label=label, random_state=random_state
                             )
