@@ -2,14 +2,8 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (
-    MethodEnum,
-    MetricCategoryEnum,
-    MetricClassEnum,
-    MetricNameEnum,
-    ServiceAPIEnum,
-    StageNameEnum,
-)
+from .datamodel_enum import (MethodEnum, MetricCategoryEnum, MetricClassEnum,
+                             MetricNameEnum, ServiceAPIEnum, StageNameEnum)
 
 
 class Client(BaseModel):
@@ -56,27 +50,30 @@ ConnectorConfigClass = Union[AMQPConnectorConfig, Dict]
 
 
 class CollectorConfig(BaseModel):
+    name: str
     collector_class: ServiceAPIEnum
     config: CollectorConfigClass
 
 
 class ConnectorConfig(BaseModel):
+    name: str
     connector_class: ServiceAPIEnum
     config: ConnectorConfigClass
 
 
 class ClientConfig(BaseModel):
     client: Client
-    collector: CollectorConfig
-    connector: ConnectorConfig
+    registration_url: Optional[str] = None
+    collector: Optional[List[CollectorConfig]] = None
+    connector: Optional[List[ConnectorConfig]] = None
 
 
 class MetricConfig(BaseModel):
     name: MetricNameEnum
     metric_class: MetricClassEnum
     description: Optional[str] = None
-    default_value: Optional[float] = None
-    category: Optional[List[MetricCategoryEnum]] = None
+    default_value: int
+    category: int
     # NOTE: for getting the metric key when calling external libs like psutil
     key: Optional[str] = None
 

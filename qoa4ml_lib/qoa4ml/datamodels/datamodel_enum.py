@@ -168,5 +168,6 @@ class CgroupVersionEnum(Enum):
 
 class MetricClassEnum(Enum):
     gauge = "Gauge"
-    coutner = "Counter"
+    counter = "Counter"
     summary = "Summary"
+    histogram = "Historgram"

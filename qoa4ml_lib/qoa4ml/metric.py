@@ -1,5 +1,5 @@
 # Metrics are implemented based on these classes to be compatible with Prometheus
-class Metric(object):
+class PrometheusMetric(object):
     """
     This class defines the common attribute and provide basic function for handling a metric
     - Attribute:
@@ -58,7 +58,7 @@ class Metric(object):
         return mectric_dict
 
 
-class Counter(Metric):
+class Counter(PrometheusMetric):
     """
     This class inherit all attributes of Metric
     - Attribute: (Developing)
@@ -76,7 +76,7 @@ class Counter(Metric):
         self.value += num
 
 
-class Gauge(Metric):
+class Gauge(PrometheusMetric):
     """
     This class inherit all attributes of Metric
     - Attribute: (Developing)
@@ -97,11 +97,8 @@ class Gauge(Metric):
     def dec(self, num=1):
         self.value -= num
 
-    def set(self, val):
-        self.value = val
 
-
-class Summary(Metric):
+class Summary(PrometheusMetric):
     """
     This class inherit all attributes of Metric
     - Attribute: (Developing)
@@ -122,11 +119,8 @@ class Summary(Metric):
     def dec(self, num):
         self.value -= num
 
-    def set(self, val):
-        self.value = val
 
-
-class Histogram(Metric):
+class Histogram(PrometheusMetric):
     """
     This class inherit all attributes of Metric
     - Attribute: (Developing)
@@ -146,6 +140,3 @@ class Histogram(Metric):
     # implement other functions
     def dec(self, num):
         self.value -= num
-
-    def set(self, val):
-        self.value = val
