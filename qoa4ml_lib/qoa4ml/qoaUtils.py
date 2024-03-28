@@ -1,8 +1,14 @@
-import json, psutil, time, os, yaml, logging
-from threading import Thread
-import traceback, sys, pathlib
-
+import json
 import logging
+import os
+import pathlib
+import sys
+import time
+import traceback
+from threading import Thread
+
+import psutil
+import yaml
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO

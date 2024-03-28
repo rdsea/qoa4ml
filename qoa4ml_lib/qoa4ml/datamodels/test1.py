@@ -1,25 +1,14 @@
-from qoa4ml.datamodels.datamodel_enum import (
-    DataFormatEnum,
-    DataTypeEnum,
-    DevelopmentEnvironmentEnum,
-    InferenceModeEnum,
-    ModelCategoryEnum,
-    ProcessorEnum,
-    ResourceEnum,
-    ServiceAPIEnum,
-    ServingPlatformEnum,
-    StakeholderRoleEnum,
-)
-from qoa4ml.datamodels.ml_contract import (
-    DataSpecs,
-    MLSpecs,
-    MicroserviceSpecs,
-    QualityConstraint,
-    ResourceSpecs,
-    Stakeholder,
-    InfrastructureEnum,
-)
-
+from qoa4ml.datamodels.datamodel_enum import (DataFormatEnum, DataTypeEnum,
+                                              DevelopmentEnvironmentEnum,
+                                              InferenceModeEnum,
+                                              ModelCategoryEnum, ProcessorEnum,
+                                              ResourceEnum, ServiceAPIEnum,
+                                              ServingPlatformEnum,
+                                              StakeholderRoleEnum)
+from qoa4ml.datamodels.ml_contract import (DataSpecs, InfrastructureEnum,
+                                           MicroserviceSpecs, MLSpecs,
+                                           QualityConstraint, ResourceSpecs,
+                                           Stakeholder)
 
 stakeholder = Stakeholder(
     id="stakeholder_id",

@@ -1,29 +1,31 @@
-import sys
 import pathlib
-
+import sys
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from qoaUtils import qoaLogger
+from collector.host_object import HostObject
 from datamodels.configs import MQTTConnectorConfig
+from qoaUtils import qoaLogger
 
 
 # TODO: this client handle both connector and collector
 class Mqtt_Connector(object):
     # This class will handle all the mqtt connection for each client application
     # FIX: what is host object?
-    def __init__(self, host_object, configuration: MQTTConnectorConfig):
+    def __init__(self, host_object: HostObject, configuration: MQTTConnectorConfig):
         if "mqtt" not in globals():
             global mqtt
-            from paho.mqtt.client import Client as MqttClient
-            from paho.mqtt.enums import CallbackAPIVersion
+            import paho.mqtt as mqtt
+
+            # from paho.mqtt.client import Client as MqttClient
+            # from paho.mqtt.enums import CallbackAPIVersion
         # Init the host object to return message
         self.host_object = host_object
         # Init the send/receive queue
         self.pub_queue = configuration.in_queue
         self.sub_queue = configuration.out_queue
         # Create the mqtt client
-        self.client = MqttClient(
+        self.client = mqtt.client.MqttClient(
             callback_api_version=CallbackAPIVersion.VERSION2,
             client_id=configuration.client_id,
             clean_session=False,
