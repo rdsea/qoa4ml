@@ -1,0 +1,26 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: ^qoa4ml_lib/qoa4ml/.*\.(py|yaml|json)$
+      - id: end-of-file-fixer
+        files: ^qoa4ml_lib/qoa4ml/.*\.(py|yaml|json)$
+      - id: check-yaml
+        files: ^qoa4ml_lib/qoa4ml/.*\.yaml$
+      - id: check-json
+        files: ^qoa4ml_lib/qoa4ml/.*\.json$
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        files: ^qoa4ml_lib/qoa4ml/.*\.py$
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^qoa4ml_lib/qoa4ml/.*\.py$
+
+
+  # Add more hooks specific to your directory and its sub-directories
