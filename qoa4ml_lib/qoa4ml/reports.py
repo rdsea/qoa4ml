@@ -1,5 +1,10 @@
-import time, traceback, sys, copy
-from .qoaUtils import mergeReport, get_dict_at, load_config, qoaLogger
+import copy
+import sys
+import time
+import traceback
+from typing import Optional
+
+from .qoaUtils import get_dict_at, load_config, mergeReport, qoaLogger
 
 
 class QoaReport(object):
@@ -75,7 +80,7 @@ class QoaReport(object):
             self.qualityReport = mergeReport(self.qualityReport, i_quality)
         return self.qualityReport
 
-    def generateReport(self, metric: list = None, reset=True):
+    def generateReport(self, metric: Optional[list] = None, reset=True):
         # Todo: only report on specific metrics
         self.report["computationGraph"] = self.buildComputationGraph()
         self.report["quality"] = self.buildQualityReport()

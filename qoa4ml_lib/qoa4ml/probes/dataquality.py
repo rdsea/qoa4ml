@@ -1,13 +1,16 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
 
-import pandas as pd
-import numpy as np
-import traceback, sys, pathlib
 import io
+import pathlib
+import sys
+import traceback
+
+import numpy as np
+import pandas as pd
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from qoaUtils import qoaLogger, is_numpyarray, is_pddataframe
+from qoaUtils import is_numpyarray, is_pddataframe, qoaLogger
 
 # Define metric names, return formats: dictionary {metric name} {sub-element}
 # Return error/debugging
@@ -130,7 +133,8 @@ class Outlier_Detector(object):
                         try:
                             if "LabelInspector" not in globals():
                                 global LabelInspector
-                                from ydata_quality.labelling import LabelInspector
+                                from ydata_quality.labelling import \
+                                    LabelInspector
                             li = LabelInspector(
                                 df=data, label=label, random_state=random_state
                             )

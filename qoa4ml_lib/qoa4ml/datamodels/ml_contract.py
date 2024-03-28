@@ -1,19 +1,11 @@
 from typing import List
 
 from common_models import BaseConstraint
-from datamodel_enum import (
-    DataFormatEnum,
-    DataTypeEnum,
-    DevelopmentEnvironmentEnum,
-    InferenceModeEnum,
-    InfrastructureEnum,
-    ModelCategoryEnum,
-    ProcessorEnum,
-    ResourceEnum,
-    ServiceAPIEnum,
-    ServingPlatformEnum,
-    StakeholderRoleEnum,
-)
+from datamodel_enum import (DataFormatEnum, DataTypeEnum,
+                            DevelopmentEnvironmentEnum, InferenceModeEnum,
+                            InfrastructureEnum, ModelCategoryEnum,
+                            ProcessorEnum, ResourceEnum, ServiceAPIEnum,
+                            ServingPlatformEnum, StakeholderRoleEnum)
 from pydantic import BaseModel
 
 

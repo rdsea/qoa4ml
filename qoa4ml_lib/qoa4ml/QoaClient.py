@@ -1,6 +1,28 @@
+import copy
+import json
+import os
+import sys
+import threading
+import time
+import traceback
+from typing import Optional
+import uuid
+from threading import Thread
+
+import requests
+
 from qoa4ml.datamodels.datamodel_enum import ServiceAPIEnum
+
 from .connector.amqp_connector import Amqp_Connector
-from .connector.mqtt_connector import Mqtt_Connector
+
+# from .connector.mqtt_connector import Mqtt_Connector
+from .datamodels.configs import (
+    AMQPCollectorConfig,
+    AMQPConnectorConfig,
+    ConnectorConfig,
+    MQTTConnectorConfig,
+)
+from .metric import Counter, Gauge, Histogram, Summary
 from .probes.dataquality import (
     eva_duplicate,
     eva_erronous,
@@ -9,12 +31,6 @@ from .probes.dataquality import (
     image_quality,
 )
 from .probes.mlquality import *
-from .metric import Gauge, Counter, Summary, Histogram
-import json, uuid
-import threading
-from threading import Thread
-import time, uuid, requests
-import os, sys, traceback, copy
 from .qoaUtils import (
     get_proc_cpu,
     get_proc_mem,
@@ -23,13 +39,6 @@ from .qoaUtils import (
     set_logger_level,
 )
 from .reports import QoaReport
-from .datamodels.configs import (
-    AMQPCollectorConfig,
-    AMQPConnectorConfig,
-    ConnectorConfig,
-    MQTTConnectorConfig,
-)
-
 
 headers = {"Content-Type": "application/json"}
 
@@ -38,9 +47,9 @@ class QoaClient(object):
     # Init QoA Client
     def __init__(
         self,
-        config_dict: dict = None,
-        config_path: str = None,
-        registration_url: str = None,
+        config_dict: Optional[dict] = None,
+        config_path: Optional[str] = None,
+        registration_url: Optional[str] = None,
         logging_level=2,
         config_format=0,
     ):
@@ -79,7 +88,7 @@ class QoaClient(object):
             self.configuration = config_dict
 
         if config_path != None:
-            self.configuration = load_config(config_path, config_format)
+            self.configuration = load_config(config_path)
 
         self.clientConf = self.configuration["client"]
 
@@ -159,20 +168,20 @@ class QoaClient(object):
 
     def initConnector(self, configuration: ConnectorConfig):
         # init connector from configuration
-        if configuration.connector_class == ServiceAPIEnum.amqp:
-            if type(configuration.config) is AMQPConnectorConfig:
-                return Amqp_Connector(configuration.config)
-            else:
-                raise RuntimeError(
-                    "Connector config for AMQP Connector must be of type AMQPConnectorConfig"
-                )
-        if configuration.connector_class == ServiceAPIEnum.mqtt:
-            if type(configuration.config) is MQTTConnectorConfig:
-                return Mqtt_Connector(configuration.config)
-            else:
-                raise RuntimeError(
-                    "Connector config for MQTT Connector must be of type MQTTConnectorConfig"
-                )
+        if (
+            configuration.connector_class == ServiceAPIEnum.amqp
+            and type(configuration.config) is AMQPConnectorConfig
+        ):
+            return Amqp_Connector(configuration.config)
+
+        # TODO: MQTT is both connector and collector
+        #
+        # if (
+        #    configuration.connector_class == ServiceAPIEnum.mqtt
+        #    and type(configuration.config) is MQTTConnectorConfig
+        # ):
+        #    return Mqtt_Connector(configuration.config)
+        raise RuntimeError("Connector config is not of correct type")
 
     def addMetric(self, metric_conf: dict):
         # Add multiple metrics
@@ -302,7 +311,7 @@ class QoaClient(object):
     def __str__(self):
         return str(self.clientConf) + "\n" + str(self.connectorList)
 
-    def process_report(self, interval: int, pid: int = None):
+    def process_report(self, interval: int, pid: Optional[int] = None):
         report = {}
         while self.procMonitorFlag == 1:
             try:
@@ -332,7 +341,7 @@ class QoaClient(object):
                 traceback.print_exception(*sys.exc_info())
             time.sleep(interval)
 
-    def process_monitor_start(self, interval: int, pid: int = None):
+    def process_monitor_start(self, interval: int, pid: Optional[int] = None):
         if self.procMonitorFlag == 0:
             if pid == None:
                 pid = os.getpid()
@@ -344,7 +353,7 @@ class QoaClient(object):
     def process_monitor_stop(self):
         self.procMonitorFlag = 2
 
-    def asyn_report(self, report: dict, connectors: list = None):
+    def asyn_report(self, report: dict, connectors: Optional[list] = None):
         body_mess = json.dumps(report)
         self.lock.acquire()
         if connectors == None:
@@ -360,14 +369,14 @@ class QoaClient(object):
 
     def report(
         self,
-        metrics: list = None,
-        report: dict = None,
-        connectors: list = None,
+        metrics: Optional[list] = None,
+        report: Optional[dict] = None,
+        connectors: Optional[list] = None,
         submit=False,
         reset=True,
     ):
         if report == None:
-            report = self.qoaReport.generateReport(metrics, reset=reset)
+            report = self.qoaReport.generateReport(metrics, reset)
         else:
             report["metadata"] = copy.deepcopy(self.clientConf)
             report["metadata"]["timestamp"] = time.time()
