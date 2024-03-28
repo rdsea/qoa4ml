@@ -5,13 +5,12 @@ import sys
 import threading
 import time
 import traceback
-from typing import Optional
 import uuid
 from threading import Thread
+from typing import List, Optional, Union
 
 import requests
-
-from qoa4ml.datamodels.datamodel_enum import ServiceAPIEnum
+from qoa4ml.datamodels.datamodel_enum import MetricClassEnum, ServiceAPIEnum
 
 from .connector.amqp_connector import Amqp_Connector
 
@@ -19,10 +18,13 @@ from .connector.amqp_connector import Amqp_Connector
 from .datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
+    ClientConfig,
     ConnectorConfig,
+    GroupMetricConfig,
+    MetricConfig,
     MQTTConnectorConfig,
 )
-from .metric import Counter, Gauge, Histogram, Summary
+from .metric import Counter, Gauge, Histogram, Metric, Summary
 from .probes.dataquality import (
     eva_duplicate,
     eva_erronous,
@@ -47,56 +49,26 @@ class QoaClient(object):
     # Init QoA Client
     def __init__(
         self,
-        config_dict: Optional[dict] = None,
+        config_dict: Optional[ClientConfig] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
         logging_level=2,
-        config_format=0,
     ):
-        """
-        The 'config_dict' contains the information about the client and its configuration in form of dictionary
-        Example:
-        {
-            "client":{
-                "userID": "aaltosea4",
-                "instance_name": "ML02",
-                "stageID": "ML",
-                "method": "REST",
-                "application": "test",
-                "role": "ml"
-            },
-            "connector":{
-                "amqp_connector":{
-                    "class": "amqp",
-                    "conf":{
-                        "end_point": "localhost",
-                        "exchange_name": "qoa4ml",
-                        "exchange_type": "topic",
-                        "out_routing_key": "qoa.report.ml"
-                    }
-                }
-            }
-        }
-        The 'connector' is the dictionary containing multiple connector configuration (amqp, mqtt, kafka)
-        If 'connector' is not define, developer must give 'registration_url'
-        The 'registration_url' specify the service where the client register for monitoring service. If it's set, the client register with the service and receive connector configuration
-        Example: "http://127.0.0.1:5001/registration"
-        """
         set_logger_level(logging_level)
 
         if config_dict != None:
             self.configuration = config_dict
 
         if config_path != None:
-            self.configuration = load_config(config_path)
+            self.configuration = ClientConfig(**load_config(config_path))
 
-        self.clientConf = self.configuration["client"]
+        self.clientConf = self.configuration.client
 
         self.metricList = {}
         self.connectorList = {}
         self.timerFlag = False
-        self.method = self.clientConf["method"]
-        self.stageID = self.clientConf["stageID"]
+        self.method = self.clientConf.method
+        self.stageID = self.clientConf.stage
         self.procMonitorFlag = 0
         self.inferenceFlag = False
 
@@ -105,15 +77,15 @@ class QoaClient(object):
             print("INSTANCE_ID is not defined")
             self.instanceID = str(uuid.uuid4())
 
-        self.clientConf["instances_id"] = self.instanceID
+        self.clientConf.instances_id = self.instanceID
         self.qoaReport = QoaReport(self.clientConf)
 
-        if "connector" in self.configuration:
+        if self.configuration.connector:
             # init connectors offline if it's specified
-            connector_conf = self.configuration["connector"]
+            connector_conf = self.configuration.connector
             try:
-                for key in connector_conf:
-                    self.connectorList[key] = self.initConnector(connector_conf[key])
+                for connector in connector_conf:
+                    self.connectorList[connector.name] = self.initConnector(connector)
             except Exception as e:
                 qoaLogger.error(
                     str(
@@ -122,19 +94,23 @@ class QoaClient(object):
                         )
                     )
                 )
-        elif (registration_url != None) or ("registration_url" in self.configuration):
+        elif registration_url or self.configuration.registration_url:
             # init connectors using configuration received from monitoring service, if it's specified
             try:
-                if registration_url == None:
-                    registration_url = self.configuration["registration_url"]
+                registration_url = (
+                    self.configuration.registration_url
+                    if self.configuration.registration_url
+                    else registration_url
+                )
                 registration_data = self.registration(registration_url)
                 json_data = registration_data.json()
                 response = json_data["response"]
                 if isinstance(response, dict):
-                    connector_conf = response["connector"]
-                    for key in connector_conf:
-                        self.connectorList[key] = self.initConnector(
-                            connector_conf[key]
+                    connector_configs = response["connector"]
+                    for connector in connector_configs:
+                        connector_config = ConnectorConfig(**connector)
+                        self.connectorList[connector_config.name] = self.initConnector(
+                            connector_config
                         )
                 else:
                     qoaLogger.warning(
@@ -183,53 +159,53 @@ class QoaClient(object):
         #    return Mqtt_Connector(configuration.config)
         raise RuntimeError("Connector config is not of correct type")
 
-    def addMetric(self, metric_conf: dict):
+    def addMetric(self, metric_configs: List[MetricConfig]):
         # Add multiple metrics
-        for key in metric_conf:
-            self.metricList[key] = self.initMetric(key, metric_conf[key])
+        for metric_config in metric_configs:
+            self.metricList[metric_config.name] = self.initMetric(metric_config)
 
-    def initMetric(self, name, configuration: dict):
+    def initMetric(self, configuration: MetricConfig):
         # init individual metrics
-        if configuration["class"] == "Gauge":
+        if configuration.metric_class == MetricClassEnum.gauge:
             return Gauge(
-                name,
-                configuration["description"],
-                configuration["default"],
-                configuration["category"],
+                configuration.name,
+                configuration.description,
+                configuration.default_value,
+                configuration.category,
             )
-        elif configuration["class"] == "Counter":
+        elif configuration.metric_class == MetricClassEnum.counter:
             return Counter(
-                name,
-                configuration["description"],
-                configuration["default"],
-                configuration["category"],
+                configuration.name,
+                configuration.description,
+                configuration.default_value,
+                configuration.category,
             )
-        elif configuration["class"] == "Summary":
+        elif configuration.metric_class == MetricClassEnum.summary:
             return Summary(
-                name,
-                configuration["description"],
-                configuration["default"],
-                configuration["category"],
+                configuration.name,
+                configuration.description,
+                configuration.default_value,
+                configuration.category,
             )
-        elif configuration["class"] == "Histogram":
+        elif configuration.metric_class == MetricClassEnum.histogram:
             return Histogram(
-                name,
-                configuration["description"],
-                configuration["default"],
-                configuration["category"],
+                configuration.name,
+                configuration.description,
+                configuration.default_value,
+                configuration.category,
             )
 
     def getClientConfig(self):
-        # TO DO:
+        # TODO: what to do exactly?
         return self.clientConf
 
-    def getMetric(self, key=None):
+    def getMetric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
             if key == None:
                 # Get all metric
                 return self.metricList
-            elif isinstance(key, list):
+            elif isinstance(key, List):
                 # Get a list of metrics
                 return dict((k, self.metricList[k]) for k in key)
             else:
@@ -244,7 +220,7 @@ class QoaClient(object):
                 )
             )
 
-    def resetMetric(self, key=None):
+    def resetMetric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
             if key == None:
@@ -267,7 +243,7 @@ class QoaClient(object):
     def setConfig(self, key, value):
         # TO DO:
         try:
-            self.clientConf[key] = value
+            self.clientConf.__setattr__(key, value)
         except Exception as e:
             qoaLogger.error(
                 str(
@@ -278,7 +254,13 @@ class QoaClient(object):
             )
 
     def observeMetric(
-        self, metric_name, value, category=0, cl="Gauge", des="", def_val=-1
+        self,
+        metric_name,
+        value,
+        category=0,
+        metric_class="Gauge",
+        description: str = "",
+        default_value: int = -1,
     ):
         if metric_name not in self.metricList:
             metric_config = {}
@@ -450,41 +432,3 @@ class QoaClient(object):
         if results != None:
             for key in results:
                 self.observeMetric(key, results[key], 1)
-
-        # self.qoaReport = QoA_Report()
-        # self.start_time = time.time()
-        # self.clientConf = client_conf
-        # self.metricList = {}
-        # self.connectorList = {}
-        # self.timerFlag = False
-        self.timer_start = 0
-        # self.method = client_conf["method"]
-        # self.stageID = client_conf["stageID"]
-        # self.instanceID  = os.environ.get('INSTANCE_ID')
-        # if not self.instanceID:
-        #     print("INSTANCE_ID is not defined")
-        #     self.instanceID  = str(uuid.uuid4())
-        # self.procMonitorFlag = False
-        # Init all connectors in for loop
-        # self.registration_flag = False
-        # try:
-        #     registration_data = self.registration(registration_url)
-        #     json_data = registration_data.json()
-        #     response = json_data["response"]
-
-        #     if isinstance (response,dict):
-        #         self.registration_flag = True
-        #         connector_conf = response["connector"]
-
-        #         for key in connector_conf:
-        #             self.connectorList[key] = self.initConnector(connector_conf[key])
-        #     else:
-        #         print("Unable to register Qoa Client")
-        # except Exception as e:
-        #     qoaLogger.error("Error {} when register QoA client: {}".format(type(e),e.__traceback__))
-        #     traceback.print_exception(*sys.exc_info())
-
-        # Set default connector for sending monitoring data if not specify
-        # self.default_connector = list(self.connectorList.keys())[0]
-        # self.addMetric(metric_conf)
-        # self.lock = threading.Lock()
