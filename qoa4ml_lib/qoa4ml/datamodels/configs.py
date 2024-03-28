@@ -2,14 +2,8 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (
-    MethodEnum,
-    MetricCategoryEnum,
-    MetricClassEnum,
-    MetricNameEnum,
-    ServiceAPIEnum,
-    StageNameEnum,
-)
+from .datamodel_enum import (MethodEnum, MetricCategoryEnum, MetricClassEnum,
+                             MetricNameEnum, ServiceAPIEnum, StageNameEnum)
 
 
 class Client(BaseModel):
