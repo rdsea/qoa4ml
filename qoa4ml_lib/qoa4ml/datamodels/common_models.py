@@ -2,9 +2,13 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (AggregateFunctionEnum, DataQualityEnum,
-                             MlSpecificMetricNameEnum, OperatorEnum,
-                             ServiceMetricNameEnum)
+from .datamodel_enum import (
+    AggregateFunctionEnum,
+    DataQualityEnum,
+    MlSpecificMetricNameEnum,
+    OperatorEnum,
+    ServiceMetricNameEnum,
+)
 
 
 class Metric(BaseModel):
@@ -27,6 +31,3 @@ class MetricConstraint(BaseModel):
 class BaseConstraint(BaseModel):
     name: str
     constraint_list: List[MetricConstraint]
-
-
-# TODO: can have image size class

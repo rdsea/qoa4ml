@@ -10,7 +10,13 @@ from threading import Thread
 from typing import List, Optional, Union
 
 import requests
-from qoa4ml.datamodels.datamodel_enum import MetricClassEnum, ServiceAPIEnum
+from qoa4ml.datamodels.datamodel_enum import (
+    MetricClassEnum,
+    MetricNameEnum,
+    ServiceAPIEnum,
+)
+from qoa4ml.datamodels.ml_report import LinkedInstance
+from qoa4ml.metric_mananger import MetricManager
 
 from .connector.amqp_connector import Amqp_Connector
 
@@ -24,7 +30,6 @@ from .datamodels.configs import (
     MetricConfig,
     MQTTConnectorConfig,
 )
-from .metric import Counter, Gauge, Histogram, Metric, Summary
 from .probes.dataquality import (
     eva_duplicate,
     eva_erronous,
@@ -40,7 +45,7 @@ from .qoaUtils import (
     qoaLogger,
     set_logger_level,
 )
-from .reports import QoaReport
+from .reports.ROHE_reports import QoaReport
 
 headers = {"Content-Type": "application/json"}
 
@@ -62,30 +67,30 @@ class QoaClient(object):
         if config_path != None:
             self.configuration = ClientConfig(**load_config(config_path))
 
-        self.clientConf = self.configuration.client
+        self.client_config = self.configuration.client
 
-        self.metricList = {}
-        self.connectorList = {}
-        self.timerFlag = False
-        self.method = self.clientConf.method
-        self.stageID = self.clientConf.stage
-        self.procMonitorFlag = 0
-        self.inferenceFlag = False
+        self.metric_manager = MetricManager()
+        self.connector_list = {}
+        self.timer_flag = False
+        self.method = self.client_config.method
+        self.stageID = self.client_config.stage
+        self.process_monitor_flag = 0
+        self.inference_flag = False
 
         self.instanceID = os.environ.get("INSTANCE_ID")
         if not self.instanceID:
             print("INSTANCE_ID is not defined")
             self.instanceID = str(uuid.uuid4())
 
-        self.clientConf.instances_id = self.instanceID
-        self.qoaReport = QoaReport(self.clientConf)
+        self.client_config.instances_id = self.instanceID
+        self.qoa_report = QoaReport(self.client_config)
 
         if self.configuration.connector:
             # init connectors offline if it's specified
             connector_conf = self.configuration.connector
             try:
                 for connector in connector_conf:
-                    self.connectorList[connector.name] = self.initConnector(connector)
+                    self.connector_list[connector.name] = self.init_connector(connector)
             except Exception as e:
                 qoaLogger.error(
                     str(
@@ -109,9 +114,9 @@ class QoaClient(object):
                     connector_configs = response["connector"]
                     for connector in connector_configs:
                         connector_config = ConnectorConfig(**connector)
-                        self.connectorList[connector_config.name] = self.initConnector(
-                            connector_config
-                        )
+                        self.connector_list[
+                            connector_config.name
+                        ] = self.init_connector(connector_config)
                 else:
                     qoaLogger.warning(
                         "Unable to register Qoa Client: connector configuration must be dictionary"
@@ -126,12 +131,12 @@ class QoaClient(object):
                 )
                 traceback.print_exception(*sys.exc_info())
 
-        if not any(self.connectorList):
+        if not any(self.connector_list):
             qoaLogger.warning("No connector initiated")
             self.default_connector = None
         else:
             # Set default connector for sending monitoring data if not specify
-            self.default_connector = list(self.connectorList.keys())[0]
+            self.default_connector = list(self.connector_list.keys())[0]
 
         # lock report to guarantee consistency
         self.lock = threading.Lock()
@@ -139,10 +144,10 @@ class QoaClient(object):
     def registration(self, url):
         # get connector configuration by registering with the monitoring service
         return requests.request(
-            "POST", url, headers=headers, data=json.dumps(self.clientConf)
+            "POST", url, headers=headers, data=json.dumps(self.client_config)
         )
 
-    def initConnector(self, configuration: ConnectorConfig):
+    def init_connector(self, configuration: ConnectorConfig):
         # init connector from configuration
         if (
             configuration.connector_class == ServiceAPIEnum.amqp
@@ -159,91 +164,30 @@ class QoaClient(object):
         #    return Mqtt_Connector(configuration.config)
         raise RuntimeError("Connector config is not of correct type")
 
-    def addMetric(self, metric_configs: List[MetricConfig]):
+    def add_metric(self, metric_configs: List[MetricConfig]):
         # Add multiple metrics
-        for metric_config in metric_configs:
-            self.metricList[metric_config.name] = self.initMetric(metric_config)
+        self.metric_manager.add_metric(metric_configs)
 
-    def initMetric(self, configuration: MetricConfig):
+    def init_metric(self, configuration: MetricConfig):
         # init individual metrics
-        if configuration.metric_class == MetricClassEnum.gauge:
-            return Gauge(
-                configuration.name,
-                configuration.description,
-                configuration.default_value,
-                configuration.category,
-            )
-        elif configuration.metric_class == MetricClassEnum.counter:
-            return Counter(
-                configuration.name,
-                configuration.description,
-                configuration.default_value,
-                configuration.category,
-            )
-        elif configuration.metric_class == MetricClassEnum.summary:
-            return Summary(
-                configuration.name,
-                configuration.description,
-                configuration.default_value,
-                configuration.category,
-            )
-        elif configuration.metric_class == MetricClassEnum.histogram:
-            return Histogram(
-                configuration.name,
-                configuration.description,
-                configuration.default_value,
-                configuration.category,
-            )
+        self.metric_manager.init_metric(configuration)
 
-    def getClientConfig(self):
+    def get_client_config(self):
         # TODO: what to do exactly?
-        return self.clientConf
+        return self.client_config
 
-    def getMetric(self, key: Optional[Union[List, str]] = None):
+    def get_metric(self, key: Optional[Union[List, str]] = None):
+        # TO DO:
+        return self.metric_manager.get_metric(key)
+
+    def reset_metric(self, key: Optional[Union[List, str]] = None):
+        # TO DO:
+        self.metric_manager.reset_metric(key)
+
+    def set_config(self, key, value):
         # TO DO:
         try:
-            if key == None:
-                # Get all metric
-                return self.metricList
-            elif isinstance(key, List):
-                # Get a list of metrics
-                return dict((k, self.metricList[k]) for k in key)
-            else:
-                # Get a specific metric
-                return self.metricList[key]
-        except Exception as e:
-            qoaLogger.error(
-                str(
-                    "[ERROR] - Error {} when getting metric from QoA client: {}".format(
-                        type(e), e.__traceback__
-                    )
-                )
-            )
-
-    def resetMetric(self, key: Optional[Union[List, str]] = None):
-        # TO DO:
-        try:
-            if key == None:
-                for key in self.metricList:
-                    self.metricList[key].reset()
-            elif isinstance(key, list):
-                for k in key:
-                    self.metricList[k].reset()
-            else:
-                return self.metricList[key].reset()
-        except Exception as e:
-            qoaLogger.error(
-                str(
-                    "[ERROR] - Error {} when reseting metric in QoA client: {}".format(
-                        type(e), e.__traceback__
-                    )
-                )
-            )
-
-    def setConfig(self, key, value):
-        # TO DO:
-        try:
-            self.clientConf.__setattr__(key, value)
+            self.client_config.__setattr__(key, value)
         except Exception as e:
             qoaLogger.error(
                 str(
@@ -253,49 +197,45 @@ class QoaClient(object):
                 )
             )
 
-    def observeMetric(
+    def observe_metric(
         self,
         metric_name,
         value,
         category=0,
-        metric_class="Gauge",
+        metric_class: MetricClassEnum = MetricClassEnum.gauge,
         description: str = "",
         default_value: int = -1,
     ):
-        if metric_name not in self.metricList:
-            metric_config = {}
-            metric_config["class"] = cl
-            metric_config["default"] = def_val
-            metric_config["description"] = des
-            metric_config["category"] = category
-            self.addMetric({metric_name: metric_config})
-        self.metricList[metric_name].set(value)
-
-        self.qoaReport.observeMetric(metric=self.metricList[metric_name])
+        self.metric_manager.observe_metric(
+            metric_name, value, category, metric_class, description, default_value
+        )
+        self.qoa_report.observe_metric(
+            metric=self.metric_manager.metricList[metric_name]
+        )
 
     def timer(self):
-        if self.timerFlag == False:
-            self.timerFlag = True
+        if self.timer_flag == False:
+            self.timer_flag = True
             self.timerStart = time.time()
             return {}
         else:
-            self.timerFlag = False
+            self.timer_flag = False
             responseTime = {
                 "startTime": self.timerStart,
                 "responseTime": time.time() - self.timerStart,
             }
-            self.observeMetric("responseTime", responseTime, category=0)
+            self.observe_metric("responseTime", responseTime, category=0)
             return responseTime
 
-    def importPReport(self, reports):
-        self.qoaReport.importPReport(reports)
+    def import_previous_report(self, reports):
+        self.qoa_report.import_previous_report(reports)
 
     def __str__(self):
-        return str(self.clientConf) + "\n" + str(self.connectorList)
+        return str(self.client_config) + "\n" + str(self.connector_list)
 
     def process_report(self, interval: int, pid: Optional[int] = None):
         report = {}
-        while self.procMonitorFlag == 1:
+        while self.process_monitor_flag == 1:
             try:
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
@@ -324,23 +264,23 @@ class QoaClient(object):
             time.sleep(interval)
 
     def process_monitor_start(self, interval: int, pid: Optional[int] = None):
-        if self.procMonitorFlag == 0:
+        if self.process_monitor_flag == 0:
             if pid == None:
                 pid = os.getpid()
-            self.procMonitorFlag = 1
+            self.process_monitor_flag = 1
             sub_thread = Thread(target=self.process_report, args=(interval, pid))
             sub_thread.start()
-        self.procMonitorFlag = 1
+        self.process_monitor_flag = 1
 
     def process_monitor_stop(self):
-        self.procMonitorFlag = 2
+        self.process_monitor_flag = 2
 
     def asyn_report(self, report: dict, connectors: Optional[list] = None):
         body_mess = json.dumps(report)
         self.lock.acquire()
         if connectors == None:
             # if connectors are not specify, use default
-            self.connectorList[self.default_connector].send_data(
+            self.connector_list[self.default_connector].send_data(
                 body_mess, str(uuid.uuid4())
             )
         else:
@@ -358,9 +298,9 @@ class QoaClient(object):
         reset=True,
     ):
         if report == None:
-            report = self.qoaReport.generateReport(metrics, reset)
+            report = self.qoa_report.generate_report(metrics, reset)
         else:
-            report["metadata"] = copy.deepcopy(self.clientConf)
+            report["metadata"] = copy.deepcopy(self.client_config)
             report["metadata"]["timestamp"] = time.time()
 
         if submit:
@@ -371,8 +311,13 @@ class QoaClient(object):
                 qoaLogger.warning("No connector available")
         return report
 
-    def observeInferenceMetric(
-        self, metric_name, value, new_inf=False, inference_id=None, dependency=None
+    def observe_inference_metric(
+        self,
+        metric_name: MetricNameEnum,
+        value,
+        new_inf=False,
+        inference_id: Optional[str] = None,
+        dependency: Optional[List[LinkedInstance]] = None,
     ):
         report = {}
 
@@ -382,9 +327,9 @@ class QoaClient(object):
             if inference_id != None:
                 infID = inference_id
             else:
-                if self.inferenceFlag == False:
+                if self.inference_flag == False:
                     self.infID = str(uuid.uuid4())
-                    self.inferenceFlag = True
+                    self.inference_flag = True
                 infID = self.infID
         report[infID] = {}
         report[infID]["instance_id"] = self.instanceID
@@ -392,22 +337,22 @@ class QoaClient(object):
         report[infID][metric_name] = {}
         report[infID][metric_name]["value"] = value
 
-        self.qoaReport.observeInferenceMetric(report, dependency=dependency)
+        self.qoa_report.observe_inference_metric(report, dependency=dependency)
         return infID
 
-    def observeErronous(self, data, errors=None):
+    def observe_erronous(self, data, errors=None):
         results = eva_erronous(data, errors=errors)
         if results != None:
             for key in results:
-                self.observeMetric(key, results[key], 1)
+                self.observe_metric(key, results[key], 1)
 
-    def observeDuplicate(self, data):
+    def observe_duplicate(self, data):
         results = eva_duplicate(data)
         if results != None:
             for key in results:
-                self.observeMetric(key, results[key], 1)
+                self.observe_metric(key, results[key], 1)
 
-    def observeMissing(
+    def observe_missing(
         self, data, null_count=True, correlations=False, predict=False, random_state=0
     ):
         results = eva_missing(
@@ -419,16 +364,16 @@ class QoaClient(object):
         )
         if results != None:
             for key in results:
-                self.observeMetric(key, results[key], 1)
+                self.observe_metric(key, results[key], 1)
 
-    def observeImgQuality(self, image):
+    def observe_image_quality(self, image):
         results = image_quality(image)
         if results != None:
             for key in results:
-                self.observeMetric(key, results[key], 1)
+                self.observe_metric(key, results[key], 1)
 
-    def observeNone(self, data):
+    def observe_none(self, data):
         results = eva_none(data)
         if results != None:
             for key in results:
-                self.observeMetric(key, results[key], 1)
+                self.observe_metric(key, results[key], 1)
