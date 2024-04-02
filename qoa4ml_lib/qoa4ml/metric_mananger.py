@@ -10,14 +10,14 @@ from .qoaUtils import qoaLogger
 
 class MetricManager:
     def __init__(self) -> None:
-        self.metricList: Dict[MetricNameEnum, PrometheusMetric]
+        self.metricList: Dict[MetricNameEnum, PrometheusMetric] = {}
 
-    def addMetric(self, metric_configs: List[MetricConfig]):
+    def add_metric(self, metric_configs: List[MetricConfig]):
         # Add multiple metrics
         for metric_config in metric_configs:
-            self.metricList[metric_config.name] = self.initMetric(metric_config)
+            self.metricList[metric_config.name] = self.init_metric(metric_config)
 
-    def resetMetric(self, key: Optional[Union[List, str]] = None):
+    def reset_metric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
             if key == None:
@@ -37,7 +37,7 @@ class MetricManager:
                 )
             )
 
-    def getMetric(self, key: Optional[Union[List, str]] = None):
+    def get_metric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
             if key == None:
@@ -58,7 +58,7 @@ class MetricManager:
                 )
             )
 
-    def initMetric(self, configuration: MetricConfig) -> PrometheusMetric:
+    def init_metric(self, configuration: MetricConfig) -> PrometheusMetric:
         # init individual metrics
         if configuration.metric_class == MetricClassEnum.gauge:
             return Gauge(
@@ -93,7 +93,7 @@ class MetricManager:
                 f"Metric class {configuration.metric_class} is not supported"
             )
 
-    def observeMetric(
+    def observe_metric(
         self,
         metric_name: MetricNameEnum,
         value,
@@ -110,5 +110,5 @@ class MetricManager:
                 description=description,
                 default_value=default_value,
             )
-            self.metricList[metric_name] = self.initMetric(metric_config)
+            self.metricList[metric_name] = self.init_metric(metric_config)
         self.metricList[metric_name].set(value)
