@@ -543,6 +543,8 @@ def get_process_allowed_memory():
             for line in file:
                 parts = line.strip().split(":")
                 cgroup_path = parts[2]
+                pattern = r"/task_\d+"
+                cgroup_path = re.sub(pattern, "", cgroup_path)
                 with open(f"/sys/fs/cgroup{cgroup_path}/memory.max") as limit_file:
                     number_of_task = len(
                         glob.glob(f"/sys/fs/cgroup{cgroup_path}/task_*")
