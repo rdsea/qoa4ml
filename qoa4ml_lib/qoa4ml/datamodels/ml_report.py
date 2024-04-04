@@ -1,7 +1,8 @@
 from typing import List, Optional, Union
-from pydantic import BaseModel
-from datamodel_enum import StageNameEnum
+
 from common_models import Metric
+from datamodel_enum import StageNameEnum
+from pydantic import BaseModel
 
 
 class MicroserviceInstance(BaseModel):

@@ -1,13 +1,14 @@
 import json
-import sys
 import pathlib
+import sys
 from typing import Optional
-from .host_object import HostObject
+
+from host_object import HostObject
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from qoaUtils import qoaLogger
 from datamodels.configs import AMQPCollectorConfig
+from qoaUtils import qoaLogger
 
 
 class Amqp_Collector(object):
