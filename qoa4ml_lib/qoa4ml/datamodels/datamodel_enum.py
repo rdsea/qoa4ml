@@ -17,10 +17,22 @@ class MlSpecificMetricNameEnum(Enum):
     mse = "mse"
 
 
-<<<<<<< HEAD
-MetricNameEnum = Union[ServiceMetricNameEnum, MlSpecificMetricNameEnum, str]
-=======
->>>>>>> 95f62ac (update config)
+class ResourcesUtilizationMetricNameEnum(Enum):
+    cpu = "cpu_usage"
+    memory = "memory_usage"
+
+
+print(ResourcesUtilizationMetricNameEnum.memory == "cpu_usage")
+
+
+MetricNameEnum = Union[
+    ServiceMetricNameEnum,
+    MlSpecificMetricNameEnum,
+    ResourcesUtilizationMetricNameEnum,
+    str,
+]
+
+
 class DataQualityEnum(Enum):
     image_size = "image_size"
     object_size = "object_size"
@@ -145,6 +157,8 @@ class MetricCategoryEnum(Enum):
     service = "service"
     data = "data"
     ml_specific = "ml_specific"
+    quality = "quality"
+    inference = "inference"
 
 
 class CgroupVersionEnum(Enum):
@@ -154,6 +168,6 @@ class CgroupVersionEnum(Enum):
 
 class MetricClassEnum(Enum):
     gauge = "Gauge"
-    coutner = "Counter"
+    counter = "Counter"
     summary = "Summary"
-    histogram = "Histogram"
+    histogram = "Historgram"
