@@ -10,7 +10,7 @@ import sys
 from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
 from tinyflux import TinyFlux, Point, TimeQuery
-from .core.common import ODOP_PATH
+from ...common import ODOP_PATH
 from . import odop_utils
 
 logging.basicConfig(
@@ -19,7 +19,7 @@ logging.basicConfig(
 
 
 sys.path.append(ODOP_PATH)
-DEFAULT_DATABASE_FOLDER = ODOP_PATH + "tinyflux/"
+DEFAULT_DATABASE_FOLDER = ODOP_PATH + "metric_database/"
 odop_utils.make_folder(DEFAULT_DATABASE_FOLDER)
 METRICS_URL_PATH = "/metrics"
 

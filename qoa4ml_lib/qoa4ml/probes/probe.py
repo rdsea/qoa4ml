@@ -4,7 +4,8 @@ import socket
 from threading import Thread
 import logging
 import time
-from .common import ODOP_PATH
+from ..common import ODOP_PATH
+from ..observability.odop_obs.odop_utils import make_folder
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -33,6 +34,7 @@ class Probe:
         self.log_latency_flag = self.config["log_latency_flag"]
         if self.log_latency_flag:
             self.latency_logging_path = ODOP_PATH + config["latency_logging_path"]
+            make_folder(self.latency_logging_path)
         self.max_latency = 0.0
 
     def create_report(self):
