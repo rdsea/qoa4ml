@@ -17,7 +17,10 @@ class MlSpecificMetricNameEnum(Enum):
     mse = "mse"
 
 
+<<<<<<< HEAD
 MetricNameEnum = Union[ServiceMetricNameEnum, MlSpecificMetricNameEnum, str]
+=======
+>>>>>>> 95f62ac (update config)
 class DataQualityEnum(Enum):
     image_size = "image_size"
     object_size = "object_size"
