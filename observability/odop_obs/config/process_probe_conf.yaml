@@ -1,7 +1,0 @@
-frequency: 1
-requireRegister: false
-log_latency_flag: true
-latency_logging_path: "logs/"
-aggregator_host: "127.0.0.1"
-aggregator_port: 12345
-environment: "HPC"
