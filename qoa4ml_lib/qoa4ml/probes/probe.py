@@ -4,6 +4,7 @@ import socket
 from threading import Thread
 import logging
 import time
+from typing import Optional
 from ..common import ODOP_PATH
 from ..observability.odop_obs.odop_utils import make_folder
 
@@ -55,11 +56,14 @@ class Probe:
                 - time.time()
             )
 
-    def start_reporting(self):
+    def start_reporting(self, background: bool = True):
         self.execution_flag = True
-        self.report_thread = Thread(target=self.reporting)
-        self.report_thread.daemon = True
-        self.report_thread.start()
+        if background:
+            self.report_thread = Thread(target=self.reporting)
+            self.report_thread.daemon = True
+            self.report_thread.start()
+        else:
+            self.reporting()
 
     def stop_reporting(self):
         self.execution_flag = False
