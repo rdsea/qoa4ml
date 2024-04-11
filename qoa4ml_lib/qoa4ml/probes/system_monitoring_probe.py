@@ -1,5 +1,6 @@
 import os
 import time
+import socket
 import importlib
 from ..qoaUtils import (
     get_sys_cpu_util,
@@ -14,15 +15,11 @@ from ..gpuUtils import (
 )
 from .probe import Probe
 
-NODE_NAME = os.getenv("NODE_NAME")
-if not NODE_NAME:
-    NODE_NAME = "node_default"
-
 
 class SystemMonitoringProbe(Probe):
     def __init__(self, config: dict) -> None:
         super().__init__(config)
-        self.node_name = NODE_NAME  # TODO: find somehow to get node name
+        self.node_name = socket.gethostname().split(".")[0]
         if self.config["requireRegister"]:
             self.obs_service_url = self.config["obsServiceUrl"]
         self.environment = config["environment"]

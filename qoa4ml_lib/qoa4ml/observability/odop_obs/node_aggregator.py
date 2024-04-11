@@ -28,7 +28,8 @@ class NodeAggregator:
     def __init__(self, config):
         self.config = config
         self.unit_conversion = self.config["unit_conversion"]
-        self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + str(self.config["database_path"]))
+        self.node_name = socket.gethostname().split(".")[0]
+        self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + self.node_name + ".csv")
         self.server_thread = Thread(
             target=self.start_handling, args=(self.config["host"], self.config["port"])
         )
