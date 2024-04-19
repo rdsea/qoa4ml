@@ -502,17 +502,10 @@ def is_pddataframe(obj):
 
 
 def get_process_allowed_cpus():
-    with open("/proc/self/status") as file:
-        for line in file:
-            if "Cpus_allowed_list" in line:
-                ranges = line.split(":")[1].strip().split(",")
-                result = []
-                for range_str in ranges:
-                    if "-" not in range_str:
-                        result.append(int(range_str))
-                    start, end = map(int, range_str.split("-"))
-                    result.extend(list(range(start, end + 1)))
-                return result
+    # NOTE: 0 as PID represents the calling process
+    pid = 0
+    affinity = os.sched_getaffinity(pid)
+    return list(affinity)
 
 
 def get_process_allowed_memory():
