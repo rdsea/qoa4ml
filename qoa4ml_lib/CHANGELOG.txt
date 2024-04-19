@@ -28,3 +28,7 @@ Add metric and modify format of system/process reports
 0.0.72 (22/05/2023)
 ---------------------
 Refactor source code
+
+0.0.73 (19/04/2024)
+---------------------
+Add new ODOP observability module
