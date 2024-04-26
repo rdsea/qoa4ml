@@ -17,7 +17,6 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
 )
 
-
 sys.path.append(ODOP_PATH)
 DEFAULT_DATABASE_FOLDER = ODOP_PATH + "metric_database/"
 odop_utils.make_folder(DEFAULT_DATABASE_FOLDER)
@@ -199,11 +198,13 @@ class NodeAggregator:
         data = self.db.search(time_query >= timestamp)
         return [
             unflatten(
-                {
-                    "timestamp": datetime.timestamp(datapoint.time),
-                    **datapoint.tags,
-                    **datapoint.fields,
-                },
+                self.revert_unit(
+                    {
+                        "timestamp": datetime.timestamp(datapoint.time),
+                        **datapoint.tags,
+                        **datapoint.fields,
+                    }
+                ),
                 self.config["data_separator"],
             )
             for datapoint in data
