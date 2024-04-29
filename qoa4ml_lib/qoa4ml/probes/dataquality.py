@@ -10,7 +10,7 @@ import pandas as pd
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from qoaUtils import is_numpyarray, is_pddataframe, qoaLogger
+from ..qoa_utils import is_numpyarray, is_pddataframe, qoaLogger
 
 # Define metric names, return formats: dictionary {metric name} {sub-element}
 # Return error/debugging

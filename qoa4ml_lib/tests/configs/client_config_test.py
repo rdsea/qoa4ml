@@ -1,10 +1,17 @@
-from qoa4ml.datamodels.configs import (AMQPCollectorConfig,
-                                       AMQPConnectorConfig, Client,
-                                       ClientConfig, CollectorConfig,
-                                       ConnectorConfig)
-from qoa4ml.datamodels.datamodel_enum import (MethodEnum, ServiceAPIEnum,
-                                              StageNameEnum,
-                                              StakeholderRoleEnum)
+from qoa4ml.datamodels.configs import (
+    AMQPCollectorConfig,
+    AMQPConnectorConfig,
+    Client,
+    ClientConfig,
+    CollectorConfig,
+    ConnectorConfig,
+)
+from qoa4ml.datamodels.datamodel_enum import (
+    MethodEnum,
+    ServiceAPIEnum,
+    StageNameEnum,
+    StakeholderRoleEnum,
+)
 
 client = Client(
     id="aaltosea1",

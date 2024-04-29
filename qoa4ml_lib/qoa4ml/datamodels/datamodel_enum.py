@@ -22,27 +22,25 @@ class ResourcesUtilizationMetricNameEnum(Enum):
     memory = "memory_usage"
 
 
-print(ResourcesUtilizationMetricNameEnum.memory == "cpu_usage")
+class ImageQualityNameEnum(Enum):
+    image_size = "image_size"
+    object_size = "object_size"
 
 
 MetricNameEnum = Union[
     ServiceMetricNameEnum,
     MlSpecificMetricNameEnum,
     ResourcesUtilizationMetricNameEnum,
+    ImageQualityNameEnum,
     str,
 ]
-
-
-class DataQualityEnum(Enum):
-    image_size = "image_size"
-    object_size = "object_size"
 
 
 class StageNameEnum(Enum):
     ml_inference_aggregate = "ml_inference_aggregate"
     ml_inference_ensemble = "ml_inference_ensemble"
     data_processing = "data_processing"
-    gate_way = "gateway"
+    gateway = "gateway"
 
 
 class MethodEnum(Enum):
