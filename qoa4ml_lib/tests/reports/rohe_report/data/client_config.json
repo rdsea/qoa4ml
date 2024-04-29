@@ -1,0 +1,8 @@
+{
+    "id": "aaltosea1",
+    "name": "data_handling01",
+    "stage": "gateway",
+    "method": "REST",
+    "application": "test",
+    "role": "ml"
+}

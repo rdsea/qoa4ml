@@ -8,7 +8,7 @@ import numpy as np
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from qoaUtils import is_numpyarray, qoaLogger
+from ..qoa_utils import is_numpyarray, qoaLogger
 
 
 ################################################ ML QUALITY ########################################################

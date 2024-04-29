@@ -8,7 +8,8 @@ from host_object import HostObject
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 from datamodels.configs import AMQPCollectorConfig
-from qoaUtils import qoaLogger
+
+from ..qoa_utils import qoaLogger
 
 
 class Amqp_Collector(object):
