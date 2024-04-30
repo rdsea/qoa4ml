@@ -1,6 +1,8 @@
 import pathlib
 import sys
 
+from .base_connector import BaseConnector
+
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 from collector.host_object import HostObject
@@ -10,7 +12,7 @@ from ..qoa_utils import qoaLogger
 
 
 # TODO: this client handle both connector and collector
-class Mqtt_Connector(object):
+class Mqtt_Connector(BaseConnector):
     # This class will handle all the mqtt connection for each client application
     # FIX: what is host object?
     def __init__(self, host_object: HostObject, configuration: MQTTConnectorConfig):
@@ -61,6 +63,6 @@ class Mqtt_Connector(object):
         # Start looking for data from broker
         self.client.loop_start()
 
-    def send_data(self, body_mess):
+    def send_data(self, body_message: str):
         # Send data in form of text message
-        self.client.publish(self.pub_queue, body_mess)
+        self.client.publish(self.pub_queue, body_message)

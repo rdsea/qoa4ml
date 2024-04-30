@@ -14,7 +14,7 @@ from .datamodel_enum import (
 
 
 class Client(BaseModel):
-    id: UUID
+    id: Optional[UUID] = None
     name: str
     stage: StageNameEnum
     functionality: FunctionalityEnum

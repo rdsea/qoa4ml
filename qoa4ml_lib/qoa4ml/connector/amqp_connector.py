@@ -1,7 +1,10 @@
 import importlib
 import pathlib
 import sys
+from typing import Optional
 import uuid
+
+from .base_connector import BaseConnector
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
@@ -9,7 +12,7 @@ sys.path.append(str(p_dir))
 from datamodels.configs import AMQPConnectorConfig
 
 
-class Amqp_Connector(object):
+class Amqp_Connector(BaseConnector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(self, configuration: AMQPConnectorConfig, log: bool = False):
         """
@@ -44,7 +47,13 @@ class Amqp_Connector(object):
             exchange=self.exchange_name, exchange_type=self.exchange_type
         )
 
-    def send_data(self, body_mess, corr_id=None, routing_key=None, expiration=1000):
+    def send_data(
+        self,
+        body_message,
+        corr_id=None,
+        routing_key: Optional[str] = None,
+        expiration=1000,
+    ):
         # Sending data to desired destination
         # if sender is client, it will include the "reply_to" attribute to specify where to reply this message
         # if sender is server, it will reply the message to "reply_to" via default exchange
@@ -59,7 +68,7 @@ class Amqp_Connector(object):
             exchange=self.exchange_name,
             routing_key=routing_key,
             properties=self.sub_properties,
-            body=body_mess,
+            body=body_message,
         )
         # if self.log_flag:
         #     self.mess_logging.log_request(body_mess,corr_id)
