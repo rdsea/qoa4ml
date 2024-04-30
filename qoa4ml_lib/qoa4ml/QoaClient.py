@@ -10,23 +10,42 @@ from threading import Thread
 from typing import List, Optional, Union
 
 import requests
-from qoa4ml.datamodels.datamodel_enum import (MetricClassEnum, MetricNameEnum,
-                                              ServiceAPIEnum)
+from qoa4ml.datamodels.datamodel_enum import (
+    MetricClassEnum,
+    MetricNameEnum,
+    ServiceAPIEnum,
+)
 from qoa4ml.datamodels.ml_report import LinkedInstance
 from qoa4ml.metric_mananger import MetricManager
 
 from .connector.amqp_connector import Amqp_Connector
+
 # from .connector.mqtt_connector import Mqtt_Connector
-from .datamodels.configs import (AMQPCollectorConfig, AMQPConnectorConfig,
-                                 ClientConfig, ConnectorConfig,
-                                 GroupMetricConfig, MetricConfig,
-                                 MQTTConnectorConfig)
-from .probes.dataquality import (eva_duplicate, eva_erronous, eva_missing,
-                                 eva_none, image_quality)
+from .datamodels.configs import (
+    AMQPCollectorConfig,
+    AMQPConnectorConfig,
+    ClientConfig,
+    ConnectorConfig,
+    GroupMetricConfig,
+    MetricConfig,
+    MQTTConnectorConfig,
+)
+from .probes.dataquality import (
+    eva_duplicate,
+    eva_erronous,
+    eva_missing,
+    eva_none,
+    image_quality,
+)
 from .probes.mlquality import *
-from .qoa_utils import (get_proc_cpu, get_proc_mem, load_config, qoaLogger,
-                        set_logger_level)
-from .reports.ROHE_reports import RoheReport
+from .qoa_utils import (
+    get_proc_cpu,
+    get_proc_mem,
+    load_config,
+    qoaLogger,
+    set_logger_level,
+)
+from .reports.rohe_reports import RoheReport
 
 headers = {"Content-Type": "application/json"}
 
@@ -53,8 +72,8 @@ class QoaClient(object):
         self.metric_manager = MetricManager()
         self.connector_list = {}
         self.timer_flag = False
-        self.method = self.client_config.method
-        self.stageID = self.client_config.stage
+        self.method = self.client_config.functionality
+        self.stage = self.client_config.stage
         self.process_monitor_flag = 0
         self.inference_flag = False
 
@@ -95,9 +114,9 @@ class QoaClient(object):
                     connector_configs = response["connector"]
                     for connector in connector_configs:
                         connector_config = ConnectorConfig(**connector)
-                        self.connector_list[connector_config.name] = (
-                            self.init_connector(connector_config)
-                        )
+                        self.connector_list[
+                            connector_config.name
+                        ] = self.init_connector(connector_config)
                 else:
                     qoaLogger.warning(
                         "Unable to register Qoa Client: connector configuration must be dictionary"
