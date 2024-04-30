@@ -1,17 +1,17 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, TypeVar, Union, Generic
 from uuid import UUID
 
 from pydantic import BaseModel
 
 from .common_models import Metric
-from .datamodel_enum import MetricNameEnum, StageNameEnum
+from .datamodel_enum import FunctionalityEnum, MetricNameEnum, StageNameEnum
 
 
 class MicroserviceInstance(BaseModel):
     id: UUID
     name: str
-    functionality: str
-    stage: Optional[str] = None
+    functionality: FunctionalityEnum
+    stage: Optional[StageNameEnum] = None
 
 
 class StageReport(BaseModel):
@@ -26,22 +26,22 @@ class InferenceInstance(BaseModel):
     prediction: Union[dict, float]
 
 
-InstanceType = Union[MicroserviceInstance, InferenceInstance]
+InstanceType = TypeVar("InstanceType")
 
 
-class LinkedInstance(BaseModel):
+class LinkedInstance(BaseModel, Generic[InstanceType]):
     previous: List[InstanceType] = []
     instance: InstanceType
 
 
 class ExecutionGraph(BaseModel):
     end_point: Optional[MicroserviceInstance] = None
-    linked_list: Dict[str, LinkedInstance]
+    linked_list: Dict[UUID, LinkedInstance[MicroserviceInstance]]
 
 
 class InferenceGraph(BaseModel):
-    end_point: InferenceInstance
-    linked_list: Dict[UUID, LinkedInstance]
+    end_point: Optional[InferenceInstance] = None
+    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]]
 
 
 # NOTE: use dict so that we know which stage to add metric to
@@ -56,5 +56,5 @@ class InferenceReport(QualityReport):
 
 class RoheReportModel(BaseModel):
     inference_report: Optional[InferenceReport] = None
-    metadata: Optional[Dict] = None
+    metadata: Dict = {}
     execution_graph: Optional[ExecutionGraph] = None

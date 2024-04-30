@@ -1,7 +1,6 @@
 import json
 import unittest
 from devtools import debug
-from unittest.mock import MagicMock
 
 from qoa4ml.datamodels.configs import Client
 from qoa4ml.reports.rohe_reports import RoheReport
@@ -26,29 +25,29 @@ class TestQoaReport(unittest.TestCase):
     def test_import_report_from_file(self):
         self.rohe_report.import_report_from_file("./data/imported_report.json")
 
-    #
-    # def test_combine_stage_report(self):
-    #     # self.rohe_report.import_report_from_file("./data/current_report.json")
-    #     previous_report = RoheReport(
-    #         self.client_config, "./data/previous_report_1.json"
-    #     )
-    #     test = self.rohe_report.combine_stage_report(
-    #         self.rohe_report.inference_report.service,
-    #         previous_report.inference_report.service,
-    #     )
-    #     debug(test)
-
     def test_process_previous_report(self):
-        # self.rohe_report.import_report_from_file("./data/previous_report_2.json")
         previous_report_1 = RoheReport(
             self.client_config, "./data/previous_report_1.json"
         )
         previous_report_2 = RoheReport(
             self.client_config, "./data/previous_report_2.json"
         )
+
         self.rohe_report.process_previous_report(previous_report_1.report)
         self.rohe_report.process_previous_report(previous_report_2.report)
-        debug(self.rohe_report.report)
+
+    def test_build_execution_graph(self):
+        previous_report_1 = RoheReport(
+            self.client_config, "./data/previous_report_1.json"
+        )
+        previous_report_2 = RoheReport(
+            self.client_config, "./data/previous_report_2.json"
+        )
+
+        self.rohe_report.process_previous_report(previous_report_1.report)
+        self.rohe_report.process_previous_report(previous_report_2.report)
+        self.rohe_report.build_execution_graph()
+        debug(self.rohe_report.execution_graph)
 
 
 if __name__ == "__main__":

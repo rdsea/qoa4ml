@@ -286,23 +286,7 @@
               ]
             }
           ]
-        }
-      },
-      "end_point": {
-        "id": "5595ed89-41c5-4a0c-b18e-85a0aab912fa",
-        "execution_instance_id": "5e4f82e8-f2ff-45a8-8809-140f98253e4d",
-        "metrics": [
-          {
-            "metric_name": "confidence",
-            "records": [
-              0.5
-            ]
-          }
-        ],
-        "prediction": {
-          "cat": 345
-        }
-      },
+        },
       "51fe4c60-7f30-4cfb-8521-69d4c6b810f2": {
         "instance": {
           "id": "51fe4c60-7f30-4cfb-8521-69d4c6b810f2",
@@ -338,6 +322,22 @@
           ]
         },
         "previous": []
+      }
+      },
+      "end_point": {
+        "id": "5595ed89-41c5-4a0c-b18e-85a0aab912fa",
+        "execution_instance_id": "5e4f82e8-f2ff-45a8-8809-140f98253e4d",
+        "metrics": [
+          {
+            "metric_name": "confidence",
+            "records": [
+              0.5
+            ]
+          }
+        ],
+        "prediction": {
+          "cat": 345
+        }
       }
     }
   }

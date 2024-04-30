@@ -1,3 +1,4 @@
+from uuid import UUID
 from qoa4ml.datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
@@ -7,17 +8,17 @@ from qoa4ml.datamodels.configs import (
     ConnectorConfig,
 )
 from qoa4ml.datamodels.datamodel_enum import (
-    MethodEnum,
+    FunctionalityEnum,
     ServiceAPIEnum,
     StageNameEnum,
     StakeholderRoleEnum,
 )
 
 client = Client(
-    id="aaltosea1",
+    id=UUID("7191a40f-ac85-4ca8-aa25-8114213e006a"),
     name="data_handling01",
-    stage=StageNameEnum.gate_way,
-    method=MethodEnum.rest,
+    stage=StageNameEnum.gateway,
+    functionality=FunctionalityEnum.rest,
     application="test",
     role="ml",
 )

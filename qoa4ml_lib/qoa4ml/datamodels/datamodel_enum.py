@@ -43,11 +43,11 @@ class StageNameEnum(Enum):
     gateway = "gateway"
 
 
-class MethodEnum(Enum):
+class FunctionalityEnum(Enum):
     rest = "REST"
-    tensorflow = "tensorflow"
-    transformation = "transformation"
-    max_aggregate = "max_aggregate"
+    tensorflow = "TensorFlow"
+    transformation = "Transformation"
+    max_aggregate = "Max Aggregate"
 
 
 class StakeholderRoleEnum(Enum):
@@ -169,3 +169,9 @@ class MetricClassEnum(Enum):
     counter = "Counter"
     summary = "Summary"
     histogram = "Historgram"
+
+
+class ReportTypeEnum(Enum):
+    data = "data_report"
+    service = "service_report"
+    ml_specific = "ml_specific_report"
