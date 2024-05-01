@@ -1,9 +1,9 @@
 {
   "client": {
-    "id": "aaltosea1",
+    "id": "e56de067-01be-4303-bc26-e3934292c098",
     "name": "data_handling01",
-    "stage": "gateway",
-    "method": "REST",
+    "stage": "data_processing",
+    "functionality": "REST",
     "application": "test",
     "role": "ml"
   },

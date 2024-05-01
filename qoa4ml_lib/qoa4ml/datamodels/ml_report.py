@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, TypeVar, Union, Generic
+from typing import Dict, Generic, List, Optional, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -16,7 +16,7 @@ class MicroserviceInstance(BaseModel):
 
 class StageReport(BaseModel):
     name: StageNameEnum
-    metric: Dict[MetricNameEnum, Dict[UUID, Metric]]
+    metrics: Dict[MetricNameEnum, Dict[UUID, Metric]]
 
 
 class InferenceInstance(BaseModel):

@@ -1,4 +1,7 @@
 # Metrics are implemented based on these classes to be compatible with Prometheus
+from qoa4ml.datamodels.datamodel_enum import MetricNameEnum
+
+
 class PrometheusMetric(object):
     """
     This class defines the common attribute and provide basic function for handling a metric
@@ -24,7 +27,9 @@ class PrometheusMetric(object):
         Other: To do (extend more categories)
     """
 
-    def __init__(self, metric_name, description, default_value=-1, category=0):
+    def __init__(
+        self, metric_name: MetricNameEnum, description, default_value=-1, category=0
+    ):
         self.name = metric_name
         self.description = description
         self.default_value = default_value
