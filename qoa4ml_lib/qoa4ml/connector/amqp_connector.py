@@ -1,8 +1,8 @@
 import importlib
 import pathlib
 import sys
-from typing import Optional
 import uuid
+from typing import Optional
 
 from .base_connector import BaseConnector
 

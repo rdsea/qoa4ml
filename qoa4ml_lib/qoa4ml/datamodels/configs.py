@@ -3,14 +3,9 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (
-    FunctionalityEnum,
-    MetricCategoryEnum,
-    MetricClassEnum,
-    MetricNameEnum,
-    ServiceAPIEnum,
-    StageNameEnum,
-)
+from .datamodel_enum import (FunctionalityEnum, MetricCategoryEnum,
+                             MetricClassEnum, MetricNameEnum, ServiceAPIEnum,
+                             StageNameEnum)
 
 
 class Client(BaseModel):
