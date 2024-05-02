@@ -2,7 +2,6 @@ import copy
 import time
 from typing import Dict, List, Optional
 
-
 from qoa4ml.datamodels.common_models import Metric
 from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum, StageNameEnum
 

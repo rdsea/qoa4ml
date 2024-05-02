@@ -1,20 +1,45 @@
 import json
-import logging
-import os
-import pathlib
-import sys
 import time
-import traceback
-from threading import Thread
-
-import psutil
+import os
 import yaml
+import logging
+import subprocess
+import shlex
+import re
+import glob
+from threading import Thread
+import traceback
+import sys
+import pathlib
+import psutil
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
 )
 
 qoaLogger = logging.getLogger()
+
+
+def get_cgroup_version() -> str:
+    proc1 = subprocess.Popen("mount", stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(
+        shlex.split("grep cgroup"),
+        stdin=proc1.stdout,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if proc1.stdout:
+        proc1.stdout.close()
+    out, _ = proc2.communicate()
+    if "cgroup2" in out.decode():
+        return "v2"
+    return "v1"
+
+
+if get_cgroup_version() == "v2":
+    CGROUP_VERSION = "v2"
+else:
+    CGROUP_VERSION = "v1"
 
 
 def set_logger_level(logging_level):
@@ -101,6 +126,21 @@ def get_sys_cpu():
     return info
 
 
+def get_sys_cpu_util():
+    info = {}
+    core_utils = psutil.cpu_percent(percpu=True)
+    for core_num, core_util in enumerate(core_utils):
+        info[f"core_{core_num}"] = core_util
+    return info
+
+
+def get_sys_cpu_metadata():
+    cpu_freq = psutil.cpu_freq()
+    frequency = {"value": cpu_freq.max / 1000, "unit": "GHz"}
+    cpu_threads = psutil.cpu_count(logical=True)
+    return {"frequency": frequency, "thread": cpu_threads}
+
+
 def get_sys_mem():
     stats = psutil.virtual_memory()
     info = {}
@@ -128,6 +168,26 @@ def report_proc_cpu(process):
     report["num_thread"] = process.num_threads()
 
     return report
+
+
+def report_proc_child_cpu(process: psutil.Process):
+    # WARNING: this children function takes a lot of time
+    child_processes = process.children(recursive=True)
+    child_processes_count = len(child_processes)
+    child_processes_cpu = {}
+    process_cpu_time = process.cpu_times()
+    for id, child_proc in enumerate(child_processes):
+        cpu_time = child_proc.cpu_times()
+        child_processes_cpu[f"child_{id}"] = float(cpu_time.user + cpu_time.system)
+
+    total_cpu_usage = sum(child_processes_cpu.values())
+    total_cpu_usage += float(process_cpu_time.user + process_cpu_time.system)
+    return {
+        "child_process": child_processes_count,
+        "value": child_processes_cpu,
+        "total": total_cpu_usage,
+        "unit": "cputime",
+    }
 
 
 def get_proc_cpu(pid=None):
@@ -441,3 +501,52 @@ def is_pddataframe(obj):
         global pd
         import pandas as pd
     return type(obj) == pd.DataFrame
+
+
+def get_process_allowed_cpus():
+    # NOTE: 0 as PID represents the calling process
+    pid = 0
+    affinity = os.sched_getaffinity(pid)
+    return list(affinity)
+
+
+def get_process_allowed_memory():
+    if CGROUP_VERSION == "v1":
+        with open("/proc/self/cgroup") as file:
+            for line in file:
+                parts = line.strip().split(":")
+                if len(parts) == 3 and parts[1] == "memory":
+                    cgroup_path = parts[2]
+                    memory_limit_file = re.sub(r"/task_\d+", "", cgroup_path)
+
+                    number_of_task = len(
+                        glob.glob(f"/sys/fs/cgroup/memory{memory_limit_file}/task_*")
+                    )
+
+                    with open(
+                        f"/sys/fs/cgroup/memory{memory_limit_file}/memory.limit_in_bytes"
+                    ) as limit_file:
+                        memory_limit_str = limit_file.read().strip()
+                        try:
+                            memory_limit_int = int(memory_limit_str)
+                            return memory_limit_int / number_of_task
+                        except ValueError:
+                            return memory_limit_str
+
+    else:
+        with open("/proc/self/cgroup") as file:
+            for line in file:
+                parts = line.strip().split(":")
+                cgroup_path = parts[2]
+                pattern = r"/task_\d+"
+                cgroup_path = re.sub(pattern, "", cgroup_path)
+                with open(f"/sys/fs/cgroup{cgroup_path}/memory.max") as limit_file:
+                    number_of_task = len(
+                        glob.glob(f"/sys/fs/cgroup{cgroup_path}/task_*")
+                    )
+                    memory_limit_str = limit_file.read().strip()
+                    try:
+                        memory_limit_int = int(memory_limit_str)
+                        return memory_limit_int / number_of_task
+                    except ValueError:
+                        return memory_limit_str
