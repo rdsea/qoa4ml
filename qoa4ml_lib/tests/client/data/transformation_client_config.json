@@ -1,0 +1,23 @@
+
+{
+  "client": {
+    "id": "a215af9e-313a-4e09-abd5-4dd014dafc51",
+    "name": "Inference Jet 02",
+    "stage": "Transformation",
+    "functionality": "REST",
+    "application": "test",
+    "role": "ml"
+  },
+  "connector": [
+    {
+      "name": "amqp_connector",
+      "connector_class": "AMQP",
+      "config": {
+        "end_point": "localhost",
+        "exchange_name": "qoa4ml",
+        "exchange_type": "topic",
+        "out_routing_key": "qoa1.report.ml"
+      }
+    }
+  ]
+}

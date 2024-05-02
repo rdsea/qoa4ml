@@ -13,3 +13,7 @@ modules/orchestration/temp/
 *.pyd
 .ipynb_checkpoints/
 .env
+*.pem
+observability/odop_obs/logs/*.txt
+observability/odop_obs/tinyflux/*.csv
+
