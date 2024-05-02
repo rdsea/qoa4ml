@@ -1,7 +1,11 @@
 from qoa4ml.datamodels.configs import GroupMetricConfig, MetricConfig
 from qoa4ml.datamodels.datamodel_enum import (
-    MetricCategoryEnum, MetricClassEnum, MlSpecificMetricNameEnum,
-    ResourcesUtilizationMetricNameEnum, ServiceMetricNameEnum)
+    MetricCategoryEnum,
+    MetricClassEnum,
+    MlSpecificMetricNameEnum,
+    ResourcesUtilizationMetricNameEnum,
+    ServiceMetricNameEnum,
+)
 
 accuracy_metric = MetricConfig(
     name=MlSpecificMetricNameEnum.acccuracy,

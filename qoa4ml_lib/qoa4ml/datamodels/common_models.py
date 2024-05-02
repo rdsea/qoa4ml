@@ -2,17 +2,11 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (
-    AggregateFunctionEnum,
-    DataQualityEnum,
-    MlSpecificMetricNameEnum,
-    OperatorEnum,
-    ServiceMetricNameEnum,
-)
+from .datamodel_enum import AggregateFunctionEnum, MetricNameEnum, OperatorEnum
 
 
 class Metric(BaseModel):
-    metric_name: Union[ServiceMetricNameEnum, MlSpecificMetricNameEnum, DataQualityEnum]
+    metric_name: MetricNameEnum
     records: List[Union[dict, float, int]] = []
     unit: Optional[str] = None
 

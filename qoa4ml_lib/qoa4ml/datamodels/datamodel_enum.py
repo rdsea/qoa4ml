@@ -22,34 +22,32 @@ class ResourcesUtilizationMetricNameEnum(Enum):
     memory = "memory_usage"
 
 
-print(ResourcesUtilizationMetricNameEnum.memory == "cpu_usage")
+class ImageQualityNameEnum(Enum):
+    image_size = "image_size"
+    object_size = "object_size"
 
 
 MetricNameEnum = Union[
     ServiceMetricNameEnum,
     MlSpecificMetricNameEnum,
     ResourcesUtilizationMetricNameEnum,
+    ImageQualityNameEnum,
     str,
 ]
-
-
-class DataQualityEnum(Enum):
-    image_size = "image_size"
-    object_size = "object_size"
 
 
 class StageNameEnum(Enum):
     ml_inference_aggregate = "ml_inference_aggregate"
     ml_inference_ensemble = "ml_inference_ensemble"
     data_processing = "data_processing"
-    gate_way = "gateway"
+    gateway = "gateway"
 
 
-class MethodEnum(Enum):
+class FunctionalityEnum(Enum):
     rest = "REST"
-    tensorflow = "tensorflow"
-    transformation = "transformation"
-    max_aggregate = "max_aggregate"
+    tensorflow = "TensorFlow"
+    transformation = "Transformation"
+    max_aggregate = "Max Aggregate"
 
 
 class StakeholderRoleEnum(Enum):
@@ -171,3 +169,9 @@ class MetricClassEnum(Enum):
     counter = "Counter"
     summary = "Summary"
     histogram = "Historgram"
+
+
+class ReportTypeEnum(Enum):
+    data = "data_report"
+    service = "service_report"
+    ml_specific = "ml_specific_report"

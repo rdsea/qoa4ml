@@ -5,29 +5,29 @@ from qoa4ml.datamodels.datamodel_enum import MetricClassEnum, MetricNameEnum
 from .datamodels.configs import MetricConfig
 from .metric import Counter, Gauge, Histogram, PrometheusMetric, Summary
 from .probes.mlquality import *
-from .qoaUtils import qoaLogger
+from .qoa_utils import qoaLogger
 
 
 class MetricManager:
     def __init__(self) -> None:
-        self.metricList: Dict[MetricNameEnum, PrometheusMetric] = {}
+        self.metric_list: Dict[MetricNameEnum, PrometheusMetric] = {}
 
     def add_metric(self, metric_configs: List[MetricConfig]):
         # Add multiple metrics
         for metric_config in metric_configs:
-            self.metricList[metric_config.name] = self.init_metric(metric_config)
+            self.metric_list[metric_config.name] = self.init_metric(metric_config)
 
     def reset_metric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
             if key == None:
-                for metric_name in self.metricList:
-                    self.metricList[metric_name].reset()
+                for metric_name in self.metric_list:
+                    self.metric_list[metric_name].reset()
             elif isinstance(key, list):
                 for k in key:
-                    self.metricList[k].reset()
+                    self.metric_list[k].reset()
             else:
-                return self.metricList[key].reset()
+                return self.metric_list[key].reset()
         except Exception as e:
             qoaLogger.error(
                 str(
@@ -42,13 +42,13 @@ class MetricManager:
         try:
             if key == None:
                 # Get all metric
-                return self.metricList
+                return self.metric_list
             elif isinstance(key, List):
                 # Get a list of metrics
-                return dict((k, self.metricList[k]) for k in key)
+                return dict((k, self.metric_list[k]) for k in key)
             else:
                 # Get a specific metric
-                return self.metricList[key]
+                return self.metric_list[key]
         except Exception as e:
             qoaLogger.error(
                 str(
@@ -102,7 +102,7 @@ class MetricManager:
         description: str = "",
         default_value: int = -1,
     ):
-        if metric_name not in self.metricList:
+        if metric_name not in self.metric_list:
             metric_config = MetricConfig(
                 name=metric_name,
                 category=category,
@@ -110,5 +110,5 @@ class MetricManager:
                 description=description,
                 default_value=default_value,
             )
-            self.metricList[metric_name] = self.init_metric(metric_config)
-        self.metricList[metric_name].set(value)
+            self.metric_list[metric_name] = self.init_metric(metric_config)
+        self.metric_list[metric_name].set(value)

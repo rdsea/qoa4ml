@@ -1,54 +1,60 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, Generic, List, Optional, TypeVar, Union
+from uuid import UUID
 
-from common_models import Metric
-from datamodel_enum import MetricNameEnum, StageNameEnum
 from pydantic import BaseModel
+
+from .common_models import Metric
+from .datamodel_enum import FunctionalityEnum, MetricNameEnum, StageNameEnum
 
 
 class MicroserviceInstance(BaseModel):
-    id: str
+    id: UUID
     name: str
-    functionality: str
-    stage: Optional[str] = None
-
-
-class LinkedInstance(BaseModel):
-    previous: List[MicroserviceInstance] = []
-    microservice: MicroserviceInstance
-
-
-class ExecutionGraph(BaseModel):
-    end_point: Optional[MicroserviceInstance] = None
-    linked_list: List[LinkedInstance]
+    functionality: FunctionalityEnum
+    stage: Optional[StageNameEnum] = None
 
 
 class StageReport(BaseModel):
-    id: str
     name: StageNameEnum
-    metric: Dict[MetricNameEnum, Metric]
+    metrics: Dict[MetricNameEnum, Dict[UUID, Metric]]
 
 
-class InferenceInstance(MicroserviceInstance):
+class InferenceInstance(BaseModel):
+    id: UUID
+    execution_instance_id: UUID
     metrics: List[Metric]
     prediction: Union[dict, float]
 
 
+InstanceType = TypeVar("InstanceType")
+
+
+class LinkedInstance(BaseModel, Generic[InstanceType]):
+    previous: List[InstanceType] = []
+    instance: InstanceType
+
+
+class ExecutionGraph(BaseModel):
+    end_point: Optional[MicroserviceInstance] = None
+    linked_list: Dict[UUID, LinkedInstance[MicroserviceInstance]]
+
+
 class InferenceGraph(BaseModel):
-    end_point: InferenceInstance
-    linked_list: List[LinkedInstance]
+    end_point: Optional[InferenceInstance] = None
+    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]]
 
 
 # NOTE: use dict so that we know which stage to add metric to
-class InferenceQuality(BaseModel):
+class QualityReport(BaseModel):
     service: Dict[StageNameEnum, StageReport] = {}
-    data: Dict[StageNameEnum, StageReport] = {}
+
+
+class InferenceReport(QualityReport):
     ml_specific: Optional[InferenceGraph] = None
+    data: Dict[StageNameEnum, StageReport] = {}
 
 
-class BaseReport(BaseModel):
-    quality: Optional[InferenceQuality] = None
-
-
-class ROHEReport(BaseReport):
-    metadata: Optional[Dict] = None
+class RoheReportModel(BaseModel):
+    inference_report: Optional[InferenceReport] = None
+    metadata: Dict = {}
     execution_graph: Optional[ExecutionGraph] = None

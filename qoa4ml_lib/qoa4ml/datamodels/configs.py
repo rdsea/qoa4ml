@@ -1,17 +1,23 @@
 from typing import Dict, List, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (MethodEnum, MetricCategoryEnum, MetricClassEnum,
-                             MetricNameEnum, ServiceAPIEnum, StageNameEnum)
+from .datamodel_enum import (
+    FunctionalityEnum,
+    MetricCategoryEnum,
+    MetricClassEnum,
+    MetricNameEnum,
+    ServiceAPIEnum,
+    StageNameEnum,
+)
 
 
 class Client(BaseModel):
-    id: str
+    id: Optional[UUID] = None
     name: str
     stage: StageNameEnum
-    method: MethodEnum
-    # TODO: need to be more clear
+    functionality: FunctionalityEnum
     application: str
     role: str
 

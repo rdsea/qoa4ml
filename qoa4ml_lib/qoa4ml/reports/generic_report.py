@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..datamodels.ml_report import BaseReport
+from ..datamodels.ml_report import QualityReport
 
 
 class Report(ABC):

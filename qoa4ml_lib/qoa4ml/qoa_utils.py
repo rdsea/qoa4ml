@@ -55,6 +55,8 @@ def set_logger_level(logging_level):
         log_level = logging.ERROR
     elif logging_level == 5:
         log_level = logging.CRITICAL
+    else:
+        raise ValueError(f"Error logging level {logging_level}")
     qoaLogger.setLevel(log_level)
 
 
