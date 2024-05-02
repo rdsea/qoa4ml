@@ -10,10 +10,9 @@ setup(
     author="AaltoSEA",
     email="tri.m.nguyen@aalto.fi",
     keyword="Monitoring Machine Learning",
-    # install_requires=['pika','requests','paho-mqtt','prometheus-client','psutil', 'docker'],
     install_requires=[line.strip() for line in open("requirements.txt").readlines()],
     extras_require={
-        "ML_feature": [line.strip() for line in open("exrequirements.txt").readlines()]
+        "ml": [line.strip() for line in open("ml_requirements.txt").readlines()]
     },
     packages=find_packages(),
     license="Apache License 2.0",

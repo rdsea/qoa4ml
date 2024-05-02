@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from qoa4ml.datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
