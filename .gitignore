@@ -1,5 +1,6 @@
 test/
 modules/orchestration/temp/
+**/*/dist
 *.DS_Store
 *.jpg
 *.pt
