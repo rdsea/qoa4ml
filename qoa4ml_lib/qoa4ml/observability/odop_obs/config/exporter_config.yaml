@@ -10,15 +10,15 @@ node_aggregator:
   environment: "HPC"
   data_separator: "dot"
   unit_conversion:
-    cpu: 
+    cpu:
       usage:
         milicpu: 1
         cputime: 2
         percentage: 3
-    gpu: 
-      usage: 
+    gpu:
+      usage:
         percentage: 1
-    mem: 
+    mem:
       Gb: 1
       Mb: 2
       Kb: 3

@@ -12,7 +12,6 @@ from qoa4ml.datamodels.datamodel_enum import (
     FunctionalityEnum,
     ServiceAPIEnum,
     StageNameEnum,
-    StakeholderRoleEnum,
 )
 
 client = Client(

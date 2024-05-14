@@ -1,6 +1,5 @@
 import time
 
-from devtools import debug
 from PIL import Image
 
 from qoa4ml.qoa_client import QoaClient

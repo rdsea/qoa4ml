@@ -12,7 +12,8 @@ setup(
     keyword="Monitoring Machine Learning",
     install_requires=[line.strip() for line in open("requirements.txt").readlines()],
     extras_require={
-        "ml": [line.strip() for line in open("ml_requirements.txt").readlines()]
+        "ml": [line.strip() for line in open("ml_requirements.txt").readlines()],
+        "dev": [line.strip() for line in open("dev_requirements.txt").readlines()],
     },
     packages=find_packages(),
     license="Apache License 2.0",

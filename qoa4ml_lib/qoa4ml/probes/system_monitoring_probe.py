@@ -1,36 +1,53 @@
-import os
-import time
-import socket
 import importlib
-from ..qoaUtils import (
-    get_sys_cpu_util,
-    get_sys_mem,
+import socket
+import time
+from typing import TYPE_CHECKING
+
+import lazy_import
+
+from ..connector.base_connector import BaseConnector
+from ..datamodels.configs import SystemProbeConfig
+from ..datamodels.datamodel_enum import EnvironmentEnum
+from ..gpu_utils import get_sys_gpu_metadata, get_sys_gpu_usage
+from ..qoa_utils import (
     convert_to_gbyte,
     convert_to_mbyte,
     get_sys_cpu_metadata,
-)
-from ..gpuUtils import (
-    get_sys_gpu_metadata,
-    get_sys_gpu_usage,
+    get_sys_cpu_util,
+    get_sys_mem,
 )
 from .probe import Probe
 
+if TYPE_CHECKING:
+    from ..datamodels.resources_report import (
+        ResourceReport,
+        SystemMetadata,
+        SystemReport,
+    )
+else:
+    SystemReport = lazy_import.lazy_class(
+        "..datamodels.resources_report", "SystemReport"
+    )
+    SystemMetadata = lazy_import.lazy_class(
+        "..datamodels.resources_report", "SystemMetadata"
+    )
+    ResourceReport = lazy_import.lazy_class(
+        "..datamodels.resources_report", "ResourceReport"
+    )
+
 
 class SystemMonitoringProbe(Probe):
-    def __init__(self, config: dict) -> None:
-        super().__init__(config)
+    def __init__(self, config: SystemProbeConfig, connector: BaseConnector) -> None:
+        super().__init__(config, connector)
+        self.config = config
         self.node_name = socket.gethostname().split(".")[0]
-        if self.config["requireRegister"]:
-            self.obs_service_url = self.config["obsServiceUrl"]
-        self.environment = config["environment"]
+        if self.config.require_register:
+            self.obs_service_url = self.config.obs_service_url
+        self.environment = config.environment
         self.cpu_metadata = self.get_cpu_metadata()
         self.gpu_metadata = self.get_gpu_metadata()
         self.mem_metadata = self.get_mem_metadata()
-        if self.environment == "HPC":
-            self.metadata = {"node_name": self.node_name}
-        else:
-            self.custom_model = importlib.import_module("core.custom_model")
-            self.metadata = self.custom_model.SystemMetadata(node_name=self.node_name)
+        self.metadata = {"node_name": self.node_name}
 
     def get_cpu_metadata(self):
         return get_sys_cpu_metadata()
@@ -60,8 +77,8 @@ class SystemMonitoringProbe(Probe):
         cpu_usage = self.get_cpu_usage()
         gpu_usage = self.get_gpu_usage()
         mem_usage = self.get_mem_usage()
-        if self.environment == "HPC":
-            self.current_report = {
+        if self.environment == EnvironmentEnum.hpc:
+            report = {
                 "type": "system",
                 "metadata": {**self.metadata},
                 "timestamp": round(timestamp),
@@ -79,24 +96,19 @@ class SystemMonitoringProbe(Probe):
                 },
             }
         else:
-            self.current_report = self.custom_model.SystemReport(
-                metadata=self.custom_model.SystemMetadata(node_name=self.node_name),
+            report = SystemReport(
+                metadata=SystemMetadata(node_name=self.node_name),
                 timestamp=round(timestamp),
-                cpu=self.custom_model.ResourceReport(
-                    metadata=self.cpu_metadata, usage=cpu_usage
-                ),
-                gpu=self.custom_model.ResourceReport(
-                    metadata=self.gpu_metadata, usage=gpu_usage
-                ),
-                mem=self.custom_model.ResourceReport(
-                    metadata=self.mem_metadata, usage=mem_usage
-                ),
+                cpu=ResourceReport(metadata=self.cpu_metadata, usage=cpu_usage),
+                gpu=ResourceReport(metadata=self.gpu_metadata, usage=gpu_usage),
+                mem=ResourceReport(metadata=self.mem_metadata, usage=mem_usage),
             )
         if self.log_latency_flag:
             self.write_log(
                 (time.time() - timestamp) * 1000,
                 self.latency_logging_path + "calculating_system_metric_latency.txt",
             )
+        return report
 
 
 if __name__ == "__main__":

@@ -1,17 +1,21 @@
 from flask import Flask, request
 from predictionService.powerGrid.LSTM_Prediction import LSTM_Prediction_Service
-import traceback, sys, argparse
+import traceback
+import sys
+import argparse
 
 app = Flask(__name__)
-#for storing service
+# for storing service
 service_dict = {}
 
-@app.route('/')
+
+@app.route("/")
 def hello():
-    return {"msg":"This is BTS Plain Server that you can use to test"}
+    return {"msg": "This is BTS Plain Server that you can use to test"}
+
 
 # command: creating/removing service
-@app.route('/command', methods=['POST'])
+@app.route("/command", methods=["POST"])
 def execute_command():
     """
     Command schema:
@@ -38,45 +42,44 @@ def execute_command():
             if command == "CREATE":
                 if req_data["model"] != None:
                     model_name = req_data["model"]["name"]
-                    if (model_name not in service_dict.keys()):
+                    if model_name not in service_dict.keys():
                         if req_data["model"]["name"] == "LSTM":
                             # Create LSTM prediction service
                             req_service = LSTM_Prediction_Service()
                             service_dict["LSTM"] = req_service
-                            status=f'{model_name} was created'
+                            status = f"{model_name} was created"
                         else:
-                            status=f'{model_name} was not found'
+                            status = f"{model_name} was not found"
                     else:
-                        status=f'{model_name} has been already created'
+                        status = f"{model_name} has been already created"
                 else:
-                    status=f'model must be specified'
+                    status = "model must be specified"
             # Remove service
             elif command == "REMOVE":
                 model_name = req_data["model"]["name"]
-                if (model_name in service_dict.keys()):
+                if model_name in service_dict.keys():
                     service_dict.pop(model_name)
-                    status=f'{model_name} was removed'
+                    status = f"{model_name} was removed"
                 else:
-                    status=f'{model_name} was not found'
+                    status = f"{model_name} was not found"
             else:
-                status=f'{command} is not supported'
+                status = f"{command} is not supported"
         else:
-            status="command is empty"
+            status = "command is empty"
 
     # Exception tracing
     except Exception as e:
-        print("[ERROR] - Error {} in execute_command: {}".format(type(e),e.__traceback__))
+        print(
+            "[ERROR] - Error {} in execute_command: {}".format(type(e), e.__traceback__)
+        )
         traceback.print_exception(*sys.exc_info())
-        status=f'error occured'
-    resp_info={
-        "status":status,
-        "msg":"the data is {}".format(req_data)
-    }
+        status = "error occured"
+    resp_info = {"status": status, "msg": "the data is {}".format(req_data)}
     return resp_info
 
 
 # command: inference service
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
     """
     Prediction request schema:
@@ -89,43 +92,44 @@ def predict():
     try:
         req_data = request.get_json()
         if req_data["model"] != None:
-            model = req_data["model"] 
+            model = req_data["model"]
             if model in service_dict:
-                service=service_dict[model]
+                service = service_dict[model]
                 print(service)
                 if req_data["data"] != None:
-                    result =service.predict(req_data["data"]) 
-                    status=f'predict success'
+                    result = service.predict(req_data["data"])
+                    status = "predict success"
                 else:
-                    status=f'request data not found'
-                    result="False"
-            else: 
-                status=f'request model not found'
-                result="False"
+                    status = "request data not found"
+                    result = "False"
+            else:
+                status = "request model not found"
+                result = "False"
         else:
-            status=f'model name not found'
-            result="False"
+            status = "model name not found"
+            result = "False"
     # Exception tracing
     except Exception as e:
-        print("[ERROR] - Error {} in execute_command: {}".format(type(e),e.__traceback__))
+        print(
+            "[ERROR] - Error {} in execute_command: {}".format(type(e), e.__traceback__)
+        )
         traceback.print_exception(*sys.exc_info())
-        status=f'error occured'
-    
+        status = "error occured"
+
     # Response
-    resp_info={
-        "status":status,
-        "msg":"the data is {}".format(req_data),
-        "result": result
+    resp_info = {
+        "status": status,
+        "msg": "the data is {}".format(req_data),
+        "result": result,
     }
     return resp_info
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port', help='Port of the service')
+    parser.add_argument("-p", "--port", help="Port of the service")
 
     args = parser.parse_args()
-    port =int(args.port)
+    port = int(args.port)
     app.run(debug=True, port=port)

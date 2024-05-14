@@ -8,9 +8,10 @@ import traceback
 import numpy as np
 import pandas as pd
 
+from ..qoa_utils import is_numpyarray, is_pddataframe, qoaLogger
+
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from ..qoa_utils import is_numpyarray, is_pddataframe, qoaLogger
 
 # Define metric names, return formats: dictionary {metric name} {sub-element}
 # Return error/debugging

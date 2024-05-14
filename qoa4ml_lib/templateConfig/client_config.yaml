@@ -18,7 +18,7 @@ collector:
       exchange_type: topic
       in_routing_key: qoa1.report.#
       in_queue: collector_1
-  
+
 # connector configuration
 connector:
   amqp_connector:

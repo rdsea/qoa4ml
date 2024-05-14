@@ -4,8 +4,8 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from .datamodel_enum import (
+    EnvironmentEnum,
     FunctionalityEnum,
-    MetricCategoryEnum,
     MetricClassEnum,
     MetricNameEnum,
     ServiceAPIEnum,
@@ -46,13 +46,25 @@ class MQTTConnectorConfig(BaseModel):
     client_id: str
 
 
+class SocketConnectorConfig(BaseModel):
+    host: str
+    port: int
+
+
+class SocketCollectorConfig(BaseModel):
+    host: str
+    port: int
+    backlog: int
+    bufsize: int
+
+
 class PrometheusConnectorConfig(BaseModel):
     pass
 
 
 # TODO: test if loading the config, the type of the config can be found
-CollectorConfigClass = Union[AMQPCollectorConfig, Dict]
-ConnectorConfigClass = Union[AMQPConnectorConfig, Dict]
+CollectorConfigClass = Union[AMQPCollectorConfig, SocketCollectorConfig, Dict]
+ConnectorConfigClass = Union[AMQPConnectorConfig, SocketConnectorConfig, Dict]
 
 
 class CollectorConfig(BaseModel):
@@ -87,3 +99,41 @@ class MetricConfig(BaseModel):
 class GroupMetricConfig(BaseModel):
     name: str
     metric_configs: List[MetricConfig]
+
+
+class ProbeConfig(BaseModel):
+    frequency: int
+    require_register: bool
+    obs_service_url: Optional[str] = None
+    log_latency_flag: bool
+    latency_logging_path: str
+    environment: EnvironmentEnum
+
+
+class ProcessProbeConfig(ProbeConfig):
+    pid: Optional[int] = None
+
+
+class SystemProbeConfig(ProbeConfig):
+    pass
+
+
+class NodeAggregatorConfig(BaseModel):
+    socket_collector_config: SocketCollectorConfig
+    environment: EnvironmentEnum
+    database_path: str
+    query_method: str
+    data_separator: str
+    unit_conversion: dict
+
+
+class ExporterConfig(BaseModel):
+    host: str
+    port: int
+    node_aggregator: NodeAggregatorConfig
+
+
+class OdopObsConfig(BaseModel):
+    process: ProbeConfig
+    system: ProbeConfig
+    exporter: ExporterConfig

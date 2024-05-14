@@ -68,6 +68,7 @@ class ServiceAPIEnum(Enum):
     kafka = "Kafka"
     amqp = "AMQP"
     coapp = "coapp"
+    socket = "socket"
 
 
 class InfrastructureEnum(Enum):
@@ -175,3 +176,9 @@ class ReportTypeEnum(Enum):
     data = "data_report"
     service = "service_report"
     ml_specific = "ml_specific_report"
+
+
+class EnvironmentEnum(Enum):
+    hpc = "HPC"
+    edge = "Edge"
+    cloud = "Cloud"

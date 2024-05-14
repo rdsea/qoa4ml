@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 
 from qoa4ml.datamodels.common_models import Metric
 from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum, StageNameEnum
+from qoa4ml.reports.generic_report import GenericReport
 
 from ..datamodels.configs import Client
 from ..datamodels.ml_report import (
@@ -18,7 +19,7 @@ from ..datamodels.ml_report import (
 from ..qoa_utils import load_config
 
 
-class RoheReport:
+class RoheReport(GenericReport):
     def __init__(self, clientConfig: Client, file_path: Optional[str] = None):
         self.client_config = copy.deepcopy(clientConfig)
         self.reset()
@@ -50,12 +51,12 @@ class RoheReport:
         combined_stage_report: Dict[StageNameEnum, StageReport] = {}
         for stage_name, stage_report in previous_stage_report.items():
             new_stage_report = StageReport(name=stage_name, metrics={})
-            if not stage_name in current_stage_report:
+            if stage_name not in current_stage_report:
                 current_stage_report[stage_name] = StageReport(
                     name=stage_name, metrics={}
                 )
             for metric_name, instance_report_dict in stage_report.metrics.items():
-                if not metric_name in current_stage_report[stage_name].metrics:
+                if metric_name not in current_stage_report[stage_name].metrics:
                     current_stage_report[stage_name].metrics[metric_name] = {}
                 new_stage_report.metrics[metric_name] = {
                     **current_stage_report[stage_name].metrics[metric_name],

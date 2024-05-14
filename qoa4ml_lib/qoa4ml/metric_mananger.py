@@ -4,7 +4,6 @@ from qoa4ml.datamodels.datamodel_enum import MetricClassEnum, MetricNameEnum
 
 from .datamodels.configs import MetricConfig
 from .metric import Counter, Gauge, Histogram, PrometheusMetric, Summary
-from .probes.mlquality import *
 from .qoa_utils import qoaLogger
 
 
@@ -20,7 +19,7 @@ class MetricManager:
     def reset_metric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
-            if key == None:
+            if key is None:
                 for metric_name in self.metric_list:
                     self.metric_list[metric_name].reset()
             elif isinstance(key, list):
@@ -40,7 +39,7 @@ class MetricManager:
     def get_metric(self, key: Optional[Union[List, str]] = None):
         # TO DO:
         try:
-            if key == None:
+            if key is None:
                 # Get all metric
                 return self.metric_list
             elif isinstance(key, List):

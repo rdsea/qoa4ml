@@ -1,17 +1,15 @@
-cpu: 
+cpu:
   usage:
     milicpu: 1
     cputime: 2
     percentage: 3
-gpu: 
-  usage: 
+gpu:
+  usage:
     percentage: 1
-mem: 
+mem:
   Gb: 1
   Mb: 2
   Kb: 3
 frequency:
   GHz: 1
   MHz: 2
-
-

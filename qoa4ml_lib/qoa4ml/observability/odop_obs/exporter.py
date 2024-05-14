@@ -1,10 +1,12 @@
 import argparse
 import logging
+
+import uvicorn
 import yaml
 from fastapi import FastAPI
-import uvicorn
-from .node_aggregator import NodeAggregator
+
 from ...common import ODOP_PATH
+from .node_aggregator import NodeAggregator
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO

@@ -1,11 +1,10 @@
-from tinyflux import TinyFlux, Point, TimeQuery
-import time
-import json
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
+
 import matplotlib.pyplot as plt
+import numpy as np
 import yaml
-from flatten_dict import flatten, unflatten
+from flatten_dict import unflatten
+from tinyflux import TimeQuery, TinyFlux
 
 
 def revert_unit(unit_conversion, converted_report: dict):
