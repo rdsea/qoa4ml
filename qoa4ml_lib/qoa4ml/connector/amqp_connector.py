@@ -1,15 +1,13 @@
-import importlib
 import pathlib
 import sys
 import uuid
 from typing import Optional
 
+from ..datamodels.configs import AMQPConnectorConfig
 from .base_connector import BaseConnector
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-
-from datamodels.configs import AMQPConnectorConfig
 
 
 class Amqp_Connector(BaseConnector):
@@ -47,9 +45,9 @@ class Amqp_Connector(BaseConnector):
             exchange=self.exchange_name, exchange_type=self.exchange_type
         )
 
-    def send_data(
+    def send_report(
         self,
-        body_message,
+        body_message: str,
         corr_id=None,
         routing_key: Optional[str] = None,
         expiration=1000,
@@ -57,9 +55,9 @@ class Amqp_Connector(BaseConnector):
         # Sending data to desired destination
         # if sender is client, it will include the "reply_to" attribute to specify where to reply this message
         # if sender is server, it will reply the message to "reply_to" via default exchange
-        if corr_id == None:
+        if corr_id is None:
             corr_id = str(uuid.uuid4())
-        if routing_key == None:
+        if routing_key is None:
             routing_key = self.out_routing_key
         self.sub_properties = pika.BasicProperties(
             correlation_id=corr_id, expiration=str(expiration)

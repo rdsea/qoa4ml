@@ -6,9 +6,10 @@ import traceback
 
 import numpy as np
 
+from ..qoa_utils import is_numpyarray, qoaLogger
+
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
-from ..qoa_utils import is_numpyarray, qoaLogger
 
 
 ################################################ ML QUALITY ########################################################

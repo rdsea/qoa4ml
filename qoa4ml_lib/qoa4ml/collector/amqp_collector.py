@@ -1,18 +1,15 @@
 import json
-import pathlib
-import sys
 from typing import Optional
 
 from host_object import HostObject
 
-p_dir = pathlib.Path(__file__).parent.parent.absolute()
-sys.path.append(str(p_dir))
-from datamodels.configs import AMQPCollectorConfig
+from qoa4ml.collector.base_collector import BaseCollector
 
+from ..datamodels.configs import AMQPCollectorConfig
 from ..qoa_utils import qoaLogger
 
 
-class Amqp_Collector(object):
+class Amqp_Collector(BaseCollector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(
         self,
@@ -59,13 +56,13 @@ class Amqp_Collector(object):
 
     def on_request(self, ch, method, props, body):
         # Process the data on request: sending back to host object
-        if self.host_object != None:
+        if self.host_object is not None:
             self.host_object.message_processing(ch, method, props, body)
         else:
             mess = json.loads(str(body.decode("utf-8")))
             qoaLogger.debug(mess)
 
-    def start(self):
+    def start_collecting(self):
         # Start rabbit MQ
         self.in_channel.basic_qos(prefetch_count=1)
         self.in_channel.basic_consume(

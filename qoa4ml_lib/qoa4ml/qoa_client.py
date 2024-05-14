@@ -44,7 +44,6 @@ from .probes.dataquality import (
     eva_none,
     image_quality,
 )
-from .probes.mlquality import *
 from .qoa_utils import (
     get_proc_cpu,
     get_proc_mem,
@@ -68,10 +67,10 @@ class QoaClient(object):
     ):
         set_logger_level(logging_level)
 
-        if config_dict != None:
+        if config_dict is not None:
             self.configuration = config_dict
 
-        if config_path != None:
+        if config_path is not None:
             self.configuration = ClientConfig(**load_config(config_path))
 
         self.client_config = self.configuration.client
@@ -124,9 +123,9 @@ class QoaClient(object):
                     connector_configs = response["connector"]
                     for connector in connector_configs:
                         connector_config = ConnectorConfig(**connector)
-                        self.connector_list[
-                            connector_config.name
-                        ] = self.init_connector(connector_config)
+                        self.connector_list[connector_config.name] = (
+                            self.init_connector(connector_config)
+                        )
                 else:
                     qoaLogger.warning(
                         "Unable to register Qoa Client: connector configuration must be dictionary"
@@ -234,7 +233,7 @@ class QoaClient(object):
             )
 
     def timer(self):
-        if self.timer_flag == False:
+        if self.timer_flag is False:
             self.timer_flag = True
             self.timerStart = time.time()
             return {}
@@ -287,7 +286,7 @@ class QoaClient(object):
 
     def process_monitor_start(self, interval: int, pid: Optional[int] = None):
         if self.process_monitor_flag == 0:
-            if pid == None:
+            if pid is None:
                 pid = os.getpid()
             self.process_monitor_flag = 1
             sub_thread = Thread(target=self.process_report, args=(interval, pid))
@@ -300,15 +299,15 @@ class QoaClient(object):
     def asyn_report(self, report: dict, connectors: Optional[list] = None):
         body_mess = json.dumps(report)
         self.lock.acquire()
-        if connectors == None:
+        if connectors is None:
             # if connectors are not specify, use default
             if self.default_connector:
-                self.connector_list[self.default_connector].send_data(
+                self.connector_list[self.default_connector].send_report(
                     body_mess, corr_id=str(uuid.uuid4())
                 )
             else:
                 qoaLogger.error(
-                    f"No default connector, please specify the connector to use"
+                    "No default connector, please specify the connector to use"
                 )
         else:
             # iterate connector to send report
@@ -324,14 +323,14 @@ class QoaClient(object):
         submit=False,
         reset=True,
     ):
-        if report == None:
+        if report is None:
             report = self.qoa_report.generate_report(metrics, reset)
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()
 
         if submit:
-            if self.default_connector != None:
+            if self.default_connector is not None:
                 sub_thread = Thread(target=self.asyn_report, args=(report, connectors))
                 sub_thread.start()
             else:
@@ -370,13 +369,13 @@ class QoaClient(object):
 
     def observe_erronous(self, data, errors=None):
         results = eva_erronous(data, errors=errors)
-        if results != None:
+        if results is not None:
             for key in results:
                 self.observe_metric(key, results[key], 1)
 
     def observe_duplicate(self, data):
         results = eva_duplicate(data)
-        if results != None:
+        if results is not None:
             for key in results:
                 self.observe_metric(key, results[key], 1)
 
@@ -390,18 +389,18 @@ class QoaClient(object):
             predict=predict,
             random_state=random_state,
         )
-        if results != None:
+        if results is not None:
             for key in results:
                 self.observe_metric(key, results[key], 1)
 
     def observe_image_quality(self, image):
         results = image_quality(image)
-        if results != None:
+        if results is not None:
             for key in results:
                 self.observe_metric(key, results[key], 1)
 
     def observe_none(self, data):
         results = eva_none(data)
-        if results != None:
+        if results is not None:
             for key in results:
                 self.observe_metric(key, results[key], 1)

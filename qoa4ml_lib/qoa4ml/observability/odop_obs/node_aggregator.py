@@ -1,17 +1,20 @@
 import importlib
+import logging
 import math
 import socket
-import pickle
-from threading import Thread
-from datetime import datetime
-import time
-import logging
 import sys
+import time
+from datetime import datetime
+from threading import Thread
+
 from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
-from tinyflux import TinyFlux, Point, TimeQuery
+from tinyflux import Point, TimeQuery, TinyFlux
+
+from ...collector.socket_collector import SocketCollector
 from ...common import ODOP_PATH
-from . import odop_utils
+from ...datamodels.configs import NodeAggregatorConfig
+from ...qoa_utils import make_folder
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -19,29 +22,31 @@ logging.basicConfig(
 
 sys.path.append(ODOP_PATH)
 DEFAULT_DATABASE_FOLDER = ODOP_PATH + "metric_database/"
-odop_utils.make_folder(DEFAULT_DATABASE_FOLDER)
+make_folder(DEFAULT_DATABASE_FOLDER)
 METRICS_URL_PATH = "/metrics"
 
 
 class NodeAggregator:
-    def __init__(self, config):
+    def __init__(self, config: NodeAggregatorConfig):
         self.config = config
-        self.unit_conversion = self.config["unit_conversion"]
+        self.unit_conversion = self.config.unit_conversion
         self.node_name = socket.gethostname().split(".")[0]
         self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + self.node_name + ".csv")
-        self.server_thread = Thread(
-            target=self.start_handling, args=(self.config["host"], self.config["port"])
-        )
-        self.environment = config["environment"]
-        if self.environment != "HPC":
+        self.environment = config.environment
+        if self.environment.__str__ != "HPC":
             self.custom_model = importlib.import_module("core.custom_model")
         self.server_thread.daemon = True
-        self.execution_flag = False
+        self.collector = SocketCollector(
+            config.socket_collector_config, self.process_report
+        )
+        self.server_thread = Thread(
+            target=self.collector.start_collecting,
+        )
         self.router = APIRouter()
         self.router.add_api_route(
             METRICS_URL_PATH,
             self.get_lastest_timestamp,
-            methods=[self.config["query_method"]],
+            methods=[self.config.query_method],
         )
 
     def insert_metric(self, timestamp: float, tags: dict, fields: dict):
@@ -49,39 +54,16 @@ class NodeAggregator:
         datapoint = Point(time=timestamp_datetime, tags=tags, fields=fields)
         self.db.insert(datapoint, compact_key_prefixes=True)
 
-    def start_handling(self, host, port):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind((host, port))
-        server_socket.listen(self.config["backlog_number"])
-        while self.execution_flag:
-            client_socket, _ = server_socket.accept()
-            self.handle_client(client_socket)
-
-    def handle_client(self, client_socket):
-        data = b""
-        while True:
-            packet = client_socket.recv(self.config["socket_package_size"])
-            if not packet:
-                break
-            data += packet
-
-        report = pickle.loads(data)
-        self.process_report(report)
-
-        client_socket.close()
-
     def process_report(self, report):
         if self.environment == "HPC":
             if report["type"] == "system":
                 del report["type"]
                 metadata = flatten(
-                    {"metadata": report["metadata"]}, self.config["data_separator"]
+                    {"metadata": report["metadata"]}, self.config.data_separator
                 )
                 timestamp = report["timestamp"]
                 del report["metadata"], report["timestamp"]
-                fields = self.convert_unit(
-                    flatten(report, self.config["data_separator"])
-                )
+                fields = self.convert_unit(flatten(report, self.config.data_separator))
                 self.insert_metric(
                     timestamp,
                     {"type": "node", **metadata},
@@ -90,13 +72,11 @@ class NodeAggregator:
             elif report["type"] == "process":
                 del report["type"]
                 metadata = flatten(
-                    {"metadata": report["metadata"]}, self.config["data_separator"]
+                    {"metadata": report["metadata"]}, self.config.data_separator
                 )
                 timestamp = report["timestamp"]
                 del report["metadata"], report["timestamp"]
-                fields = self.convert_unit(
-                    flatten(report, self.config["data_separator"])
-                )
+                fields = self.convert_unit(flatten(report, self.config.data_separator))
                 self.insert_metric(
                     timestamp,
                     {"type": "process", **metadata},
@@ -110,9 +90,7 @@ class NodeAggregator:
                 timestamp = report.timestamp
                 del report.metadata, report.timestamp
                 fields = self.convert_unit(
-                    flatten(
-                        report.dict(exclude_none=True), self.config["data_separator"]
-                    )
+                    flatten(report.dict(exclude_none=True), self.config.data_separator)
                 )
                 self.insert_metric(
                     timestamp,
@@ -124,14 +102,12 @@ class NodeAggregator:
                 )
             elif isinstance(report, self.custom_model.ProcessReport):
                 metadata = flatten(
-                    {"metadata": report.metadata.dict()}, self.config["data_separator"]
+                    {"metadata": report.metadata.dict()}, self.config.data_separator
                 )
                 timestamp = report.timestamp
                 del report.metadata, report.timestamp
                 fields = self.convert_unit(
-                    flatten(
-                        report.dict(exclude_none=True), self.config["data_separator"]
-                    )
+                    flatten(report.dict(exclude_none=True), self.config.data_separator)
                 )
                 self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
 
@@ -205,7 +181,7 @@ class NodeAggregator:
                         **datapoint.fields,
                     }
                 ),
-                self.config["data_separator"],
+                self.config.data_separator,
             )
             for datapoint in data
         ]

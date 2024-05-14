@@ -1,20 +1,23 @@
 from qoa4ml.collector.amqp_collector import Amqp_Collector
 import pymongo
-from threading import Thread, Timer
+from threading import Thread
 import json
+
 
 class Rohe_Agent(object):
     def __init__(self, configuration, mg_db=False):
         self.conf = configuration
         colletor_conf = self.conf["collector"]
-        self.collector = Amqp_Collector(colletor_conf['amqp_collector']['conf'], host_object=self)
+        self.collector = Amqp_Collector(
+            colletor_conf["amqp_collector"]["conf"], host_object=self
+        )
         db_conf = self.conf["database"]
         self.mongo_client = pymongo.MongoClient(db_conf["url"])
         self.db = self.mongo_client[db_conf["db_name"]]
         self.metric_collection = self.db[db_conf["metric_collection"]]
 
         self.insert_db = mg_db
-    
+
     def reset_db(self):
         self.metric_collection.drop()
 
@@ -27,8 +30,6 @@ class Rohe_Agent(object):
         sub_thread.start()
         print("start consumming message")
 
-
-
     def message_processing(self, ch, method, props, body):
         mess = json.loads(str(body.decode("utf-8")))
         print("Receive QoA Report: \n", mess)
@@ -39,7 +40,7 @@ class Rohe_Agent(object):
     def stop(self):
         # self.collector.stop()
         self.insert_db = False
+
     def restart(self):
         # self.collector.stop()
         self.insert_db = True
-    

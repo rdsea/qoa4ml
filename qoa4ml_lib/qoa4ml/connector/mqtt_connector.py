@@ -1,14 +1,16 @@
-import pathlib
-import sys
+from typing import TYPE_CHECKING
 
+import lazy_import
+
+from ..collector.host_object import HostObject
+from ..datamodels.configs import MQTTConnectorConfig
+from ..qoa_utils import qoaLogger
 from .base_connector import BaseConnector
 
-p_dir = pathlib.Path(__file__).parent.parent.absolute()
-sys.path.append(str(p_dir))
-from collector.host_object import HostObject
-from datamodels.configs import MQTTConnectorConfig
-
-from ..qoa_utils import qoaLogger
+if TYPE_CHECKING:
+    import paho.mqtt.client as mqtt
+else:
+    mqtt = lazy_import.lazy_module("paho.mqtt")
 
 
 # TODO: this client handle both connector and collector
@@ -16,20 +18,17 @@ class Mqtt_Connector(BaseConnector):
     # This class will handle all the mqtt connection for each client application
     # FIX: what is host object?
     def __init__(self, host_object: HostObject, configuration: MQTTConnectorConfig):
-        if "mqtt" not in globals():
-            global mqtt
-            import paho.mqtt as mqtt
-
-            # from paho.mqtt.client import Client as MqttClient
-            # from paho.mqtt.enums import CallbackAPIVersion
+        # from paho.mqtt.client import Client as MqttClient
+        # from paho.mqtt.enums import CallbackAPIVersion
         # Init the host object to return message
         self.host_object = host_object
         # Init the send/receive queue
         self.pub_queue = configuration.in_queue
         self.sub_queue = configuration.out_queue
         # Create the mqtt client
-        self.client = mqtt.client.MqttClient(
-            callback_api_version=CallbackAPIVersion.VERSION2,
+        self.test = mqtt
+        self.client = mqtt.Client(
+            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
             client_id=configuration.client_id,
             clean_session=False,
             userdata=None,

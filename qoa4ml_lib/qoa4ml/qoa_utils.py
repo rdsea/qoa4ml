@@ -1,23 +1,35 @@
-import json
-import time
-import os
-import yaml
-import logging
-import subprocess
-import shlex
-import re
 import glob
-from threading import Thread
-import traceback
-import sys
+import json
+import logging
+import os
 import pathlib
+import re
+import shlex
+import subprocess
+import sys
+import time
+import traceback
+from threading import Thread
+
 import psutil
+import yaml
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
 )
 
 qoaLogger = logging.getLogger()
+
+
+def make_folder(temp_path):
+    try:
+        if os.path.exists(temp_path):
+            pass
+        else:
+            os.makedirs(temp_path)
+        return True
+    except Exception:
+        return False
 
 
 def get_cgroup_version() -> str:
@@ -93,7 +105,7 @@ def load_config(file_path: str) -> dict:
         else:
             qoaLogger.warning("Unsupported format")
             return None
-    except Exception as e:
+    except Exception:
         qoaLogger.error("Unable to load configuration")
 
     return None
@@ -191,7 +203,7 @@ def report_proc_child_cpu(process: psutil.Process):
 
 
 def get_proc_cpu(pid=None):
-    if pid == None:
+    if pid is None:
         pid = os.getpid()
     process = psutil.Process(pid)
     child_list = process.children()
@@ -212,7 +224,7 @@ def report_proc_mem(process):
 
 
 def get_proc_mem(pid=None):
-    if pid == None:
+    if pid is None:
         pid = os.getpid()
     process = psutil.Process(pid)
     child_list = process.children()
@@ -435,7 +447,7 @@ def docker_report(client, interval: int, metrics: dict = None, detail=False):
 
 
 def docker_monitor(client, interval: int, metrics: dict = None, detail=False):
-    if metrics == None:
+    if metrics is None:
         metrics = default_docker_metric
     sub_thread = Thread(target=docker_report, args=(client, interval, metrics, detail))
     sub_thread.start()
@@ -452,7 +464,7 @@ def mergeReport(f_report, i_report, prio=True):
             f_report.update(i_report)
         else:
             if f_report != i_report:
-                if prio == True:
+                if prio is True:
                     return f_report
                 else:
                     return i_report
