@@ -40,7 +40,10 @@ class SystemMonitoringProbe(Probe):
     def __init__(self, config: SystemProbeConfig, connector: BaseConnector) -> None:
         super().__init__(config, connector)
         self.config = config
-        self.node_name = socket.gethostname().split(".")[0]
+        if self.config.node_name is None:
+            self.node_name = socket.gethostname().split(".")[0]
+        else:
+            self.node_name = self.config.node_name
         if self.config.require_register:
             self.obs_service_url = self.config.obs_service_url
         self.environment = config.environment

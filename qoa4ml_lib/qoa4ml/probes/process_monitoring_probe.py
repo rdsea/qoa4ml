@@ -1,4 +1,3 @@
-import importlib
 import logging
 import os
 import time
@@ -45,10 +44,10 @@ class ProcessMonitoringProbe(Probe):
     def __init__(self, config: ProcessProbeConfig, connector: BaseConnector) -> None:
         super().__init__(config, connector)
         self.config = config
-        if not config.pid:
+        if self.config.pid is None:
             self.pid = os.getpid()
         else:
-            self.pid = config.pid
+            self.pid = self.config.pid
             if not psutil.pid_exists(self.pid):
                 raise RuntimeError(f"No process with pid {self.pid}")
         self.environment = config.environment
@@ -110,22 +109,3 @@ class ProcessMonitoringProbe(Probe):
                 self.latency_logging_path + "calculating_process_metric_latency.txt",
             )
         return report
-
-
-if __name__ == "__main__":
-    argparse = importlib.import_module("argparse")
-    yaml = importlib.import_module("yaml")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="config path", default="config/process_probe_conf.yaml"
-    )
-    args = parser.parse_args()
-    config_file = args.config
-    with open(config_file, encoding="utf-8") as file:
-        proces_config = yaml.safe_load(file)
-    process_monitoring_probe = ProcessMonitoringProbe(proces_config)
-    del proces_config
-    process_monitoring_probe.start_reporting()
-    while True:
-        time.sleep(10)

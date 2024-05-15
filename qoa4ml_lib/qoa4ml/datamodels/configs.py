@@ -115,13 +115,12 @@ class ProcessProbeConfig(ProbeConfig):
 
 
 class SystemProbeConfig(ProbeConfig):
-    pass
+    node_name: Optional[str] = None
 
 
 class NodeAggregatorConfig(BaseModel):
     socket_collector_config: SocketCollectorConfig
     environment: EnvironmentEnum
-    database_path: str
     query_method: str
     data_separator: str
     unit_conversion: dict
@@ -134,6 +133,7 @@ class ExporterConfig(BaseModel):
 
 
 class OdopObsConfig(BaseModel):
-    process: ProbeConfig
-    system: ProbeConfig
+    process: ProcessProbeConfig
+    system: SystemProbeConfig
+    probe_connector: SocketConnectorConfig
     exporter: ExporterConfig

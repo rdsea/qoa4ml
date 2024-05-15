@@ -6,10 +6,14 @@ import sys
 import time
 from datetime import datetime
 from threading import Thread
+from typing import TYPE_CHECKING
 
+import lazy_import
 from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
 from tinyflux import Point, TimeQuery, TinyFlux
+
+from qoa4ml.datamodels.datamodel_enum import EnvironmentEnum
 
 from ...collector.socket_collector import SocketCollector
 from ...common import ODOP_PATH
@@ -25,6 +29,16 @@ DEFAULT_DATABASE_FOLDER = ODOP_PATH + "metric_database/"
 make_folder(DEFAULT_DATABASE_FOLDER)
 METRICS_URL_PATH = "/metrics"
 
+if TYPE_CHECKING:
+    from ...datamodels.resources_report import ProcessReport, SystemReport
+else:
+    ProcessReport = lazy_import.lazy_class(
+        "...datamodels.resources_report", "ProcessReport"
+    )
+    SystemReport = lazy_import.lazy_class(
+        "...datamodels.resources_report", "SystemReport"
+    )
+
 
 class NodeAggregator:
     def __init__(self, config: NodeAggregatorConfig):
@@ -33,15 +47,10 @@ class NodeAggregator:
         self.node_name = socket.gethostname().split(".")[0]
         self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + self.node_name + ".csv")
         self.environment = config.environment
-        if self.environment.__str__ != "HPC":
-            self.custom_model = importlib.import_module("core.custom_model")
-        self.server_thread.daemon = True
         self.collector = SocketCollector(
             config.socket_collector_config, self.process_report
         )
-        self.server_thread = Thread(
-            target=self.collector.start_collecting,
-        )
+        self.server_thread = Thread(target=self.collector.start_collecting, daemon=True)
         self.router = APIRouter()
         self.router.add_api_route(
             METRICS_URL_PATH,
@@ -55,7 +64,7 @@ class NodeAggregator:
         self.db.insert(datapoint, compact_key_prefixes=True)
 
     def process_report(self, report):
-        if self.environment == "HPC":
+        if self.environment == EnvironmentEnum.hpc:
             if report["type"] == "system":
                 del report["type"]
                 metadata = flatten(
@@ -85,7 +94,7 @@ class NodeAggregator:
             else:
                 logging.error("Value Error: Unkown report type")
         else:
-            if isinstance(report, self.custom_model.SystemReport):
+            if isinstance(report, SystemReport):
                 node_name = report.metadata.node_name
                 timestamp = report.timestamp
                 del report.metadata, report.timestamp
@@ -100,7 +109,7 @@ class NodeAggregator:
                     },
                     fields,
                 )
-            elif isinstance(report, self.custom_model.ProcessReport):
+            elif isinstance(report, ProcessReport):
                 metadata = flatten(
                     {"metadata": report.metadata.dict()}, self.config.data_separator
                 )

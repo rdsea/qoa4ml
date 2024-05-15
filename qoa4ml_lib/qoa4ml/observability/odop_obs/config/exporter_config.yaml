@@ -2,12 +2,13 @@ host: "127.0.0.1"
 port: 8000
 environment: "HPC"
 node_aggregator:
-  host: "127.0.0.1"
-  port: 12345
-  query_method: "GET"
-  backlog_number: 5
-  socket_package_size: 4096
+  socket_collector_config:
+    host: "127.0.0.1"
+    port: 12345
+    backlog: 5
+    bufsize: 4096
   environment: "HPC"
+  query_method: "GET"
   data_separator: "dot"
   unit_conversion:
     cpu:
