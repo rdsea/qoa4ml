@@ -5,6 +5,8 @@ import uvicorn
 import yaml
 from fastapi import FastAPI
 
+from qoa4ml.datamodels.configs import ExporterConfig
+
 from ...common import ODOP_PATH
 from .node_aggregator import NodeAggregator
 
@@ -14,15 +16,15 @@ logging.basicConfig(
 
 
 class Exporter:
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: ExporterConfig) -> None:
         self.app = FastAPI()
         self.config = config
-        self.node_aggregator = NodeAggregator(self.config["node_aggregator"])
+        self.node_aggregator = NodeAggregator(self.config.node_aggregator)
         self.app.include_router(self.node_aggregator.router)
 
     def start(self):
         self.node_aggregator.start()
-        uvicorn.run(self.app, host=self.config["host"], port=self.config["port"])
+        uvicorn.run(self.app, host=self.config.host, port=self.config.port)
 
 
 if __name__ == "__main__":
