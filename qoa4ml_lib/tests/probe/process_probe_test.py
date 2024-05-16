@@ -1,6 +1,7 @@
-import yaml
 import argparse
 import time
+
+import yaml
 
 from qoa4ml.connector.socket_connector import SocketConnector
 from qoa4ml.datamodels.configs import ProcessProbeConfig, SocketConnectorConfig

@@ -40,12 +40,11 @@ class Probe(ABC):
 
     def start_reporting(self, background: bool = True):
         self.execution_flag = True
-        if background:
-            current_time = time.time()
-            time.sleep(math.ceil(current_time) - current_time)
-            self.timer = RepeatedTimer(self.monitoring_interval, self.reporting)
-        else:
-            self.reporting()
+        current_time = time.time()
+        time.sleep(math.ceil(current_time) - current_time)
+        self.timer = RepeatedTimer(self.monitoring_interval, self.reporting)
+        if not background:
+            self.timer.thread.join()
 
     def stop_reporting(self):
         if not hasattr(self, "timer"):
