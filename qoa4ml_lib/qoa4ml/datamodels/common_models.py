@@ -7,7 +7,7 @@ from .datamodel_enum import AggregateFunctionEnum, MetricNameEnum, OperatorEnum
 
 class Metric(BaseModel):
     metric_name: MetricNameEnum
-    records: List[Union[dict, float, int]] = []
+    records: List[Union[dict, float, int, tuple, str]] = []
     unit: Optional[str] = None
 
 
