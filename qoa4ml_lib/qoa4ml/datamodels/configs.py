@@ -1,28 +1,25 @@
 from typing import Dict, List, Optional, Union
-from uuid import UUID
 
 from pydantic import BaseModel
 
 from .datamodel_enum import (
     EnvironmentEnum,
-    FunctionalityEnum,
     MetricClassEnum,
     MetricNameEnum,
     ServiceAPIEnum,
-    StageNameEnum,
 )
 
 
 class ClientInfo(BaseModel):
-    id: Optional[str] = ""
-    name: Optional[str] = ""
-    user_id: Optional[str] = ""
-    instance_id: Optional[str] = ""
-    stage_id: Optional[str] = ""
-    functionality: Optional[str] = ""
-    application_name: Optional[str] = ""
-    role: Optional[str] = ""
-    run_id: Optional[str] = ""
+    id: str = ""
+    name: str = ""
+    user_id: str = ""
+    instance_id: str = ""
+    stage_id: str = ""
+    functionality: str = ""
+    application_name: str = ""
+    role: str = ""
+    run_id: str = ""
 
 
 class AMQPCollectorConfig(BaseModel):

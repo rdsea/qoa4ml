@@ -1,5 +1,4 @@
 import copy
-import json
 import os
 import sys
 import threading
@@ -314,7 +313,7 @@ class QoaClient(object):
         else:
             # iterate connector to send report
             # for connector in connectors:
-                # print(connector)
+            # print(connector)
             # Todo: send by multiple connector
             pass
 
