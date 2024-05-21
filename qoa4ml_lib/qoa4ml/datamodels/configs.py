@@ -13,13 +13,16 @@ from .datamodel_enum import (
 )
 
 
-class Client(BaseModel):
-    id: Optional[UUID] = None
-    name: str
-    stage: StageNameEnum
-    functionality: FunctionalityEnum
-    application: str
-    role: str
+class ClientInfo(BaseModel):
+    id: Optional[str] = ""
+    name: Optional[str] = ""
+    user_id: Optional[str] = ""
+    instance_id: Optional[str] = ""
+    stage_id: Optional[str] = ""
+    functionality: Optional[str] = ""
+    application_name: Optional[str] = ""
+    role: Optional[str] = ""
+    run_id: Optional[str] = ""
 
 
 class AMQPCollectorConfig(BaseModel):
@@ -80,7 +83,7 @@ class ConnectorConfig(BaseModel):
 
 
 class ClientConfig(BaseModel):
-    client: Client
+    client: ClientInfo
     registration_url: Optional[str] = None
     collector: Optional[List[CollectorConfig]] = None
     connector: Optional[List[ConnectorConfig]] = None

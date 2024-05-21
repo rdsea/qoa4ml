@@ -3,7 +3,7 @@ import unittest
 
 from devtools import debug
 
-from qoa4ml.datamodels.configs import Client
+from qoa4ml.datamodels.configs import ClientInfo
 from qoa4ml.reports.rohe_reports import RoheReport
 
 
@@ -11,7 +11,7 @@ class TestQoaReport(unittest.TestCase):
     def setUp(self):
         with open("./data/client_config.json") as f:
             client_config_dict = json.load(f)
-            self.client_config = Client(**client_config_dict)
+            self.client_config = ClientInfo(**client_config_dict)
             self.rohe_report = RoheReport(self.client_config)
 
     def test_reset(self):

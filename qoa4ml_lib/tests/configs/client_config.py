@@ -1,14 +1,14 @@
 from qoa4ml.datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
-    Client,
+    ClientInfo,
     ClientConfig,
     CollectorConfig,
     ConnectorConfig,
 )
 from qoa4ml.datamodels.datamodel_enum import MethodEnum, ServiceAPIEnum, StageNameEnum
 
-client = Client(
+client = ClientInfo(
     id="aaltosea1",
     name="data_handling01",
     stage=StageNameEnum.gate_way,

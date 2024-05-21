@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from host_object import HostObject
+from .host_object import HostObject
 
 from qoa4ml.collector.base_collector import BaseCollector
 

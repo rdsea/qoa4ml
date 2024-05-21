@@ -46,12 +46,14 @@ class InferenceGraph(BaseModel):
 
 # NOTE: use dict so that we know which stage to add metric to
 class QualityReport(BaseModel):
-    service: Dict[StageNameEnum, StageReport] = {}
+    # service: Dict[StageNameEnum, StageReport] = {}
+    service: Dict[str, StageReport] = {}
 
 
 class InferenceReport(QualityReport):
     ml_specific: Optional[InferenceGraph] = None
-    data: Dict[StageNameEnum, StageReport] = {}
+    # data: Dict[StageNameEnum, StageReport] = {}
+    data: Dict[str, StageReport] = {}
 
 
 class RoheReportModel(BaseModel):
