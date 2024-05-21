@@ -25,6 +25,8 @@ class ResourcesUtilizationMetricNameEnum(Enum):
 class ImageQualityNameEnum(Enum):
     image_size = "image_size"
     object_size = "object_size"
+    color_mode = "color_mode"
+    color_channel = "color_channel"
 
 
 MetricNameEnum = Union[

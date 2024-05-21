@@ -1,6 +1,4 @@
-import importlib
 import logging
-import math
 import socket
 import sys
 import time
@@ -11,7 +9,6 @@ from typing import TYPE_CHECKING
 import lazy_import
 from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
-from tinyflux import Point, TimeQuery, TinyFlux
 
 from qoa4ml.datamodels.datamodel_enum import EnvironmentEnum
 
@@ -19,6 +16,7 @@ from ...collector.socket_collector import SocketCollector
 from ...common import ODOP_PATH
 from ...datamodels.configs import NodeAggregatorConfig
 from ...qoa_utils import make_folder
+from .embedded_database import EmbeddedDatabase
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -45,7 +43,9 @@ class NodeAggregator:
         self.config = config
         self.unit_conversion = self.config.unit_conversion
         self.node_name = socket.gethostname().split(".")[0]
-        self.db = TinyFlux(DEFAULT_DATABASE_FOLDER + self.node_name + ".csv")
+        self.embedded_database = EmbeddedDatabase(
+            DEFAULT_DATABASE_FOLDER + self.node_name + ".csv"
+        )
         self.environment = config.environment
         self.collector = SocketCollector(
             config.socket_collector_config, self.process_report
@@ -58,11 +58,6 @@ class NodeAggregator:
             methods=[self.config.query_method],
         )
 
-    def insert_metric(self, timestamp: float, tags: dict, fields: dict):
-        timestamp_datetime = datetime.fromtimestamp(timestamp)
-        datapoint = Point(time=timestamp_datetime, tags=tags, fields=fields)
-        self.db.insert(datapoint, compact_key_prefixes=True)
-
     def process_report(self, report):
         if self.environment == EnvironmentEnum.hpc:
             if report["type"] == "system":
@@ -73,7 +68,7 @@ class NodeAggregator:
                 timestamp = report["timestamp"]
                 del report["metadata"], report["timestamp"]
                 fields = self.convert_unit(flatten(report, self.config.data_separator))
-                self.insert_metric(
+                self.embedded_database.insert(
                     timestamp,
                     {"type": "node", **metadata},
                     fields,
@@ -86,7 +81,7 @@ class NodeAggregator:
                 timestamp = report["timestamp"]
                 del report["metadata"], report["timestamp"]
                 fields = self.convert_unit(flatten(report, self.config.data_separator))
-                self.insert_metric(
+                self.embedded_database.insert(
                     timestamp,
                     {"type": "process", **metadata},
                     fields,
@@ -101,7 +96,7 @@ class NodeAggregator:
                 fields = self.convert_unit(
                     flatten(report.dict(exclude_none=True), self.config.data_separator)
                 )
-                self.insert_metric(
+                self.embedded_database.insert(
                     timestamp,
                     {
                         "type": "node",
@@ -118,7 +113,9 @@ class NodeAggregator:
                 fields = self.convert_unit(
                     flatten(report.dict(exclude_none=True), self.config.data_separator)
                 )
-                self.insert_metric(timestamp, {"type": "process", **metadata}, fields)
+                self.embedded_database.insert(
+                    timestamp, {"type": "process", **metadata}, fields
+                )
 
     def convert_unit(self, report: dict):
         converted_report = report
@@ -178,9 +175,7 @@ class NodeAggregator:
         return original_report
 
     def get_lastest_timestamp(self):
-        time_query = TimeQuery()
-        timestamp = datetime.fromtimestamp(math.floor(time.time()))
-        data = self.db.search(time_query >= timestamp)
+        data = self.embedded_database.get_lastest_timestamp()
         return [
             unflatten(
                 self.revert_unit(
@@ -207,6 +202,8 @@ class NodeAggregator:
 
 
 if __name__ == "__main__":
+    import importlib
+
     yaml = importlib.import_module("yaml")
     argparse = importlib.import_module("argparse")
     parser = argparse.ArgumentParser()

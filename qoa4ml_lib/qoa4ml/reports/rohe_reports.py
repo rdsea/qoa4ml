@@ -128,17 +128,27 @@ class RoheReport(GenericReport):
         )
         self.execution_graph.linked_list[end_point.instance.id] = end_point
         self.execution_graph.end_point = end_point.instance
+        self.report.execution_graph = self.execution_graph
 
     def observe_metric(
         self, report_type: ReportTypeEnum, stage: StageNameEnum, metric: Metric
     ):
-        if report_type == ReportTypeEnum.service or report_type == ReportTypeEnum.data:
-            print(self.inference_report.service)
+        if report_type == ReportTypeEnum.service:
             self.inference_report.service[stage].metrics[metric.metric_name].update(
+                {self.client_config.id: metric}
+            )
+        elif report_type == ReportTypeEnum.data:
+            if stage not in self.inference_report.data:
+                self.inference_report.data[stage] = StageReport(name=stage, metrics={})
+            if metric.metric_name not in self.inference_report.data[stage].metrics:
+                self.inference_report.data[stage].metrics[metric.metric_name] = {}
+
+            self.inference_report.data[stage].metrics[metric.metric_name].update(
                 {self.client_config.id: metric}
             )
         else:
             raise ValueError(f"Can't handle report type {report_type}")
+        self.report.inference_report = self.inference_report
 
     def observe_inference(self, linked_instance: LinkedInstance[InferenceInstance]):
         if self.inference_report.ml_specific:
@@ -164,6 +174,7 @@ class RoheReport(GenericReport):
             raise Exception("Can't observe new metric to missing end_point")
 
     def generate_report(self, reset: bool = True):
+        self.build_execution_graph()
         self.report.metadata["client_config"] = copy.deepcopy(self.client_config)
         self.report.metadata["timestamp"] = time.time()
         self.report.metadata["runtime"] = (
