@@ -3,7 +3,7 @@ from uuid import UUID
 from qoa4ml.datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
-    Client,
+    ClientInfo,
     ClientConfig,
     CollectorConfig,
     ConnectorConfig,
@@ -14,7 +14,7 @@ from qoa4ml.datamodels.datamodel_enum import (
     StageNameEnum,
 )
 
-client = Client(
+client = ClientInfo(
     id=UUID("7191a40f-ac85-4ca8-aa25-8114213e006a"),
     name="data_handling01",
     stage=StageNameEnum.gateway,

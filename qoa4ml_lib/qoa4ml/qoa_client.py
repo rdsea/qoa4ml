@@ -74,21 +74,20 @@ class QoaClient(object):
             self.configuration = ClientConfig(**load_config(config_path))
 
         self.client_config = self.configuration.client
-
         self.metric_manager = MetricManager()
         self.connector_list: Dict[str, BaseConnector] = {}
         self.timer_flag = False
         self.method = self.client_config.functionality
-        self.stage = self.client_config.stage
+        self.stage_id = self.client_config.stage_id
         self.process_monitor_flag = 0
         self.inference_flag = False
 
         self.instance_id = os.environ.get("INSTANCE_ID")
         if not self.instance_id:
             qoaLogger.info("INSTANCE_ID is not defined, generating random uuid")
-            self.instance_id = uuid.uuid4()
+            self.instance_id = str(uuid.uuid4())
         else:
-            self.instance_id = uuid.UUID(self.instance_id)
+            self.instance_id = str(uuid.UUID(self.instance_id))
 
         self.client_config.id = self.instance_id
         self.qoa_report = RoheReport(self.client_config)
@@ -121,11 +120,17 @@ class QoaClient(object):
                 response = json_data["response"]
                 if isinstance(response, dict):
                     connector_configs = response["connector"]
-                    for connector in connector_configs:
-                        connector_config = ConnectorConfig(**connector)
+                    if isinstance(connector_configs, dict):
+                        connector_config = ConnectorConfig(**connector_configs)
                         self.connector_list[connector_config.name] = (
                             self.init_connector(connector_config)
                         )
+                    elif isinstance(connector_configs, list):
+                        for config in connector_configs:
+                            connector_config = ConnectorConfig(**config)
+                            self.connector_list[connector_config.name] = (
+                                self.init_connector(connector_config)
+                            )
                 else:
                     qoaLogger.warning(
                         "Unable to register Qoa Client: connector configuration must be dictionary"
@@ -153,7 +158,7 @@ class QoaClient(object):
     def registration(self, url: str):
         # get connector configuration by registering with the monitoring service
         return requests.request(
-            "POST", url, headers=headers, data=json.dumps(self.client_config)
+            "POST", url, headers=headers, data=self.client_config.json()
         )
 
     def init_connector(self, configuration: ConnectorConfig) -> BaseConnector:
@@ -222,13 +227,13 @@ class QoaClient(object):
         if category == 0:
             self.qoa_report.observe_metric(
                 ReportTypeEnum.service,
-                self.stage,
+                self.stage_id,
                 Metric(metric_name=metric.name, records=[metric.value]),
             )
         elif category == 1:
             self.qoa_report.observe_metric(
                 ReportTypeEnum.data,
-                self.stage,
+                self.stage_id,
                 Metric(metric_name=metric.name, records=[metric.value]),
             )
 
@@ -324,7 +329,7 @@ class QoaClient(object):
         reset=True,
     ):
         if report is None:
-            report = self.qoa_report.generate_report(metrics, reset)
+            report = self.qoa_report.generate_report(reset)
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()

@@ -6,7 +6,7 @@ from qoa4ml.datamodels.common_models import Metric
 from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum, StageNameEnum
 from qoa4ml.reports.generic_report import GenericReport
 
-from ..datamodels.configs import Client
+from ..datamodels.configs import ClientInfo
 from ..datamodels.ml_report import (
     ExecutionGraph,
     InferenceInstance,
@@ -20,7 +20,7 @@ from ..qoa_utils import load_config
 
 
 class RoheReport(GenericReport):
-    def __init__(self, clientConfig: Client, file_path: Optional[str] = None):
+    def __init__(self, clientConfig: ClientInfo, file_path: Optional[str] = None):
         self.client_config = copy.deepcopy(clientConfig)
         self.reset()
         self.init_time = time.time()
@@ -115,11 +115,11 @@ class RoheReport(GenericReport):
 
     def build_execution_graph(self):
         end_point = LinkedInstance(
-            instance=MicroserviceInstance(
+            instance = MicroserviceInstance(
                 id=self.client_config.id,
                 name=self.client_config.name,
                 functionality=self.client_config.functionality,
-                stage=self.client_config.stage,
+                stage=self.client_config.stage_id,
             ),
             previous=[
                 previous_instance
@@ -133,6 +133,7 @@ class RoheReport(GenericReport):
         self, report_type: ReportTypeEnum, stage: StageNameEnum, metric: Metric
     ):
         if report_type == ReportTypeEnum.service or report_type == ReportTypeEnum.data:
+            print(self.inference_report.service)
             self.inference_report.service[stage].metrics[metric.metric_name].update(
                 {self.client_config.id: metric}
             )
