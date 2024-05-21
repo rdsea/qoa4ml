@@ -182,7 +182,6 @@ class RoheReport(GenericReport):
 
     def generate_report(self, reset: bool = True):
         self.build_execution_graph()
-        print(self.report.dict())
         self.report.metadata["client_config"] = copy.deepcopy(self.client_config)
         self.report.metadata["timestamp"] = time.time()
         self.report.metadata["runtime"] = (
