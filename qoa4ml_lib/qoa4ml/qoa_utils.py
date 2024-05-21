@@ -215,7 +215,7 @@ def get_proc_cpu(pid=None):
     return info
 
 
-def report_proc_mem(process):
+def report_proc_mem(process: psutil.Process):
     report = {}
     mem_info = process.memory_info()
     for key in mem_info._fields:

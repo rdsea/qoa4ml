@@ -10,7 +10,6 @@ from threading import Thread
 from typing import Dict, List, Optional, Union
 
 import requests
-from devtools import debug
 
 from qoa4ml.connector.base_connector import BaseConnector
 from qoa4ml.datamodels.common_models import Metric
@@ -98,7 +97,6 @@ class QoaClient(object):
             try:
                 for connector in connector_conf:
                     self.connector_list[connector.name] = self.init_connector(connector)
-                debug(self.connector_list)
             except Exception as e:
                 qoaLogger.error(
                     str(
@@ -296,8 +294,7 @@ class QoaClient(object):
     def process_monitor_stop(self):
         self.process_monitor_flag = 2
 
-    def asyn_report(self, report: dict, connectors: Optional[list] = None):
-        body_mess = json.dumps(report)
+    def asyn_report(self, body_mess: str, connectors: Optional[list] = None):
         self.lock.acquire()
         if connectors is None:
             # if connectors are not specify, use default
@@ -323,15 +320,17 @@ class QoaClient(object):
         submit=False,
         reset=True,
     ):
-        if report is None:
-            report = self.qoa_report.generate_report(metrics, reset)
+        if report == None:
+            report = self.qoa_report.generate_report(reset)
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()
 
         if submit:
-            if self.default_connector is not None:
-                sub_thread = Thread(target=self.asyn_report, args=(report, connectors))
+            if self.default_connector != None:
+                sub_thread = Thread(
+                    target=self.asyn_report, args=(report.model_dump_json(), connectors)
+                )
                 sub_thread.start()
             else:
                 qoaLogger.warning("No connector available")

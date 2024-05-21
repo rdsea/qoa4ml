@@ -36,7 +36,9 @@ class Probe(ABC):
 
     def reporting(self):
         report = self.create_report()
-        self.connector.send_report(report)
+        self.connector.send_report(
+            report, log_path=self.latency_logging_path + "report_latency.txt"
+        )
 
     def start_reporting(self, background: bool = True):
         self.execution_flag = True
