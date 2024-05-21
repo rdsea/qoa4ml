@@ -8,6 +8,8 @@ import traceback
 import numpy as np
 import pandas as pd
 
+from qoa4ml.datamodels.datamodel_enum import ImageQualityNameEnum
+
 from ..qoa_utils import is_numpyarray, is_pddataframe, qoaLogger
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()
@@ -179,11 +181,9 @@ def image_quality(image):
         image, PIL.Image.Image
     ):
         # qoaLogger.debug(dir(image)
-        quality["imageWidth"] = image.width
-        quality["imageHeight"] = image.height
-        quality["imageSize"] = image.size
-        quality["colorMode"] = image.mode
-        quality["colorChannel"] = len(image.getbands())
+        quality[ImageQualityNameEnum.image_size] = image.size
+        quality[ImageQualityNameEnum.color_mode] = image.mode
+        quality[ImageQualityNameEnum.color_channel] = len(image.getbands())
     return quality
 
 

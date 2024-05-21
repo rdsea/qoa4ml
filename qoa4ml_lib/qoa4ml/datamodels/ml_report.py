@@ -11,11 +11,13 @@ class MicroserviceInstance(BaseModel):
     id: UUID
     name: str
     functionality: FunctionalityEnum
-    stage: Optional[StageNameEnum] = None
+    stage: Optional[str] = None
+    # stage: Optional[StageNameEnum] = None
 
 
 class StageReport(BaseModel):
-    name: StageNameEnum
+    # name: StageNameEnum
+    name: str
     metrics: Dict[MetricNameEnum, Dict[UUID, Metric]]
 
 
