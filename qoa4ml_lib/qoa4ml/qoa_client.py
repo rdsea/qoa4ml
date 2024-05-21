@@ -333,7 +333,7 @@ class QoaClient(object):
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()
-
+        print(report.dict())
         if submit:
             if self.default_connector != None:
                 sub_thread = Thread(
