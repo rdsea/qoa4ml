@@ -253,7 +253,7 @@ class QoaClient(object):
     def import_previous_report(
         self, reports: Union[RoheReportModel, List[RoheReportModel]]
     ):
-        if type(reports) is list:
+        if isinstance(reports, list):
             for report in reports:
                 self.qoa_report.process_previous_report(report)
         else:
@@ -333,13 +333,13 @@ class QoaClient(object):
         submit=False,
         reset=True,
     ):
-        if report == None:
+        if report is None:
             report = self.qoa_report.generate_report(reset)
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()
         if submit:
-            if self.default_connector != None:
+            if self.default_connector is not None:
                 sub_thread = Thread(
                     target=self.asyn_report, args=(report.model_dump_json(), connectors)
                 )

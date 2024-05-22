@@ -1,8 +1,8 @@
 from qoa4ml.datamodels.configs import (
     AMQPCollectorConfig,
     AMQPConnectorConfig,
-    ClientInfo,
     ClientConfig,
+    ClientInfo,
     CollectorConfig,
     ConnectorConfig,
 )

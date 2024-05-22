@@ -1,4 +1,3 @@
-
 from qoa4ml.qoa_client import QoaClient
 
 qoa_client1 = QoaClient(

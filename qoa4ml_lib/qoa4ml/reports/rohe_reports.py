@@ -3,21 +3,19 @@ import time
 from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
-from devtools import debug
-
 from qoa4ml.datamodels.common_models import Metric
-from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum, StageNameEnum
+from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum
 from qoa4ml.reports.generic_report import GenericReport
 
 from ..datamodels.configs import ClientInfo
 from ..datamodels.ml_report import (
     ExecutionGraph,
+    InferenceGraph,
     InferenceInstance,
     InferenceReport,
     LinkedInstance,
     MicroserviceInstance,
     RoheReportModel,
-    InferenceGraph,
     StageReport,
 )
 from ..qoa_utils import load_config
@@ -91,23 +89,50 @@ class RoheReport(GenericReport):
         )
 
         # NOTE: ml-specific quality report
+        # debug(previous_report.inference_report.ml_specific)
         if not self.inference_report.ml_specific:
-            if previous_report.inference_report.ml_specific:
+            if (
+                previous_report.inference_report.ml_specific
+                and previous_report.inference_report.ml_specific.end_point
+                and previous_report.inference_report.ml_specific.linked_list
+            ):
                 self.inference_report.ml_specific = (
                     previous_report.inference_report.ml_specific
                 )
+                end_point = InferenceInstance(
+                    id=uuid4(),
+                    execution_instance_id=self.execution_instance.id,
+                )
+                self.inference_report.ml_specific.end_point = end_point
+                self.inference_report.ml_specific.linked_list |= {
+                    end_point.id: LinkedInstance[InferenceInstance](
+                        instance=end_point,
+                        previous=[
+                            previous_report.inference_report.ml_specific.end_point
+                        ],
+                    )
+                }
 
-                self.inference_report.ml_specific.end_point = None
         else:
-            self.inference_report.ml_specific.linked_list.update(
-                previous_report.inference_report.ml_specific.linked_list
-            )
-
+            if (
+                previous_report.inference_report.ml_specific
+                and previous_report.inference_report.ml_specific.end_point
+                and previous_report.inference_report.ml_specific.linked_list
+                and self.inference_report.ml_specific.end_point
+            ):
+                self.inference_report.ml_specific.linked_list |= (
+                    previous_report.inference_report.ml_specific.linked_list
+                )
+                current_end_point = self.inference_report.ml_specific.end_point
+                previous_end_point = (
+                    previous_report.inference_report.ml_specific.end_point
+                )
+                self.inference_report.ml_specific.linked_list[
+                    current_end_point.id
+                ].previous.append(previous_end_point)
         # NOTE: execution graph
         if not self.execution_graph:
             self.execution_graph = previous_report.execution_graph
-
-            self.inference_report.ml_specific.end_point = None
         else:
             self.execution_graph.linked_list.update(
                 previous_report.execution_graph.linked_list
@@ -181,8 +206,13 @@ class RoheReport(GenericReport):
             if self.inference_report.ml_specific is None:
                 self.inference_report.ml_specific = InferenceGraph()
             if self.inference_report.ml_specific.end_point is None:
-                self.inference_report.ml_specific.end_point = InferenceInstance(
+                end_point = InferenceInstance(
                     id=uuid4(), execution_instance_id=self.execution_instance.id
+                )
+
+                self.inference_report.ml_specific.end_point = end_point
+                self.inference_report.ml_specific.linked_list[end_point.id] = (
+                    LinkedInstance[InferenceInstance](instance=end_point)
                 )
             self.inference_report.ml_specific.end_point.metrics.append(metric)
 
