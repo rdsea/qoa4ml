@@ -43,7 +43,7 @@ class ExecutionGraph(BaseModel):
 
 class InferenceGraph(BaseModel):
     end_point: Optional[InferenceInstance] = None
-    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]]
+    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]] = {}
 
 
 # NOTE: use dict so that we know which stage to add metric to

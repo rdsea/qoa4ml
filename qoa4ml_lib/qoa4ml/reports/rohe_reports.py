@@ -17,6 +17,7 @@ from ..datamodels.ml_report import (
     LinkedInstance,
     MicroserviceInstance,
     RoheReportModel,
+    InferenceGraph,
     StageReport,
 )
 from ..qoa_utils import load_config
@@ -38,11 +39,11 @@ class RoheReport(GenericReport):
         self.report = RoheReportModel()
         self.previous_microservice_instance = []
         self.execution_instance = MicroserviceInstance(
-                id=UUID(self.client_config.id),
-                name=self.client_config.name,
-                functionality=self.client_config.functionality,
-                stage=self.client_config.stage_id,
-            )
+            id=UUID(self.client_config.id),
+            name=self.client_config.name,
+            functionality=self.client_config.functionality,
+            stage=self.client_config.stage_id,
+        )
 
     def import_report_from_file(self, file_path: str):
         report = load_config(file_path)
@@ -166,26 +167,24 @@ class RoheReport(GenericReport):
             }
 
             self.inference_report.ml_specific.end_point = linked_instance.instance
-    def init_inference_instance(self):
-        if self.inference_report.ml_specific:
-            self.inference_report.ml_specific.end_point = InferenceInstance(id=uuid4(), execution_instance_id=self.client_config.id)
 
     def observe_inference_metric(
         self,
-        metric: Optional[Metric] = None,
-        metric_list: Optional[List[Metric]] = None,
+        metric: Metric,
     ):
         if (
             self.inference_report.ml_specific
             and self.inference_report.ml_specific.end_point
         ):
-            if metric:
-                self.inference_report.ml_specific.end_point.metrics.append(metric)
-            elif metric_list:
-                self.inference_report.ml_specific.end_point.metrics.extend(metric_list)
+            self.inference_report.ml_specific.end_point.metrics.append(metric)
         else:
-            if metric:
-                self.inference_report.ml_specific.end_point = InferenceInstance(id=)
+            if self.inference_report.ml_specific is None:
+                self.inference_report.ml_specific = InferenceGraph()
+            if self.inference_report.ml_specific.end_point is None:
+                self.inference_report.ml_specific.end_point = InferenceInstance(
+                    id=uuid4(), execution_instance_id=self.execution_instance.id
+                )
+            self.inference_report.ml_specific.end_point.metrics.append(metric)
 
     def generate_report(self, reset: bool = True):
         self.build_execution_graph()
