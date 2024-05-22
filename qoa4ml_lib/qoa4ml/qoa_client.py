@@ -6,7 +6,7 @@ import time
 import traceback
 import uuid
 from threading import Thread
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
@@ -250,8 +250,14 @@ class QoaClient(object):
             )
             return responseTime
 
-    def import_previous_report(self, reports: RoheReportModel):
-        self.qoa_report.process_previous_report(reports)
+    def import_previous_report(
+        self, reports: Union[RoheReportModel, List[RoheReportModel]]
+    ):
+        if type(reports) is list:
+            for report in reports:
+                self.qoa_report.process_previous_report(report)
+        else:
+            self.qoa_report.process_previous_report(reports)
 
     def __str__(self):
         return self.client_config.model_dump_json() + "\n" + str(self.connector_list)
@@ -367,10 +373,11 @@ class QoaClient(object):
 
     def observe_inference_metric(
         self,
-        metric: Optional[Metric] = None,
-        metric_list: Optional[List[Metric]] = None,
+        metric_name: MetricNameEnum,
+        value: Any,
     ):
-        self.qoa_report.observe_inference_metric(metric, metric_list)
+        metric = Metric(metric_name=metric_name, records=[value])
+        self.qoa_report.observe_inference_metric(metric)
 
     def observe_erronous(self, data, errors=None):
         results = eva_erronous(data, errors=errors)
