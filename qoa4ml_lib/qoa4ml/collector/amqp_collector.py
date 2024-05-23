@@ -62,6 +62,7 @@ class Amqp_Collector(BaseCollector):
             mess = json.loads(str(body.decode("utf-8")))
             qoaLogger.debug(mess)
 
+
     def start_collecting(self):
         # Start rabbit MQ
         self.in_channel.basic_qos(prefetch_count=1)
