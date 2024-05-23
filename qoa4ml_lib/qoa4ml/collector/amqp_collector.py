@@ -1,12 +1,11 @@
 import json
 from typing import Optional
 
-from .host_object import HostObject
-
 from qoa4ml.collector.base_collector import BaseCollector
 
 from ..datamodels.configs import AMQPCollectorConfig
 from ..qoa_utils import qoaLogger
+from .host_object import HostObject
 
 
 class Amqp_Collector(BaseCollector):

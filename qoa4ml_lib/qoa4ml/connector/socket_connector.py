@@ -1,7 +1,7 @@
 import logging
-import time
 import pickle
 import socket
+import time
 from typing import Optional
 
 from qoa4ml.datamodels.configs import SocketConnectorConfig
