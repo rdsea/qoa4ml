@@ -4,13 +4,13 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from .common_models import Metric
-from .datamodel_enum import FunctionalityEnum, MetricNameEnum, StageNameEnum
+from .datamodel_enum import MetricNameEnum
 
 
 class MicroserviceInstance(BaseModel):
     id: UUID
     name: str
-    functionality: FunctionalityEnum
+    functionality: str = ""
     stage: Optional[str] = None
     # stage: Optional[StageNameEnum] = None
 
@@ -24,8 +24,8 @@ class StageReport(BaseModel):
 class InferenceInstance(BaseModel):
     id: UUID
     execution_instance_id: UUID
-    metrics: List[Metric]
-    prediction: Union[dict, float]
+    metrics: List[Metric] = []
+    prediction: Optional[Union[dict, float]] = None
 
 
 InstanceType = TypeVar("InstanceType")
@@ -43,7 +43,7 @@ class ExecutionGraph(BaseModel):
 
 class InferenceGraph(BaseModel):
     end_point: Optional[InferenceInstance] = None
-    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]]
+    linked_list: Dict[UUID, LinkedInstance[InferenceInstance]] = {}
 
 
 # NOTE: use dict so that we know which stage to add metric to
