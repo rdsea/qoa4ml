@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from .common_models import Metric
-from .datamodel_enum import MetricNameEnum
+from ..lang.common_models import Metric
+from ..lang.datamodel_enum import MetricNameEnum
 
 
 class MicroserviceInstance(BaseModel):

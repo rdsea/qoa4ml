@@ -6,11 +6,10 @@ from typing import TYPE_CHECKING
 import lazy_import
 import psutil
 
-from qoa4ml.connector.base_connector import BaseConnector
-from qoa4ml.datamodels.datamodel_enum import EnvironmentEnum
-
-from ..datamodels.configs import ProcessProbeConfig
-from ..qoa_utils import (
+from ..config.configs import ProcessProbeConfig
+from ..connector.base_connector import BaseConnector
+from ..lang.datamodel_enum import EnvironmentEnum
+from ..utils.qoa_utils import (
     convert_to_mbyte,
     get_process_allowed_cpus,
     get_process_allowed_memory,
@@ -20,20 +19,20 @@ from ..qoa_utils import (
 from .probe import Probe
 
 if TYPE_CHECKING:
-    from ..datamodels.resources_report import (
+    from ..reports.resources_report_model import (
         ProcessMetadata,
         ProcessReport,
         ResourceReport,
     )
 else:
     ProcessReport = lazy_import.lazy_class(
-        "..datamodels.resources_report", "ProcessReport"
+        "..datamodels.resources_report_model", "ProcessReport"
     )
     ProcessMetadata = lazy_import.lazy_class(
-        "..datamodels.resources_report", "ProcessMetadata"
+        "..datamodels.resources_report_model", "ProcessMetadata"
     )
     ResourceReport = lazy_import.lazy_class(
-        "..datamodels.resources_report", "ResourceReport"
+        "..datamodels.resources_report_model", "ResourceReport"
     )
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -103,9 +102,9 @@ class ProcessMonitoringProbe(Probe):
                 cpu=ResourceReport(usage=cpu_usage),
                 mem=ResourceReport(usage=mem_usage),
             )
-        if self.log_latency_flag:
-            self.write_log(
-                (time.time() - timestamp) * 1000,
-                self.latency_logging_path + "calculating_process_metric_latency.txt",
-            )
+        # if self.log_latency_flag:
+        #     self.write_log(
+        #         (time.time() - timestamp) * 1000,
+        #         self.latency_logging_path + "calculating_process_metric_latency.txt",
+        #     )
         return report

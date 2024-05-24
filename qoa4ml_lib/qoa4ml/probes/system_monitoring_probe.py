@@ -1,15 +1,14 @@
-import importlib
 import socket
 import time
 from typing import TYPE_CHECKING
 
 import lazy_import
 
+from ..config.configs import SystemProbeConfig
 from ..connector.base_connector import BaseConnector
-from ..datamodels.configs import SystemProbeConfig
-from ..datamodels.datamodel_enum import EnvironmentEnum
-from ..gpu_utils import get_sys_gpu_metadata, get_sys_gpu_usage
-from ..qoa_utils import (
+from ..lang.datamodel_enum import EnvironmentEnum
+from ..utils.gpu_utils import get_sys_gpu_metadata, get_sys_gpu_usage
+from ..utils.qoa_utils import (
     convert_to_gbyte,
     convert_to_mbyte,
     get_sys_cpu_metadata,
@@ -19,20 +18,20 @@ from ..qoa_utils import (
 from .probe import Probe
 
 if TYPE_CHECKING:
-    from ..datamodels.resources_report import (
+    from ..reports.resources_report_model import (
         ResourceReport,
         SystemMetadata,
         SystemReport,
     )
 else:
     SystemReport = lazy_import.lazy_class(
-        "..datamodels.resources_report", "SystemReport"
+        "..datamodels.resources_report_model", "SystemReport"
     )
     SystemMetadata = lazy_import.lazy_class(
-        "..datamodels.resources_report", "SystemMetadata"
+        "..datamodels.resources_report_model", "SystemMetadata"
     )
     ResourceReport = lazy_import.lazy_class(
-        "..datamodels.resources_report", "ResourceReport"
+        "..datamodels.resources_report_model", "ResourceReport"
     )
 
 
@@ -106,28 +105,9 @@ class SystemMonitoringProbe(Probe):
                 gpu=ResourceReport(metadata=self.gpu_metadata, usage=gpu_usage),
                 mem=ResourceReport(metadata=self.mem_metadata, usage=mem_usage),
             )
-        if self.log_latency_flag:
-            self.write_log(
-                (time.time() - timestamp) * 1000,
-                self.latency_logging_path + "calculating_system_metric_latency.txt",
-            )
+        # if self.log_latency_flag:
+        #     self.write_log(
+        #         (time.time() - timestamp) * 1000,
+        #         self.latency_logging_path + "calculating_system_metric_latency.txt",
+        #     )
         return report
-
-
-if __name__ == "__main__":
-    argparse = importlib.import_module("argparse")
-    yaml = importlib.import_module("yaml")
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="config path", default="config/system_probe_conf.yaml"
-    )
-    args = parser.parse_args()
-    config_file = args.config
-    with open(config_file, encoding="utf-8") as file:
-        system_probe_config = yaml.safe_load(file)
-
-    sys_monitoring_probe = SystemMonitoringProbe(system_probe_config)
-    del system_probe_config
-    sys_monitoring_probe.start_reporting()
-    while True:
-        time.sleep(1)

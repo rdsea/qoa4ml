@@ -3,7 +3,7 @@ import sys
 import uuid
 from typing import Optional
 
-from ..datamodels.configs import AMQPConnectorConfig
+from ..config.configs import AMQPConnectorConfig
 from .base_connector import BaseConnector
 
 p_dir = pathlib.Path(__file__).parent.parent.absolute()

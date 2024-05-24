@@ -4,12 +4,12 @@ import time
 from abc import ABC, abstractmethod
 from typing import Any
 
-from qoa4ml.datamodels.configs import ProbeConfig
+from ..config.configs import ProbeConfig
 
-from ..common import ODOP_PATH
+# from ..common import ODOP_PATH
+# from ..utils.qoa_utils import make_folder
 from ..connector.base_connector import BaseConnector
-from ..qoa_utils import make_folder
-from .repeated_timer import RepeatedTimer
+from ..utils.repeated_timer import RepeatedTimer
 
 logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
@@ -24,9 +24,9 @@ class Probe(ABC):
         self.execution_flag = False
         self.report_thread = None
         self.log_latency_flag = self.config.log_latency_flag
-        if self.log_latency_flag:
-            self.latency_logging_path = ODOP_PATH + config.latency_logging_path
-            make_folder(self.latency_logging_path)
+        # if self.log_latency_flag:
+        #     self.latency_logging_path = ODOP_PATH + config.latency_logging_path
+        #     make_folder(self.latency_logging_path)
         self.max_latency = 0.0
         self.connector = connector
 
@@ -54,13 +54,13 @@ class Probe(ABC):
         self.timer.stop()
 
     def send_report(self, report):
-        start = time.time()
+        # start = time.time()
         self.connector.send_report(report)
-        if self.log_latency_flag:
-            self.write_log(
-                (time.time() - start) * 1000,
-                self.latency_logging_path + "report_latency.txt",
-            )
+        # if self.log_latency_flag:
+        #     self.write_log(
+        #         (time.time() - start) * 1000,
+        #         self.latency_logging_path + "report_latency.txt",
+        #     )
 
     def write_log(self, latency, filepath: str):
         with open(filepath, "a", encoding="utf-8") as file:

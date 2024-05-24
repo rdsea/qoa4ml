@@ -1,14 +1,13 @@
 import copy
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List
 from uuid import UUID, uuid4
 
-from qoa4ml.datamodels.common_models import Metric
-from qoa4ml.datamodels.datamodel_enum import ReportTypeEnum
-from qoa4ml.reports.generic_report import GenericReport
-
-from ..datamodels.configs import ClientInfo
-from ..datamodels.ml_report import (
+from ..config.configs import ClientInfo
+from ..lang.common_models import Metric
+from ..lang.datamodel_enum import ReportTypeEnum
+from ..reports.abstract_report import AbstractReport
+from ..reports.ml_report_model import (
     ExecutionGraph,
     InferenceGraph,
     InferenceInstance,
@@ -18,17 +17,17 @@ from ..datamodels.ml_report import (
     RoheReportModel,
     StageReport,
 )
-from ..qoa_utils import load_config
+from ..utils.qoa_utils import load_config
 
 
-class RoheReport(GenericReport):
-    def __init__(self, clientConfig: ClientInfo, file_path: Optional[str] = None):
+class RoheReport(AbstractReport):
+    def __init__(self, clientConfig: ClientInfo):
         self.client_config = copy.deepcopy(clientConfig)
         self.reset()
         self.init_time = time.time()
 
-        if file_path:
-            self.import_report_from_file(file_path)
+        # if file_path:
+        #     self.import_report_from_file(file_path)
 
     def reset(self):
         self.previous_report: List[RoheReportModel] = []
@@ -185,13 +184,13 @@ class RoheReport(GenericReport):
             raise ValueError(f"Can't handle report type {report_type}")
         self.report.inference_report = self.inference_report
 
-    def observe_inference(self, linked_instance: LinkedInstance[InferenceInstance]):
+    def observe_inference(self, inference_instance: LinkedInstance[InferenceInstance]):
         if self.inference_report.ml_specific:
             self.inference_report.ml_specific.linked_list |= {
-                UUID(self.client_config.id): linked_instance
+                UUID(self.client_config.id): inference_instance
             }
 
-            self.inference_report.ml_specific.end_point = linked_instance.instance
+            self.inference_report.ml_specific.end_point = inference_instance.instance
 
     def observe_inference_metric(
         self,

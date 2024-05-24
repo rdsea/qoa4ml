@@ -1,0 +1,436 @@
+{
+  "inference_report": {
+    "service": {
+      "gateway": {
+        "name": "gateway",
+        "metrics": {
+          "metric1": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "metric1",
+              "records": [
+                40
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "metric2",
+              "records": [
+                95
+              ],
+              "unit": null
+            }
+          }
+        }
+      },
+      "data_processing": {
+        "name": "data_processing",
+        "metrics": {
+          "metric1": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "metric1",
+              "records": [
+                24
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "metric2",
+              "records": [
+                8
+              ],
+              "unit": null
+            }
+          },
+          "response_time": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "startTime": 1716535580.7217674,
+                  "responseTime": 0.00010895729064941406
+                }
+              ],
+              "unit": null
+            }
+          }
+        }
+      },
+      "ml_inference_ensemble": {
+        "name": "ml_inference_ensemble",
+        "metrics": {
+          "response_time": {
+            "0f1dfa69-ba94-4aec-9c56-36677414a582": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "startTime": 1716535580.7223608,
+                  "responseTime": 7.271766662597656e-05
+                }
+              ],
+              "unit": null
+            },
+            "3d203a15-9c30-4f5f-b9dd-03510ef8631f": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "startTime": 1716535580.7232397,
+                  "responseTime": 7.176399230957031e-05
+                }
+              ],
+              "unit": null
+            }
+          }
+        }
+      },
+      "Aggregate": {
+        "name": "Aggregate",
+        "metrics": {
+          "response_time": {
+            "de49f688-096f-4e06-8308-4d24a595dec5": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "startTime": 1716535580.7241704,
+                  "responseTime": 1.8835067749023438e-05
+                }
+              ],
+              "unit": null
+            }
+          }
+        }
+      }
+    },
+    "ml_specific": {
+      "end_point": {
+        "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+        "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+        "metrics": [
+          {
+            "metric_name": "confidence",
+            "records": [
+              5
+            ],
+            "unit": null
+          },
+          {
+            "metric_name": "accuracy",
+            "records": [
+              61
+            ],
+            "unit": null
+          }
+        ],
+        "prediction": null
+      },
+      "linked_list": {
+        "4cd15734-5e59-49fc-ade5-05c6a3df4e71": {
+          "previous": [],
+          "instance": {
+            "id": "4cd15734-5e59-49fc-ade5-05c6a3df4e71",
+            "execution_instance_id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  76
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  7
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          }
+        },
+        "d56a4e83-a221-44dd-93fc-a5560d412fb0": {
+          "previous": [
+            {
+              "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+              "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+              "metrics": [
+                {
+                  "metric_name": "confidence",
+                  "records": [
+                    5
+                  ],
+                  "unit": null
+                },
+                {
+                  "metric_name": "accuracy",
+                  "records": [
+                    61
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": null
+            },
+            {
+              "id": "072fa88f-e335-41e7-b030-88e3ed22fba8",
+              "execution_instance_id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+              "metrics": [
+                {
+                  "metric_name": "confidence",
+                  "records": [
+                    84
+                  ],
+                  "unit": null
+                },
+                {
+                  "metric_name": "accuracy",
+                  "records": [
+                    91
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": null
+            }
+          ],
+          "instance": {
+            "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+            "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  5
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  61
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          }
+        },
+        "072fa88f-e335-41e7-b030-88e3ed22fba8": {
+          "previous": [],
+          "instance": {
+            "id": "072fa88f-e335-41e7-b030-88e3ed22fba8",
+            "execution_instance_id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  84
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  91
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          }
+        }
+      }
+    },
+    "data": {
+      "gateway": {
+        "name": "gateway",
+        "metrics": {
+          "image_width": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "image_width",
+              "records": [
+                46
+              ],
+              "unit": null
+            }
+          },
+          "image_height": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "image_height",
+              "records": [
+                19
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "object_width",
+              "records": [
+                28
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "object_height",
+              "records": [
+                58
+              ],
+              "unit": null
+            }
+          }
+        }
+      },
+      "data_processing": {
+        "name": "data_processing",
+        "metrics": {
+          "image_width": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "image_width",
+              "records": [
+                31
+              ],
+              "unit": null
+            }
+          },
+          "image_height": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "image_height",
+              "records": [
+                78
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "object_width",
+              "records": [
+                26
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "object_height",
+              "records": [
+                12
+              ],
+              "unit": null
+            }
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "client_config": {
+      "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+      "name": "",
+      "user_id": "aaltosea5",
+      "instance_id": "Agg01",
+      "stage_id": "Aggregate",
+      "functionality": "REST",
+      "application_name": "",
+      "role": "ml",
+      "run_id": ""
+    },
+    "timestamp": 1716535580.724298,
+    "runtime": 0.006242036819458008
+  },
+  "execution_graph": {
+    "end_point": {
+      "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+      "name": "",
+      "functionality": "REST",
+      "stage": "Aggregate"
+    },
+    "linked_list": {
+      "95d033ca-8cee-4642-92f5-de8afb00a650": {
+        "previous": [],
+        "instance": {
+          "id": "95d033ca-8cee-4642-92f5-de8afb00a650",
+          "name": "",
+          "functionality": "REST",
+          "stage": "gateway"
+        }
+      },
+      "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+        "previous": [
+          {
+            "id": "95d033ca-8cee-4642-92f5-de8afb00a650",
+            "name": "",
+            "functionality": "REST",
+            "stage": "gateway"
+          }
+        ],
+        "instance": {
+          "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+          "name": "",
+          "functionality": "REST",
+          "stage": "data_processing"
+        }
+      },
+      "0f1dfa69-ba94-4aec-9c56-36677414a582": {
+        "previous": [
+          {
+            "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+            "name": "",
+            "functionality": "REST",
+            "stage": "data_processing"
+          }
+        ],
+        "instance": {
+          "id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+          "name": "",
+          "functionality": "REST",
+          "stage": "ml_inference_ensemble"
+        }
+      },
+      "3d203a15-9c30-4f5f-b9dd-03510ef8631f": {
+        "previous": [
+          {
+            "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+            "name": "",
+            "functionality": "REST",
+            "stage": "data_processing"
+          }
+        ],
+        "instance": {
+          "id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+          "name": "",
+          "functionality": "REST",
+          "stage": "ml_inference_ensemble"
+        }
+      },
+      "de49f688-096f-4e06-8308-4d24a595dec5": {
+        "previous": [
+          {
+            "id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+            "name": "",
+            "functionality": "REST",
+            "stage": "ml_inference_ensemble"
+          },
+          {
+            "id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+            "name": "",
+            "functionality": "REST",
+            "stage": "ml_inference_ensemble"
+          }
+        ],
+        "instance": {
+          "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+          "name": "",
+          "functionality": "REST",
+          "stage": "Aggregate"
+        }
+      }
+    }
+  }
+}

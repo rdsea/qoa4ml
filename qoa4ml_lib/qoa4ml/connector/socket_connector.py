@@ -4,8 +4,7 @@ import socket
 import time
 from typing import Optional
 
-from qoa4ml.datamodels.configs import SocketConnectorConfig
-
+from ..config.configs import SocketConnectorConfig
 from .base_connector import BaseConnector
 
 
