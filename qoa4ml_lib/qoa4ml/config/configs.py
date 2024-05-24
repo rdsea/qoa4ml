@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
-from .datamodel_enum import (
+from ..lang.datamodel_enum import (
     EnvironmentEnum,
     MetricClassEnum,
     MetricNameEnum,
@@ -92,8 +92,6 @@ class MetricConfig(BaseModel):
     description: Optional[str] = None
     default_value: int
     category: int
-    # NOTE: for getting the metric key when calling external libs like psutil
-    key: Optional[str] = None
 
 
 class GroupMetricConfig(BaseModel):

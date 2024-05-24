@@ -6,35 +6,30 @@ import time
 import traceback
 import uuid
 from threading import Thread
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 import requests
 
-from qoa4ml.connector.base_connector import BaseConnector
-from qoa4ml.datamodels.common_models import Metric
-from qoa4ml.datamodels.datamodel_enum import (
+from qoa4ml.reports.abstract_report import AbstractReport
+
+# from .connector.mqtt_connector import Mqtt_Connector
+from .config.configs import (
+    AMQPConnectorConfig,
+    ClientConfig,
+    ConnectorConfig,
+    MetricConfig,
+)
+from .connector.amqp_connector import Amqp_Connector
+from .connector.base_connector import BaseConnector
+from .lang.common_models import Metric
+from .lang.datamodel_enum import (
     MetricClassEnum,
     MetricNameEnum,
     ReportTypeEnum,
     ServiceAPIEnum,
     ServiceMetricNameEnum,
 )
-from qoa4ml.datamodels.ml_report import (
-    InferenceInstance,
-    LinkedInstance,
-    RoheReportModel,
-)
-from qoa4ml.metric_mananger import MetricManager
-
-from .connector.amqp_connector import Amqp_Connector
-
-# from .connector.mqtt_connector import Mqtt_Connector
-from .datamodels.configs import (
-    AMQPConnectorConfig,
-    ClientConfig,
-    ConnectorConfig,
-    MetricConfig,
-)
+from .metric_mananger import MetricManager
 from .probes.dataquality import (
     eva_duplicate,
     eva_erronous,
@@ -42,22 +37,27 @@ from .probes.dataquality import (
     eva_none,
     image_quality,
 )
-from .qoa_utils import (
+from .reports.ml_report_model import InferenceInstance, LinkedInstance, RoheReportModel
+from .utils.qoa_utils import (
     get_proc_cpu,
     get_proc_mem,
     load_config,
     qoaLogger,
     set_logger_level,
 )
-from .reports.rohe_reports import RoheReport
 
 headers = {"Content-Type": "application/json"}
 
 
-class QoaClient(object):
+# NOTE: T must be a subtype of AbstractReport
+T = TypeVar("T", bound=AbstractReport)
+
+
+class QoaClient(Generic[T]):
     # Init QoA Client
     def __init__(
         self,
+        report_cls: Type[T],
         config_dict: Optional[ClientConfig] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
@@ -88,7 +88,7 @@ class QoaClient(object):
             self.instance_id = str(uuid.UUID(self.instance_id))
 
         self.client_config.id = self.instance_id
-        self.qoa_report = RoheReport(self.client_config)
+        self.qoa_report = report_cls(self.client_config)
         if self.configuration.connector:
             # init connectors offline if it's specified
             connector_conf = self.configuration.connector

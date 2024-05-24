@@ -6,4 +6,4 @@ build-backend = "setuptools.build_meta"
 profile = "black"
 
 [tool.ruff]
-exclude = ["./qoa4ml/pynvml_forked.py"]
+exclude = ["./qoa4ml/utils/pynvml_forked.py"]

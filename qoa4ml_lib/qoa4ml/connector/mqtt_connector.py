@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 import lazy_import
 
 from ..collector.host_object import HostObject
-from ..datamodels.configs import MQTTConnectorConfig
-from ..qoa_utils import qoaLogger
+from ..config.configs import MQTTConnectorConfig
+from ..utils.qoa_utils import qoaLogger
 from .base_connector import BaseConnector
 
 if TYPE_CHECKING:

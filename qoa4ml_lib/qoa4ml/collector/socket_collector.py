@@ -2,8 +2,7 @@ import pickle
 import socket
 from typing import Callable
 
-from qoa4ml.datamodels.configs import SocketCollectorConfig
-
+from ..config.configs import SocketCollectorConfig
 from .base_collector import BaseCollector
 
 

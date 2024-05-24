@@ -3,8 +3,8 @@ from typing import Optional
 
 from qoa4ml.collector.base_collector import BaseCollector
 
-from ..datamodels.configs import AMQPCollectorConfig
-from ..qoa_utils import qoaLogger
+from ..config.configs import AMQPCollectorConfig
+from ..utils.qoa_utils import qoaLogger
 from .host_object import HostObject
 
 
@@ -60,7 +60,6 @@ class Amqp_Collector(BaseCollector):
         else:
             mess = json.loads(str(body.decode("utf-8")))
             qoaLogger.debug(mess)
-
 
     def start_collecting(self):
         # Start rabbit MQ

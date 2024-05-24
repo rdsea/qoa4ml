@@ -1,10 +1,9 @@
 from typing import Dict, List, Optional, Union
 
-from qoa4ml.datamodels.datamodel_enum import MetricClassEnum, MetricNameEnum
-
-from .datamodels.configs import MetricConfig
+from .config.configs import MetricConfig
+from .lang.datamodel_enum import MetricClassEnum, MetricNameEnum
 from .metric import Counter, Gauge, Histogram, PrometheusMetric, Summary
-from .qoa_utils import qoaLogger
+from .utils.qoa_utils import qoaLogger
 
 
 class MetricManager:

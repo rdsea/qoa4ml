@@ -1,5 +1,5 @@
 # Metrics are implemented based on these classes to be compatible with Prometheus
-from qoa4ml.datamodels.datamodel_enum import MetricNameEnum
+from .lang.datamodel_enum import MetricNameEnum
 
 
 class PrometheusMetric(object):
