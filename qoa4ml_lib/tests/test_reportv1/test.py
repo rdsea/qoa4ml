@@ -68,19 +68,23 @@ if __name__ == "__main__":
                 client3.import_previous_report(report_2)
                 client3.timer()
                 # print("This is thread: ", num_thread, "Starting request: ", count)
+                client3.observe_inference(random.randint(1, 1000))
                 client3.observe_inference_metric("confidence", random.randint(1, 100))
                 client3.observe_inference_metric("accuracy", random.randint(1, 100))
                 client3.timer()
                 report_3 = client3.report()
+                # debug(report_3)
                 # print("Thread - ",num_thread, " Response3:", report_3)
 
                 client4.import_previous_report(report_2)
                 client4.timer()
                 # print("This is thread: ", num_thread, "Starting request: ", count)
+                client4.observe_inference(random.randint(1, 1000))
                 client4.observe_inference_metric("confidence", random.randint(1, 100))
                 client4.observe_inference_metric("accuracy", random.randint(1, 100))
                 client4.timer()
                 report_4 = client4.report()
+                # debug(report_4)
                 # print("Thread - ",num_thread, " Response4:", report_4)
 
                 # debug(report_3.inference_report)
@@ -88,13 +92,14 @@ if __name__ == "__main__":
                 client5.import_previous_report([report_3, report_4])
                 client5.timer()
                 # print("This is thread: ", num_thread, "Starting request: ", count)
+                client5.observe_inference(random.randint(1, 1000))
                 client5.observe_inference_metric("confidence", random.randint(1, 100))
                 client5.observe_inference_metric("accuracy", random.randint(1, 100))
                 client5.timer()
                 report_5 = client5.report(submit=True)
                 debug(report_5)
-                with open("schema.json", "w", encoding="utf-8") as file:
-                    file.write(report_5.model_dump_json())
+                # with open("schema.json", "w", encoding="utf-8") as file:
+                #     file.write(report_5.model_dump_json())
                 # print("Thread - ",num_thread, " Response5:", report_5)
             except Exception as e:
                 error += 1
