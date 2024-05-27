@@ -38,8 +38,8 @@ class Rohe_ObService(Resource):
             args = request.get_json(force=True)
             print(args)
             response = {}
-            if "application" in args:
-                application_name = args["application"]
+            if "application_name" in args:
+                application_name = args["application_name"]
                 if application_name not in application_list:
                     application_list[application_name] = {}
                     application_list[application_name]["id"] = str(uuid.uuid4())
@@ -52,7 +52,7 @@ class Rohe_ObService(Resource):
 
                 application_list[application_name]["client_count"] += 1
                 # TO DO
-                # Check userID, role, stageID, instance_name
+                # Check user_id, role, stage_id, instance_name
 
                 # Prepare connector for QoA Client
                 connector = self.connector_config.copy()
@@ -61,13 +61,13 @@ class Rohe_ObService(Resource):
                     i_config = connector_i["conf"]
                     i_config["exchange_name"] = str(application_name) + "_exchange"
                     i_config["out_routing_key"] = str(application_name)
-                    if "userID" in args:
+                    if "user_id" in args:
                         i_config["out_routing_key"] = (
-                            i_config["out_routing_key"] + "." + args["userID"]
+                            i_config["out_routing_key"] + "." + args["user_id"]
                         )
-                    if "stageID" in args:
+                    if "stage_id" in args:
                         i_config["out_routing_key"] = (
-                            i_config["out_routing_key"] + "." + args["stageID"]
+                            i_config["out_routing_key"] + "." + args["stage_id"]
                         )
                     if "instance_name" in args:
                         i_config["out_routing_key"] = (
