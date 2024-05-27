@@ -338,10 +338,10 @@ class QoaClient(Generic[T]):
             return_report = self.qoa_report.generate_report(reset)
         else:
             UserDefinedReportModel = create_model(
-                "UserDefinedReportModel", metadata=(dict, ...), value=(dict, ...)
+                "UserDefinedReportModel", metadata=(dict, ...), report=(dict, ...)
             )
             return_report = UserDefinedReportModel(
-                value=report, metadata=copy.deepcopy(self.client_config.__dict__)
+                report=report, metadata=copy.deepcopy(self.client_config.__dict__)
             )
 
             return_report.metadata["timestamp"] = time.time()
