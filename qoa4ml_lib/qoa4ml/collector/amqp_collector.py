@@ -7,7 +7,6 @@ from ..config.configs import AMQPCollectorConfig
 from ..utils.qoa_utils import qoaLogger
 from .host_object import HostObject
 
-
 class Amqp_Collector(BaseCollector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(
@@ -59,7 +58,7 @@ class Amqp_Collector(BaseCollector):
             self.host_object.message_processing(ch, method, props, body)
         else:
             mess = json.loads(str(body.decode("utf-8")))
-            qoaLogger.debug(mess)
+            qoaLogger.info(mess)
 
     def start_collecting(self):
         # Start rabbit MQ

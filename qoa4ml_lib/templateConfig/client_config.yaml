@@ -1,11 +1,11 @@
 ---
 #client configuration
 client:
-  userID: aaltosea1
+  user_id: aaltosea1
   instance_name: data_handling01
-  stageID: Gateway
-  method: REST
-  application: test
+  stage_id: Gateway
+  functionality: REST
+  application_name: test
   role: ml
 
 # collector configuration

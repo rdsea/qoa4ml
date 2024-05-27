@@ -75,7 +75,7 @@ class QoaClient(Generic[T]):
         self.metric_manager = MetricManager()
         self.connector_list: Dict[str, BaseConnector] = {}
         self.timer_flag = False
-        self.method = self.client_config.functionality
+        self.functionality = self.client_config.functionality
         self.stage_id = self.client_config.stage_id
         self.process_monitor_flag = 0
         self.inference_flag = False
