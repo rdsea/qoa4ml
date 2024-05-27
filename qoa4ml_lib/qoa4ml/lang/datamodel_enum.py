@@ -178,6 +178,7 @@ class ReportTypeEnum(Enum):
     data = "data_report"
     service = "service_report"
     ml_specific = "ml_specific_report"
+    security = "security_report"
 
 
 class EnvironmentEnum(Enum):
