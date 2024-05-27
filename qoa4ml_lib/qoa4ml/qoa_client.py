@@ -10,6 +10,7 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 import requests
 from pydantic import create_model
+from qoa4ml.reports.rohe_reports import RoheReport
 
 from qoa4ml.reports.abstract_report import AbstractReport
 
@@ -55,7 +56,7 @@ class QoaClient(Generic[T]):
     # Init QoA Client
     def __init__(
         self,
-        report_cls: Type[T],
+        report_cls: Type[T]= RoheReport,
         config_dict: Optional[ClientConfig] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
