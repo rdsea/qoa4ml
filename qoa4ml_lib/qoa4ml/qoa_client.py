@@ -10,9 +10,9 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 import requests
 from pydantic import create_model
-from qoa4ml.reports.rohe_reports import RoheReport
 
 from qoa4ml.reports.abstract_report import AbstractReport
+from qoa4ml.reports.rohe_reports import RoheReport
 
 # from .connector.mqtt_connector import Mqtt_Connector
 from .config.configs import (
@@ -56,7 +56,7 @@ class QoaClient(Generic[T]):
     # Init QoA Client
     def __init__(
         self,
-        report_cls: Type[T]= RoheReport,
+        report_cls: Type[T] = RoheReport,
         config_dict: Optional[ClientConfig] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
@@ -222,22 +222,21 @@ class QoaClient(Generic[T]):
         #     metric_name, value, category, metric_class, description, default_value
         # )
         # metric = self.metric_manager.metric_list[metric_name]
-        if category == 0:
-            self.qoa_report.observe_metric(
-                ReportTypeEnum.service,
-                self.stage_id,
-                Metric(
-                    metric_name=metric_name, records=[value], description=description
-                ),
-            )
-        elif category == 1:
-            self.qoa_report.observe_metric(
-                ReportTypeEnum.data,
-                self.stage_id,
-                Metric(
-                    metric_name=metric_name, records=[value], description=description
-                ),
-            )
+        match category:
+            case 0:
+                report_type = ReportTypeEnum.service
+            case 1:
+                report_type = ReportTypeEnum.data
+            case 2:
+                report_type = ReportTypeEnum.security
+            case _:
+                raise RuntimeError("Report type not supported")
+
+        self.qoa_report.observe_metric(
+            report_type,
+            self.stage_id,
+            Metric(metric_name=metric_name, records=[value], description=description),
+        )
 
     def timer(self):
         if self.timer_flag is False:
