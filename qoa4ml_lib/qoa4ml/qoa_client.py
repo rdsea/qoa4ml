@@ -338,6 +338,7 @@ class QoaClient(Generic[T]):
         else:
             report.metadata = copy.deepcopy(self.client_config.__dict__)
             report.metadata["timestamp"] = time.time()
+
         if submit:
             if self.default_connector is not None:
                 sub_thread = Thread(
