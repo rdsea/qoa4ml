@@ -8,10 +8,10 @@ from ..lang.common_models import Metric
 from ..lang.datamodel_enum import ReportTypeEnum
 from ..reports.abstract_report import AbstractReport
 from ..reports.ml_report_model import (
+    EnsembleInferenceReport,
     ExecutionGraph,
     InferenceGraph,
     InferenceInstance,
-    InferenceReport,
     LinkedInstance,
     MicroserviceInstance,
     RoheReportModel,
@@ -31,7 +31,7 @@ class RoheReport(AbstractReport):
 
     def reset(self):
         self.previous_report: List[RoheReportModel] = []
-        self.inference_report = InferenceReport()
+        self.inference_report = EnsembleInferenceReport()
         self.execution_graph = ExecutionGraph(linked_list={})
         self.report = RoheReportModel()
         self.previous_microservice_instance = []
@@ -44,7 +44,7 @@ class RoheReport(AbstractReport):
 
     def import_report_from_file(self, file_path: str):
         report = load_config(file_path)
-        self.inference_report = InferenceReport(**report["inference_report"])
+        self.inference_report = EnsembleInferenceReport(**report["inference_report"])
         self.execution_graph = ExecutionGraph(**report["execution_graph"])
         self.report = RoheReportModel(
             inference_report=self.inference_report, execution_graph=self.execution_graph
@@ -72,7 +72,8 @@ class RoheReport(AbstractReport):
             combined_stage_report[stage_name] = new_stage_report
         return combined_stage_report
 
-    def process_previous_report(self, previous_report: RoheReportModel):
+    def process_previous_report(self, previous_report_dict: Dict):
+        previous_report = RoheReportModel(**previous_report_dict)
         self.previous_report.append(previous_report)
         if not previous_report.inference_report or not previous_report.execution_graph:
             raise ValueError("Can't process empty previous report")
@@ -184,13 +185,26 @@ class RoheReport(AbstractReport):
             raise ValueError(f"Can't handle report type {report_type}")
         self.report.inference_report = self.inference_report
 
-    def observe_inference(self, inference_instance: LinkedInstance[InferenceInstance]):
-        if self.inference_report.ml_specific:
+    def observe_inference(self, inference_value):
+        if (
+            self.inference_report.ml_specific
+            and self.inference_report.ml_specific.end_point
+        ):
+            self.inference_report.ml_specific.end_point.prediction = inference_value
+        else:
+            self.inference_report.ml_specific = InferenceGraph()
+            end_point = InferenceInstance(
+                id=uuid4(),
+                execution_instance_id=self.execution_instance.id,
+                prediction=inference_value,
+            )
+            self.inference_report.ml_specific.end_point = end_point
             self.inference_report.ml_specific.linked_list |= {
-                UUID(self.client_config.id): inference_instance
+                end_point.id: LinkedInstance[InferenceInstance](
+                    instance=end_point,
+                    previous=[],
+                )
             }
-
-            self.inference_report.ml_specific.end_point = inference_instance.instance
 
     def observe_inference_metric(
         self,

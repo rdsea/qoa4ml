@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 
 from ..lang.common_models import Metric
-from ..reports.ml_report_model import QualityReport
+from ..reports.ml_report_model import BaseReport
 
 
 class AbstractReport(ABC):
@@ -14,11 +15,11 @@ class AbstractReport(ABC):
         pass
 
     @abstractmethod
-    def generate_report(self, reset: bool = True) -> QualityReport:
+    def generate_report(self, reset: bool = True) -> BaseReport:
         pass
 
     @abstractmethod
-    def process_previous_report(self, previous_report):
+    def process_previous_report(self, previous_report_dict: Dict):
         pass
 
     @abstractmethod
@@ -26,7 +27,7 @@ class AbstractReport(ABC):
         pass
 
     @abstractmethod
-    def observe_inference(self, inference_instance):
+    def observe_inference(self, inference_value):
         pass
 
     @abstractmethod
