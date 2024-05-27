@@ -9,6 +9,7 @@ class Metric(BaseModel):
     metric_name: MetricNameEnum
     records: List[Union[dict, float, int, tuple, str]] = []
     unit: Optional[str] = None
+    description: Optional[str] = None
 
 
 class Condition(BaseModel):

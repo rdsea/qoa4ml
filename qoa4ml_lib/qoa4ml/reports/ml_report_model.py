@@ -47,18 +47,30 @@ class InferenceGraph(BaseModel):
 
 
 # NOTE: use dict so that we know which stage to add metric to
-class QualityReport(BaseModel):
-    # service: Dict[StageNameEnum, StageReport] = {}
+#
+class BaseReport(BaseModel):
+    metadata: Dict = {}
+
+
+class FlattenMetric(Metric):
+    stage: str
+    instance: MicroserviceInstance
+    previous_instances: List[MicroserviceInstance]
+
+
+class GeneralApplicationReportModel(BaseReport):
+    metrics: List[FlattenMetric] = []
+
+
+class MlQualityReport(BaseModel):
     service: Dict[str, StageReport] = {}
-
-
-class InferenceReport(QualityReport):
-    ml_specific: Optional[InferenceGraph] = None
-    # data: Dict[StageNameEnum, StageReport] = {}
     data: Dict[str, StageReport] = {}
 
 
-class RoheReportModel(BaseModel):
-    inference_report: Optional[InferenceReport] = None
-    metadata: Dict = {}
+class EnsembleInferenceReport(MlQualityReport):
+    ml_specific: Optional[InferenceGraph] = None
+
+
+class RoheReportModel(BaseReport):
+    inference_report: Optional[EnsembleInferenceReport] = None
     execution_graph: Optional[ExecutionGraph] = None
