@@ -6,7 +6,7 @@ from qoa4ml.collector.amqp_collector import Amqp_Collector
 from qoa4ml.config.configs import AMQPCollectorConfig
 
 conf = {
-    "end_point": "195.148.22.62",
+    "end_point": "localhost",
     "exchange_name": "test_qoa4ml",
     "exchange_type": "topic",
     "in_routing_key": "test.#",

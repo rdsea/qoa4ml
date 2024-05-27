@@ -12,11 +12,11 @@ from devtools import debug
 from qoa4ml.qoa_client import QoaClient
 from qoa4ml.reports.rohe_reports import RoheReport
 
-client1 = QoaClient(report_cls=RoheReport, config_path="./config/client1.yaml")
-client2 = QoaClient(report_cls=RoheReport, config_path="./config/client2.yaml")
-client3 = QoaClient(report_cls=RoheReport, config_path="./config/client3.yaml")
-client4 = QoaClient(report_cls=RoheReport, config_path="./config/client4.yaml")
-client5 = QoaClient(report_cls=RoheReport, config_path="./config/client5.yaml")
+client1 = QoaClient(config_path="./config/client1.yaml")
+client2 = QoaClient(config_path="./config/client2.yaml")
+client3 = QoaClient(config_path="./config/client3.yaml")
+client4 = QoaClient(config_path="./config/client4.yaml")
+client5 = QoaClient(config_path="./config/client5.yaml")
 # client5.process_monitor_start(1)
 
 
