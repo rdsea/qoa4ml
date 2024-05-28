@@ -7,6 +7,7 @@ setup(
     long_description=open("README.md").read() + "\n\n" + open("CHANGELOG.txt").read(),
     long_description_content_type="text/markdown",
     url="https://rdsea.github.io/",
+    python_requires=">=3.10",
     author="AaltoSEA",
     email="tri.m.nguyen@aalto.fi",
     keyword="Monitoring Machine Learning",
