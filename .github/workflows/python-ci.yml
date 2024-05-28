@@ -3,13 +3,11 @@ name: Python CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  pre-commit:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
       with:
         python-version: "3.10"
     - name: Install dependencies
@@ -18,13 +16,7 @@ jobs:
         cd qoa4ml_lib
         pip install -r requirements.txt
         pip install -r dev_requirements.txt
-        pip install -r ml_requirements.txt
-    - name: Cache pre-commit hooks
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pre-commit
-        key: ${{ runner.os }}-precommit-${{ hashFiles('.pre-commit-config.yaml') }}
-    - name: Install pre-commit
-      run: pip install pre-commit
-    - name: Run pre-commit
-      run: pre-commit run --all-files
+        # Uncomment when fix ydata
+        #pip install -r ml_requirements.txt
+        cd ..
+    - uses: pre-commit/action@v3.0.1
