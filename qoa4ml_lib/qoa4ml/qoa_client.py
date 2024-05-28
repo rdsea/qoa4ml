@@ -11,9 +11,6 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 import requests
 from pydantic import create_model
 
-from qoa4ml.reports.abstract_report import AbstractReport
-from qoa4ml.reports.rohe_reports import RoheReport
-
 # from .connector.mqtt_connector import Mqtt_Connector
 from .config.configs import (
     AMQPConnectorConfig,
@@ -37,6 +34,8 @@ from .probes.dataquality import (
     eva_none,
     image_quality,
 )
+from .reports.abstract_report import AbstractReport
+from .reports.rohe_reports import RoheReport
 from .utils.qoa_utils import (
     get_proc_cpu,
     get_proc_mem,
