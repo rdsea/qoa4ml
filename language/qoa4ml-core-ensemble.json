@@ -1,31 +1,19 @@
 {
-  "stakeholders": [
-    {
-      "id": "name",
-      "roles": [
-        "mlconsumer",
-        "mlprovider",
-        "mlinfrastructure"
-      ],
-      "provisioning": [
-        "mlservice",
-        "storage",
-        "mlmodels"
-      ]
-    }
-  ],
   "composition": {
     "compositionID": "composition_id",
-    "inferenceQuantity": [
-      2,
-      3
-    ],
-    "resourcesTier": "cloud/edge",
-    "modelTier": "maxTier",
     "computationGraph": {
       "microservice": [
         {
           "id": "service_id",
+          "infrastructure": [
+            "device_name"
+          ],
+          "method": "ML/aggregation",
+          "processortypes": [
+            "CPU",
+            "GPU",
+            "TPU"
+          ],
           "serviceapis": [
             "rest",
             "mqtt",
@@ -33,22 +21,12 @@
             "amqp",
             "coapp"
           ],
-          "infrastructure": [
-            "device_name"
-          ],
-          "processortypes": [
-            "CPU",
-            "GPU",
-            "TPU"
-          ],
-          "method": "ML/aggregation",
           "source": "id_of_previous_microservice"
         }
       ]
     },
     "data": [
       {
-        "id": "data_id",
         "datatypes": [
           "video",
           "image",
@@ -59,15 +37,24 @@
           "csv",
           "json",
           "avro"
-        ]
+        ],
+        "id": "data_id"
       }
+    ],
+    "inferenceQuantity": [
+      2,
+      3
     ],
     "mlmodels": [
       {
-        "id": "mlmodel_id",
         "formats": [
           "kerash5",
           "onnx"
+        ],
+        "id": "mlmodel_id",
+        "inferencemodes": [
+          "static",
+          "dynamic"
         ],
         "mlinfrastructures": [
           "tensorflow",
@@ -81,195 +68,15 @@
           "LR",
           "KMeans",
           "ANN"
-        ],
-        "inferencemodes": [
-          "static",
-          "dynamic"
         ]
       }
-    ]
-  },
-  "quality": {
-    "__comment": "when define a contract, we replace @ATTRIBUTE with a real attribute name",
-    "services": {
-      "@ATTRIBUTE": {
-        "id": "id",
-        "attributenames": [
-          "ResponseTime",
-          "Reliability"
-        ],
-        "operators": [
-          "min",
-          "max",
-          "range"
-        ],
-        "unit": [
-          "ms",
-          "second",
-          "percentage"
-        ],
-        "value": "value",
-        "class": [
-          "performance"
-        ],
-        "condition": [
-          {
-            "operators": [
-              "min",
-              "max",
-              "range"
-            ],
-            "unit": [
-              "ms",
-              "second",
-              "percentage"
-            ],
-            "value": "value",
-            "class": [
-              "performance"
-            ]
-          }
-        ],
-        "trigger": "every_req/hour/minute"
-      }
-    },
-    "data": {
-      "@ATTRIBUTE": {
-        "id": "id",
-        "attributenames": [
-          "Accuracy",
-          "Completeness"
-        ],
-        "operators": [
-          "min",
-          "max",
-          "range"
-        ],
-        "unit": [
-          "percentage"
-        ],
-        "value": "value",
-        "class": [
-          "qualityofdata"
-        ],
-        "condition": [
-          {
-            "operators": [
-              "min",
-              "max",
-              "range"
-            ],
-            "unit": [
-              "ms",
-              "second",
-              "percentage"
-            ],
-            "value": "value",
-            "class": [
-              "performance"
-            ]
-          }
-        ],
-        "trigger": "every_req/hour/minute"
-      }
-    },
-    "mlSpecific": {
-      "@ATTRIBUTE": {
-        "id": "id",
-        "attributenames": [
-          "Accuracy",
-          "Precision",
-          "Recall",
-          "AUC",
-          "MSE"
-        ],
-        "operators": [
-          "min",
-          "max",
-          "range"
-        ],
-        "unit": [
-          "percentage"
-        ],
-        "value": "value",
-        "class": [
-          "accuracy"
-        ],
-        "condition": [
-          {
-            "operators": [
-              "min",
-              "max",
-              "range"
-            ],
-            "unit": [
-              "ms",
-              "second",
-              "percentage"
-            ],
-            "value": "value",
-            "class": [
-              "performance"
-            ]
-          }
-        ],
-        "trigger": "every_req/hour/minute"
-      }
-    }
-  },
-  "security": {
-    "encryption": {
-      "types": [
-        "end2end"
-      ]
-    },
-    "encryptedinference": {
-      "mode": [
-        true,
-        false
-      ]
-    }
-  },
-  "privacy": {
-    "membershipinferencerisk": {
-      "operators": [
-        "min",
-        "max"
-      ],
-      "unit": "float",
-      "range": [
-        0,
-        1
-      ],
-      "value": "value",
-      "class": [
-        "Privacy"
-      ]
-    }
-  },
-  "fairness": {
-    "predictionbias": {
-      "operators": [
-        "min",
-        "max"
-      ],
-      "unit": "percentage",
-      "value": "value",
-      "class": [
-        "Accuracy"
-      ]
-    }
-  },
-  "interpretability": {
-    "explainability": {
-      "modes": [
-        "full",
-        "compact"
-      ]
-    }
+    ],
+    "modelTier": "maxTier",
+    "resourcesTier": "cloud/edge"
   },
   "cost": {
     "cost": {
+      "class": "cost",
       "operators": [
         "min",
         "max",
@@ -280,13 +87,206 @@
         "EUR",
         "other"
       ],
-      "value": "value",
-      "class": "cost"
+      "value": "value"
     },
     "pricingmodel": {
+      "class": "cost",
       "id": "the id of the pricing model in the system",
-      "name": "name",
-      "class": "cost"
+      "name": "name"
     }
-  }
+  },
+  "fairness": {
+    "predictionbias": {
+      "class": [
+        "Accuracy"
+      ],
+      "operators": [
+        "min",
+        "max"
+      ],
+      "unit": "percentage",
+      "value": "value"
+    }
+  },
+  "interpretability": {
+    "explainability": {
+      "modes": [
+        "full",
+        "compact"
+      ]
+    }
+  },
+  "privacy": {
+    "membershipinferencerisk": {
+      "class": [
+        "Privacy"
+      ],
+      "operators": [
+        "min",
+        "max"
+      ],
+      "range": [
+        0,
+        1
+      ],
+      "unit": "float",
+      "value": "value"
+    }
+  },
+  "quality": {
+    "__comment": "when define a contract, we replace @ATTRIBUTE with a real attribute name",
+    "data": {
+      "@ATTRIBUTE": {
+        "attributenames": [
+          "Accuracy",
+          "Completeness"
+        ],
+        "class": [
+          "qualityofdata"
+        ],
+        "condition": [
+          {
+            "class": [
+              "performance"
+            ],
+            "operators": [
+              "min",
+              "max",
+              "range"
+            ],
+            "unit": [
+              "ms",
+              "second",
+              "percentage"
+            ],
+            "value": "value"
+          }
+        ],
+        "id": "id",
+        "operators": [
+          "min",
+          "max",
+          "range"
+        ],
+        "trigger": "every_req/hour/minute",
+        "unit": [
+          "percentage"
+        ],
+        "value": "value"
+      }
+    },
+    "mlSpecific": {
+      "@ATTRIBUTE": {
+        "attributenames": [
+          "Accuracy",
+          "Precision",
+          "Recall",
+          "AUC",
+          "MSE"
+        ],
+        "class": [
+          "accuracy"
+        ],
+        "condition": [
+          {
+            "class": [
+              "performance"
+            ],
+            "operators": [
+              "min",
+              "max",
+              "range"
+            ],
+            "unit": [
+              "ms",
+              "second",
+              "percentage"
+            ],
+            "value": "value"
+          }
+        ],
+        "id": "id",
+        "operators": [
+          "min",
+          "max",
+          "range"
+        ],
+        "trigger": "every_req/hour/minute",
+        "unit": [
+          "percentage"
+        ],
+        "value": "value"
+      }
+    },
+    "services": {
+      "@ATTRIBUTE": {
+        "attributenames": [
+          "ResponseTime",
+          "Reliability"
+        ],
+        "class": [
+          "performance"
+        ],
+        "condition": [
+          {
+            "class": [
+              "performance"
+            ],
+            "operators": [
+              "min",
+              "max",
+              "range"
+            ],
+            "unit": [
+              "ms",
+              "second",
+              "percentage"
+            ],
+            "value": "value"
+          }
+        ],
+        "id": "id",
+        "operators": [
+          "min",
+          "max",
+          "range"
+        ],
+        "trigger": "every_req/hour/minute",
+        "unit": [
+          "ms",
+          "second",
+          "percentage"
+        ],
+        "value": "value"
+      }
+    }
+  },
+  "security": {
+    "encryptedinference": {
+      "mode": [
+        true,
+        false
+      ]
+    },
+    "encryption": {
+      "types": [
+        "end2end"
+      ]
+    }
+  },
+  "stakeholders": [
+    {
+      "id": "name",
+      "provisioning": [
+        "mlservice",
+        "storage",
+        "mlmodels"
+      ],
+      "roles": [
+        "mlconsumer",
+        "mlprovider",
+        "mlinfrastructure"
+      ]
+    }
+  ]
 }
