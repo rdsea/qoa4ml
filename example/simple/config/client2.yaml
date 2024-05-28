@@ -1,8 +1,8 @@
 client:
   user_id: aaltosea2
-  instance_id: data_handling01
+  instance_id: data_processing01
   stage_id: data_processing
-  functionality: REST
+  functionality: transformation
   application_name: test
   role: ml
 connector:

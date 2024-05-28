@@ -9,13 +9,15 @@ import traceback
 from threading import Thread
 
 from devtools import debug
+from qoa4ml.reports.ml_report_model import GeneralMlInferenceReport
 from qoa4ml.qoa_client import QoaClient
+from qoa4ml.reports.ml_reports import MLReport
 
-client1 = QoaClient(config_path="./config/client1.yaml")
-client2 = QoaClient(config_path="./config/client2.yaml")
-client3 = QoaClient(config_path="./config/client3.yaml")
-client4 = QoaClient(config_path="./config/client4.yaml")
-client5 = QoaClient(config_path="./config/client5.yaml")
+client1 = QoaClient(report_cls=MLReport, config_path="./config/client1.yaml")
+client2 = QoaClient(report_cls=MLReport, config_path="./config/client2.yaml")
+client3 = QoaClient(report_cls=MLReport, config_path="./config/client3.yaml")
+client4 = QoaClient(report_cls=MLReport, config_path="./config/client4.yaml")
+client5 = QoaClient(report_cls=MLReport, config_path="./config/client5.yaml")
 # client5.process_monitor_start(1)
 
 
@@ -34,7 +36,7 @@ if __name__ == "__main__":
         count = 0
         error = 0
         start_time = time.time()
-        while time.time() - start_time < 200:
+        while time.time() - start_time < 1:
             try:
                 # client1.timer()
                 print("This is thread: ", num_thread, "Starting request: ", count)
@@ -96,9 +98,11 @@ if __name__ == "__main__":
                 client5.observe_inference_metric("accuracy", random.randint(1, 100))
                 client5.timer()
                 report_5 = client5.report(submit=True)
-                debug(report_5)
-                # with open("schema.json", "w", encoding="utf-8") as file:
-                #     file.write(report_5.model_dump_json())
+                # debug(report_5)
+                with open(
+                    "qoa4ml-general-ml-report-schema.json", "w", encoding="utf-8"
+                ) as file:
+                    file.write(GeneralMlInferenceReport(**report_5).model_dump_json())
                 # print("Thread - ",num_thread, " Response5:", report_5)
             except Exception as e:
                 error += 1

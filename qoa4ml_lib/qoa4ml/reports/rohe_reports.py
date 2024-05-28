@@ -100,12 +100,13 @@ class RoheReport(AbstractReport):
                     previous_report.inference_report.ml_specific
                 )
                 end_point = InferenceInstance(
-                    id=uuid4(),
-                    execution_instance_id=self.execution_instance.id,
+                    inference_id=uuid4(),
+                    functionality=self.client_config.functionality,
+                    instance_id=self.execution_instance.id,
                 )
                 self.inference_report.ml_specific.end_point = end_point
                 self.inference_report.ml_specific.linked_list |= {
-                    end_point.id: LinkedInstance[InferenceInstance](
+                    end_point.instance_id: LinkedInstance[InferenceInstance](
                         instance=end_point,
                         previous=[
                             previous_report.inference_report.ml_specific.end_point
@@ -128,7 +129,7 @@ class RoheReport(AbstractReport):
                     previous_report.inference_report.ml_specific.end_point
                 )
                 self.inference_report.ml_specific.linked_list[
-                    current_end_point.id
+                    current_end_point.instance_id
                 ].previous.append(previous_end_point)
         # NOTE: execution graph
         if not self.execution_graph:
@@ -180,7 +181,6 @@ class RoheReport(AbstractReport):
             self.inference_report.data[stage].metrics[metric.metric_name] |= {
                 UUID(self.client_config.id): metric
             }
-
         else:
             raise ValueError(f"Can't handle report type {report_type}")
         self.report.inference_report = self.inference_report
@@ -194,13 +194,14 @@ class RoheReport(AbstractReport):
         else:
             self.inference_report.ml_specific = InferenceGraph()
             end_point = InferenceInstance(
-                id=uuid4(),
-                execution_instance_id=self.execution_instance.id,
+                inference_id=uuid4(),
+                instance_id=self.execution_instance.id,
+                functionality=self.client_config.functionality,
                 prediction=inference_value,
             )
             self.inference_report.ml_specific.end_point = end_point
             self.inference_report.ml_specific.linked_list |= {
-                end_point.id: LinkedInstance[InferenceInstance](
+                end_point.instance_id: LinkedInstance[InferenceInstance](
                     instance=end_point,
                     previous=[],
                 )
@@ -220,11 +221,13 @@ class RoheReport(AbstractReport):
                 self.inference_report.ml_specific = InferenceGraph()
             if self.inference_report.ml_specific.end_point is None:
                 end_point = InferenceInstance(
-                    id=uuid4(), execution_instance_id=self.execution_instance.id
+                    inference_id=uuid4(),
+                    instance_id=self.execution_instance.id,
+                    functionality=self.client_config.functionality,
                 )
 
                 self.inference_report.ml_specific.end_point = end_point
-                self.inference_report.ml_specific.linked_list[end_point.id] = (
+                self.inference_report.ml_specific.linked_list[end_point.instance_id] = (
                     LinkedInstance[InferenceInstance](instance=end_point)
                 )
             self.inference_report.ml_specific.end_point.metrics.append(metric)

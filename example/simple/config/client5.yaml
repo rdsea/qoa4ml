@@ -2,7 +2,7 @@ client:
   user_id: aaltosea5
   instance_id: Agg01
   stage_id: Aggregate
-  functionality: REST
+  functionality: Max Aggregate
   application_name: test
   role: ml
 connector:
