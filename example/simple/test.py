@@ -10,7 +10,6 @@ from threading import Thread
 
 from devtools import debug
 from qoa4ml.qoa_client import QoaClient
-from qoa4ml.reports.rohe_reports import RoheReport
 
 client1 = QoaClient(config_path="./config/client1.yaml")
 client2 = QoaClient(config_path="./config/client2.yaml")
