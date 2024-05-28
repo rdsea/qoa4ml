@@ -7,6 +7,7 @@ from ..config.configs import AMQPCollectorConfig
 from ..utils.qoa_utils import qoaLogger
 from .host_object import HostObject
 
+
 class Amqp_Collector(BaseCollector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(

@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from ..lang.common_models import Metric
-from ..lang.datamodel_enum import MetricNameEnum
+from ..lang.datamodel_enum import MetricNameEnum, ReportTypeEnum
 
 
 class MicroserviceInstance(BaseModel):
@@ -54,6 +54,7 @@ class BaseReport(BaseModel):
 
 class FlattenMetric(Metric):
     stage: str
+    report_type: ReportTypeEnum
     instance: MicroserviceInstance
     previous_instances: List[MicroserviceInstance]
 
