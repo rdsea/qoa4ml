@@ -2,7 +2,7 @@ client:
   user_id: aaltoseas
   instance_id: ml_inference2
   stage_id: ml_inference_ensemble
-  functionality: REST
+  functionality: TensorFlow
   application_name: test
   role: ml
 connector:

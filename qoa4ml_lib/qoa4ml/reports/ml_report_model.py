@@ -22,8 +22,9 @@ class StageReport(BaseModel):
 
 
 class InferenceInstance(BaseModel):
-    id: UUID
-    execution_instance_id: UUID
+    inference_id: UUID
+    instance_id: UUID
+    functionality: str
     metrics: List[Metric] = []
     prediction: Optional[Union[dict, float]] = None
 
@@ -47,7 +48,8 @@ class InferenceGraph(BaseModel):
 
 
 # NOTE: use dict so that we know which stage to add metric to
-#
+
+
 class BaseReport(BaseModel):
     metadata: Dict = {}
 
@@ -66,6 +68,10 @@ class GeneralApplicationReportModel(BaseReport):
 class MlQualityReport(BaseModel):
     service: Dict[str, StageReport] = {}
     data: Dict[str, StageReport] = {}
+
+
+class GeneralMlInferenceReport(MlQualityReport, BaseReport):
+    ml_inference: Dict[str, InferenceInstance] = {}
 
 
 class EnsembleInferenceReport(MlQualityReport):
