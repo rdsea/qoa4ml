@@ -152,6 +152,7 @@ class QoaClient(Generic[T]):
 
     def registration(self, url: str):
         # get connector configuration by registering with the monitoring service
+
         return requests.request(
             "POST", url, headers=headers, data=self.client_config.json()
         )
