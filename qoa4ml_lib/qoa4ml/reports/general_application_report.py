@@ -3,10 +3,9 @@ import time
 from typing import Dict, List
 from uuid import UUID
 
-from qoa4ml.lang.datamodel_enum import ReportTypeEnum
-
 from ..config.configs import ClientInfo
 from ..lang.common_models import Metric
+from ..lang.datamodel_enum import ReportTypeEnum
 from ..reports.ml_report_model import (
     FlattenMetric,
     GeneralApplicationReportModel,
@@ -53,7 +52,7 @@ class GeneralApplicationReport(AbstractReport):
         self.report.metrics.append(flatten_metric)
 
     def observe_inference(self, inference_value):
-        # TODO: may not be a greate idea
+        # TODO: may not be a great idea
         flatten_metric = FlattenMetric(
             metric_name="Inference",
             records=inference_value,

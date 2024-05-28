@@ -1,13 +1,9 @@
-import argparse
 import logging
 
 import uvicorn
-import yaml
 from fastapi import FastAPI
 
-from qoa4ml.datamodels.configs import ExporterConfig
-
-from ...common import ODOP_PATH
+from ...config.configs import ExporterConfig
 from .node_aggregator import NodeAggregator
 
 logging.basicConfig(
@@ -25,16 +21,3 @@ class Exporter:
     def start(self):
         self.node_aggregator.start()
         uvicorn.run(self.app, host=self.config.host, port=self.config.port)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="config path", default="config/exporter_config.yaml"
-    )
-    args = parser.parse_args()
-    config_file = args.config
-    with open(ODOP_PATH + config_file, encoding="utf-8") as file:
-        exporter_config = yaml.safe_load(file)
-    exporter = Exporter(exporter_config)
-    exporter.start()

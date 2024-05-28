@@ -1,7 +1,6 @@
 import logging
 import socket
 import sys
-import time
 from datetime import datetime
 from threading import Thread
 from typing import TYPE_CHECKING
@@ -11,10 +10,10 @@ from fastapi import APIRouter
 from flatten_dict import flatten, unflatten
 
 from ...collector.socket_collector import SocketCollector
-from ...common import ODOP_PATH
 from ...config.configs import NodeAggregatorConfig
 from ...lang.datamodel_enum import EnvironmentEnum
 from ...utils.qoa_utils import make_folder
+from .common import ODOP_PATH
 from .embedded_database import EmbeddedDatabase
 
 logging.basicConfig(
@@ -198,25 +197,3 @@ class NodeAggregator:
         self.execution_flag = False
         self.server_thread.join()
         logging.info("node aggregator stopped")
-
-
-if __name__ == "__main__":
-    import importlib
-
-    yaml = importlib.import_module("yaml")
-    argparse = importlib.import_module("argparse")
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c",
-        "--config",
-        help="config path",
-        default="config/node_aggregator_config.yaml",
-    )
-    args = parser.parse_args()
-    config_file = args.config
-    with open(ODOP_PATH + config_file, encoding="utf-8") as file:
-        node_aggregator_config = yaml.safe_load(file)
-    node_aggregator = NodeAggregator(node_aggregator_config)
-    node_aggregator.start()
-    while True:
-        time.sleep(1)
