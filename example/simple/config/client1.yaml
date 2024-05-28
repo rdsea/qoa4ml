@@ -5,7 +5,7 @@ client:
   functionality: REST
   application_name: test
   role: ml
-connector: 
+connector:
   - name: amqp_connector
     connector_class: AMQP
     config:

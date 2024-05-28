@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import random
 import sys
 import time
@@ -102,7 +101,7 @@ if __name__ == "__main__":
                 # with open("schema.json", "w", encoding="utf-8") as file:
                 #     file.write(report_5.model_dump_json())
                 # print("Thread - ",num_thread, " Response5:", report_5)
-            except Exception as e:
+            except Exception:
                 error += 1
                 # qoaLogger.error("Error {} in merge_dict: {}".format(type(e),e.__traceback__))
                 traceback.print_exception(*sys.exc_info())
