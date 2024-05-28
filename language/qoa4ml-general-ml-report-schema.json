@@ -1,0 +1,295 @@
+{
+  "data": {
+    "data_processing": {
+      "metrics": {
+        "image_height": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "image_height",
+            "records": [
+              41.0
+            ],
+            "unit": null
+          }
+        },
+        "image_width": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "image_width",
+            "records": [
+              22.0
+            ],
+            "unit": null
+          }
+        },
+        "object_height": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "object_height",
+            "records": [
+              48.0
+            ],
+            "unit": null
+          }
+        },
+        "object_width": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "object_width",
+            "records": [
+              2.0
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "data_processing"
+    },
+    "gateway": {
+      "metrics": {
+        "image_height": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "image_height",
+            "records": [
+              29.0
+            ],
+            "unit": null
+          }
+        },
+        "image_width": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "image_width",
+            "records": [
+              13.0
+            ],
+            "unit": null
+          }
+        },
+        "object_height": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "object_height",
+            "records": [
+              3.0
+            ],
+            "unit": null
+          }
+        },
+        "object_width": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "object_width",
+            "records": [
+              10.0
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "gateway"
+    }
+  },
+  "metadata": {
+    "client_config": {
+      "application_name": "test",
+      "functionality": "Max Aggregate",
+      "id": "7f50266b-6d4f-4039-94d1-83b241c7cf81",
+      "instance_id": "Agg01",
+      "name": "",
+      "role": "ml",
+      "run_id": "",
+      "stage_id": "Aggregate",
+      "user_id": "aaltosea5"
+    },
+    "runtime": 0.007134914398193359,
+    "timestamp": 1716897583.8924701
+  },
+  "ml_inference": {
+    "7f50266b-6d4f-4039-94d1-83b241c7cf81": {
+      "functionality": "Max Aggregate",
+      "inference_id": "fe9bf1fd-77fe-460b-b2f3-b521576c1f75",
+      "instance_id": "7f50266b-6d4f-4039-94d1-83b241c7cf81",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            89.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            88.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 334.0
+    },
+    "af1fe3f2-1f5a-4725-bae9-ef1f9a1ef06d": {
+      "functionality": "TensorFlow",
+      "inference_id": "612213c4-3063-49b5-9c89-61f5c6ca1c7c",
+      "instance_id": "af1fe3f2-1f5a-4725-bae9-ef1f9a1ef06d",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            62.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            97.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 259.0
+    },
+    "f7fd7b41-3092-4a43-8a87-d6265a183fb8": {
+      "functionality": "TensorFlow",
+      "inference_id": "f62f58e6-293e-412d-8b44-973a97097bb9",
+      "instance_id": "f7fd7b41-3092-4a43-8a87-d6265a183fb8",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            88.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            5.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 685.0
+    }
+  },
+  "service": {
+    "Aggregate": {
+      "metrics": {
+        "response_time": {
+          "7f50266b-6d4f-4039-94d1-83b241c7cf81": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 2.4557113647460938e-05,
+                "startTime": 1716897583.8924236
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "Aggregate"
+    },
+    "data_processing": {
+      "metrics": {
+        "metric1": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "metric1",
+            "records": [
+              70.0
+            ],
+            "unit": null
+          }
+        },
+        "metric2": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "metric2",
+            "records": [
+              31.0
+            ],
+            "unit": null
+          }
+        },
+        "response_time": {
+          "2539c525-bdfb-4dac-9fc4-e224e07f964d": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 4.506111145019531e-05,
+                "startTime": 1716897583.8910482
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "data_processing"
+    },
+    "gateway": {
+      "metrics": {
+        "metric1": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "metric1",
+            "records": [
+              60.0
+            ],
+            "unit": null
+          }
+        },
+        "metric2": {
+          "4282217b-c041-4668-9135-2fd1beca9242": {
+            "description": "",
+            "metric_name": "metric2",
+            "records": [
+              98.0
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "gateway"
+    },
+    "ml_inference_ensemble": {
+      "metrics": {
+        "response_time": {
+          "af1fe3f2-1f5a-4725-bae9-ef1f9a1ef06d": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 4.076957702636719e-05,
+                "startTime": 1716897583.8914618
+              }
+            ],
+            "unit": null
+          },
+          "f7fd7b41-3092-4a43-8a87-d6265a183fb8": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 2.3365020751953125e-05,
+                "startTime": 1716897583.891908
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "ml_inference_ensemble"
+    }
+  }
+}
