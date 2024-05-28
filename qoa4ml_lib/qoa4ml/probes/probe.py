@@ -5,10 +5,9 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from ..config.configs import ProbeConfig
-
-# from ..common import ODOP_PATH
-# from ..utils.qoa_utils import make_folder
 from ..connector.base_connector import BaseConnector
+from ..observability.odop_obs.common import ODOP_PATH
+from ..utils.qoa_utils import make_folder
 from ..utils.repeated_timer import RepeatedTimer
 
 logging.basicConfig(
@@ -24,9 +23,9 @@ class Probe(ABC):
         self.execution_flag = False
         self.report_thread = None
         self.log_latency_flag = self.config.log_latency_flag
-        # if self.log_latency_flag:
-        #     self.latency_logging_path = ODOP_PATH + config.latency_logging_path
-        #     make_folder(self.latency_logging_path)
+        if self.log_latency_flag:
+            self.latency_logging_path = ODOP_PATH + config.latency_logging_path
+            make_folder(self.latency_logging_path)
         self.max_latency = 0.0
         self.connector = connector
 
