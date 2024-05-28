@@ -8,4 +8,3 @@ lazy_import.lazy_module("pandas")
 lazy_import.lazy_module("fastapi")
 lazy_import.lazy_module("tinyflux")
 lazy_import.lazy_module("psutil")
-

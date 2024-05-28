@@ -1,8 +1,16 @@
-import copy, os, sys, threading, time, traceback, uuid
+import copy
+import os
+import sys
+import threading
+import time
+import traceback
+import uuid
 from threading import Thread
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
-from pydantic import create_model
+
 import requests
+from pydantic import create_model
+
 from qoa4ml.reports.abstract_report import AbstractReport
 from qoa4ml.reports.rohe_reports import RoheReport
 
@@ -145,7 +153,7 @@ class QoaClient(Generic[T]):
 
     def registration(self, url: str):
         # get connector configuration by registering with the monitoring service
-        
+
         return requests.request(
             "POST", url, headers=headers, data=self.client_config.json()
         )
