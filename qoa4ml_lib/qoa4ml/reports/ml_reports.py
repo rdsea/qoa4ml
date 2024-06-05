@@ -3,10 +3,9 @@ import time
 from typing import Dict, List
 from uuid import UUID, uuid4
 
-from qoa4ml.lang.datamodel_enum import ReportTypeEnum
-
 from ..config.configs import ClientInfo
 from ..lang.common_models import Metric
+from ..lang.datamodel_enum import ReportTypeEnum
 from ..reports.ml_report_model import (
     BaseReport,
     GeneralMlInferenceReport,
