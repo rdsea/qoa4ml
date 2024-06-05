@@ -17,7 +17,7 @@ Or use two virtual env
 
 # Pre-commit:
 
-- If you install QoA4ML from source, install the dev version (editable or not) by:
+- If you install QoA4ML from source, install the dev version or all version (editable or not) by:
 
   ```bash
   # editable

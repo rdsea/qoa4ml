@@ -55,6 +55,7 @@ class QoaClient(Generic[T]):
     # Init QoA Client
     def __init__(
         self,
+        # NOTE: use text, number, enum
         report_cls: Type[T] = RoheReport,
         config_dict: Optional[ClientConfig] = None,
         config_path: Optional[str] = None,
