@@ -1,6 +1,5 @@
 import logging
 import socket
-import sys
 from datetime import datetime
 from threading import Thread
 from typing import TYPE_CHECKING
@@ -20,7 +19,6 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
 )
 
-sys.path.append(ODOP_PATH)
 DEFAULT_DATABASE_FOLDER = ODOP_PATH + "metric_database/"
 make_folder(DEFAULT_DATABASE_FOLDER)
 METRICS_URL_PATH = "/metrics"
