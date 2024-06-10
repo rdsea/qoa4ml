@@ -43,7 +43,7 @@ class MetricManager:
                 return self.metric_list
             elif isinstance(key, List):
                 # Get a list of metrics
-                return dict((k, self.metric_list[k]) for k in key)
+                return {k: self.metric_list[k] for k in key}
             else:
                 # Get a specific metric
                 return self.metric_list[key]
