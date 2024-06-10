@@ -148,10 +148,7 @@ class RoheReport(AbstractReport):
     def build_execution_graph(self):
         end_point = LinkedInstance(
             instance=self.execution_instance,
-            previous=[
-                previous_instance
-                for previous_instance in self.previous_microservice_instance
-            ],
+            previous=list(self.previous_microservice_instance),
         )
         self.execution_graph.linked_list[end_point.instance.id] = end_point
         self.execution_graph.end_point = end_point.instance
