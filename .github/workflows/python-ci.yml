@@ -16,10 +16,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         cd qoa4ml_lib
-        pip install -r requirements.txt
-        pip install -r dev_requirements.txt
-        # Uncomment when fix ydata
-        #pip install -r ml_requirements.txt
+        pip install ".[dev]"
         cd ..
 
     - uses: pre-commit/action@v3.0.1
