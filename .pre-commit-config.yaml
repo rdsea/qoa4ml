@@ -35,3 +35,9 @@ repos:
     -   id: ruff
         args: [--fix]
         files: ^qoa4ml_lib/.*\.py$
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.16.1
+    hooks:
+      - id: gitleaks
+        args: [detect]
