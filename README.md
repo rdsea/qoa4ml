@@ -1,5 +1,13 @@
 # QoA4ML - Quality of Analytics for Machine Learning Services
-
+---
+![PyPI - Status](https://img.shields.io/pypi/status/qoa4ml)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/qoa4ml)
+![PyPI - Version](https://img.shields.io/pypi/v/qoa4ml)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qoa4ml)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/qoa4ml)
+[![GitTutorial](https://img.shields.io/badge/PR-Welcome-%23FF8300.svg?)](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# Introduction
 QoA4ML consists of a set of utilities and specs for supporting quality of analytics in ML services. Especially, we focus on ML services across edge-cloud continuum, which are built as a composition of services.
 
 ## QoA4ML Specification
