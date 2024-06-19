@@ -2,13 +2,13 @@ from enum import Enum
 from typing import Union
 
 
-class ServiceMetricNameEnum(Enum):
+class ServiceMetricNameEnum(str, Enum):
     response_time = "response_time"
     reliability = "reliability"
     completeness = "completeness"
 
 
-class MlSpecificMetricNameEnum(Enum):
+class MlSpecificMetricNameEnum(str, Enum):
     confidence = "confidence"
     acccuracy = "accuracy"
     precision = "precision"
@@ -17,12 +17,12 @@ class MlSpecificMetricNameEnum(Enum):
     mse = "mse"
 
 
-class ResourcesUtilizationMetricNameEnum(Enum):
+class ResourcesUtilizationMetricNameEnum(str, Enum):
     cpu = "cpu_usage"
     memory = "memory_usage"
 
 
-class ImageQualityNameEnum(Enum):
+class ImageQualityNameEnum(str, Enum):
     image_size = "image_size"
     object_size = "object_size"
     color_mode = "color_mode"
@@ -38,33 +38,33 @@ MetricNameEnum = Union[
 ]
 
 
-class StageNameEnum(Enum):
+class StageNameEnum(str, Enum):
     ml_inference_aggregate = "ml_inference_aggregate"
     ml_inference_ensemble = "ml_inference_ensemble"
     data_processing = "data_processing"
     gateway = "gateway"
 
 
-class FunctionalityEnum(Enum):
+class FunctionalityEnum(str, Enum):
     rest = "REST"
     tensorflow = "TensorFlow"
     transformation = "Transformation"
     max_aggregate = "Max Aggregate"
 
 
-class StakeholderRoleEnum(Enum):
+class StakeholderRoleEnum(str, Enum):
     ml_consumer = "ml_provider"
     ml_provider = "ml_provider"
     ml_infrastructure = "ml_infrastructure"
 
 
-class ResourceEnum(Enum):
+class ResourceEnum(str, Enum):
     ml_service = "ml_service"
     storage = "storage"
     ml_models = "ml_models"
 
 
-class ServiceAPIEnum(Enum):
+class ServiceAPIEnum(str, Enum):
     rest = "REST"
     mqtt = "MQTT"
     kafka = "Kafka"
@@ -73,7 +73,7 @@ class ServiceAPIEnum(Enum):
     socket = "socket"
 
 
-class InfrastructureEnum(Enum):
+class InfrastructureEnum(str, Enum):
     raspi4 = "Raspberry Pi 4 Model B"
     nvidia_jetson_nano = "NVIDIA Jetson Nano"
     nvidia_jetson_orin_nano = "NVIDIA Jetson Orin Nano"
@@ -82,19 +82,19 @@ class InfrastructureEnum(Enum):
     rock_pi_n10 = "Rock Pi N10"
 
 
-class ProcessorEnum(Enum):
+class ProcessorEnum(str, Enum):
     cpu = "CPU"
     gpu = "GPU"
     tpu = "TPU"
 
 
-class DataTypeEnum(Enum):
+class DataTypeEnum(str, Enum):
     video = "video"
     image = "image"
     message = "message"
 
 
-class DataFormatEnum(Enum):
+class DataFormatEnum(str, Enum):
     binary = "binary"
     csv = "csv"
     json = "json"
@@ -104,7 +104,7 @@ class DataFormatEnum(Enum):
     mp4 = "mp4"
 
 
-class DevelopmentEnvironmentEnum(Enum):
+class DevelopmentEnvironmentEnum(str, Enum):
     kerash5 = "kerash5"
     onnx = "onnx"
 
