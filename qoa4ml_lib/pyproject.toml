@@ -16,6 +16,11 @@ license = {file = "LICENSE.txt"}
 authors = [
     {name = "AaltoSEA", email = "tri.m.nguyen@aalto.fi"}
 ]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3.10"
+]
 urls = {Homepage = "https://rdsea.github.io/"}
 dependencies = [
   "certifi>=2023.7.22",
