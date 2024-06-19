@@ -7,12 +7,12 @@ name = "qoa4ml"
 
 [project]
 name = "qoa4ml"
-version = "0.2.5"
+version = "0.2.6"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["Monitoring", "Machine Learning"]
-license = {file = "LICENSES.txt"}
+license = {file = "LICENSE.txt"}
 authors = [
     {name = "AaltoSEA", email = "tri.m.nguyen@aalto.fi"}
 ]
