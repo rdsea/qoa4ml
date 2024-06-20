@@ -58,7 +58,8 @@ dev = [
   "pre-commit>=3.5.0",
   "black",
   "isort",
-  "ruff"
+  "ruff",
+  "mkdocs-material[imaging]"
 ]
 
 all =["qoa4ml[ml,dev]"]

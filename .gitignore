@@ -9,7 +9,8 @@ modules/orchestration/temp/
 *.gz
 *__pycache__/
 # *.pyc
-.pyirc
+.pypirc
+qoa4ml_lib/.cache/
 *.pyo
 *.pyd
 .ipynb_checkpoints/

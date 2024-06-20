@@ -1,11 +1,11 @@
 # QoA4ML - Quality of Analytics for ML
 
 ## Source code
-https://github.com/rdsea/QoA4ML
+[QoA4ML](https://github.com/rdsea/QoA4ML/tree/main/qoa4ml_lib)
 
 
 ## Monitoring Client
-[QoA Client](qoa4ml/): an object that observes metrics, generates metric reports, and sends them to the Observation service via a list of connectors (e.g., messaging connector: RabbitMQ).
+QoA Client: an object that observes metrics, generates metric reports, and sends them to the Observation service via a list of connectors (e.g., messaging connector: RabbitMQ).
 
 The developers only need to init a QoAClient at the beginning and use it to observe/evaluate metrics by self-instrumentation (calling its functions) at the right place in the source code.
 
@@ -14,7 +14,7 @@ The developers only need to init a QoAClient at the beginning and use it to obse
 The `configuration` contains the information about the client and its configuration in form of dictionary
 
 Example: 
-```python
+```py
 clientConf = { 
     "client":{
         "user_id": "aaltosea1",
@@ -58,7 +58,7 @@ For example: "http://localhost:5001/registration"
 
 ## Probes
 
-* [QoA4ML Probes](qoa4ml/): libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
+* QoA4ML Probes: libraries and lightweight modules capturing metrics. They are integrated into suitable ML serving frameworks and ML code
 * Probe properties:
   - Can be written in different languages (Python, GoLang)
   - Can have different communications to monitoring systems (depending on probes and its ML support)
@@ -180,7 +180,7 @@ https://github.com/rdsea/QoA4ML/tree/main/example
 
 
 ## Overview
-![Class](../img/class.png)
+![Class](img/class.png)
 
 Probes will be integrated to client program or system service to collect metrics at the edge
 Probes will generate reports and sent to message broker using different connector. Coresponding collector should be used to acquire the metrics.
