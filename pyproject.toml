@@ -68,7 +68,7 @@ all =["qoa4ml[ml,dev]"]
 profile = "black"
 
 [tool.ruff]
-exclude = ["./qoa4ml/utils/pynvml_forked.py"]
+exclude = ["qoa4ml/utils/pynvml_forked.py"]
 
 [tool.ruff.lint]
 select = ["F", "C"
