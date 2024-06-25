@@ -355,7 +355,7 @@ class QoaClient(Generic[T]):
                 sub_thread.start()
             else:
                 qoaLogger.warning("No connector available")
-        return return_report.model_dump()
+        return return_report.model_dump(mode="json")
 
     def observe_inference(
         self,
