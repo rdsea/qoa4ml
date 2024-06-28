@@ -1,5 +1,6 @@
 test/
 modules/orchestration/temp/
+.venv
 *.DS_Store
 *.jpg
 *.pt

@@ -1,66 +1,74 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.flit.module]
-name = "qoa4ml"
-
-[project]
+[tool.poetry]
 name = "qoa4ml"
 version = "0.2.8"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
-requires-python = ">=3.10"
+authors = ["AaltoSEA <tri.m.nguyen@aalto.fi>"]
+license = "Apache-2.0"
+homepage = "https://rdsea.github.io/"
 keywords = ["Monitoring", "Machine Learning"]
-license = { file = "LICENSE.txt" }
-authors = [{ name = "AaltoSEA", email = "tri.m.nguyen@aalto.fi" }]
+repository = "https://github.com/rdsea/QoA4ML"
+documentation = "https://rdsea.github.io/QoA4ML/"
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3.10",
 ]
-urls = { Homepage = "https://rdsea.github.io/" }
-dependencies = [
-  "certifi>=2023.7.22",
-  "pika>=1.3.2",
-  "psutil>=5.9.2",
-  "python-dateutil>=2.8.2",
-  "pytz>=2023.3.post1",
-  "PyYAML>=6.0.1",
-  "requests>=2.31.0",
-  "tzdata>=2023.3",
-  "urllib3>=1.26.16",
-  "pre-commit>=3.5.0",
-  "fastapi>=0.110.2",
-  "flatten_dict>=0.4.2",
-  "pydantic>=2.7.0",
-  "tinyflux>=1.0.0",
-  "uvicorn>=0.29.0",
-  "setuptools==65.5.1",
-  "lazy-import>=0.2.2",
-]
 
-[project.optional-dependencies]
+[tool.poetry.dependencies]
+python = ">=3.10.0,<3.11"
+certifi = ">=2023.7.22"
+pika = ">=1.3.2"
+psutil = ">=5.9.2"
+python-dateutil = ">=2.8.2"
+pytz = ">=2023.3.post1"
+PyYAML = ">=6.0.1"
+requests = ">=2.31.0"
+tzdata = ">=2023.3"
+urllib3 = ">=1.26.16"
+pre-commit = ">=3.5.0"
+fastapi = ">=0.110.2"
+flatten_dict = ">=0.4.2"
+pydantic = ">=2.7.4,<2.8"
+tinyflux = ">=1.0.0"
+uvicorn = ">=0.29.0"
+setuptools = "==65.5.1"
+lazy-import = ">=0.2.2"
+
+docker_py = { version = "1.10.6", optional = true }
+paho_mqtt = { version = "1.6.1", optional = true }
+Pillow = { version = "10.0.0", optional = true }
+prometheus-client = { version = "0.16.0", optional = true }
+tensorflow = { version = "2.10.0", optional = true }
+# ydata-quality = { version = "0.1.0", optional = true }
+numpy = { version = ">=1.23.5", optional = true }
+pandas = { version = ">=1.4.3", optional = true }
+
+
+[tool.poetry.group.dev.dependencies]
+mkdocs-material = { version = "*", extras = ["imaging"] }
+pre-commit = "*"
+black = "*"
+isort = "*"
+devtools = "*"
+poetry = "*"
+ruff = "*"
+
+[tool.poetry.extras]
 ml = [
-  "docker_py==1.10.6",
-  "paho_mqtt==1.6.1",
-  "Pillow==10.0.0",
-  "prometheus-client==0.16.0",
-  "tensorflow==2.13.0",
-  "ydata-quality==0.1.0",
-  "numpy>=1.23.5",
-  "pandas>=1.4.3",
+  "docker_py",
+  "paho_mqtt",
+  "Pillow",
+  "prometheus-client",
+  "tensorflow",
+  # "ydata-quality",
+  "numpy",
+  "pandas",
 ]
-
-dev = [
-  "pre-commit>=3.5.0",
-  "black",
-  "isort",
-  "ruff",
-  "mkdocs-material[imaging]",
-]
-
-all = ["qoa4ml[ml,dev]"]
 
 [tool.isort]
 profile = "black"
