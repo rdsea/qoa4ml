@@ -9,6 +9,7 @@ description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 authors = ["AaltoSEA <tri.m.nguyen@aalto.fi>"]
 license = "Apache-2.0"
+packages = [{ include = "qoa4ml", from = "src" }]
 homepage = "https://rdsea.github.io/"
 keywords = ["Monitoring", "Machine Learning"]
 repository = "https://github.com/rdsea/QoA4ML"
@@ -57,6 +58,7 @@ isort = "*"
 devtools = "*"
 poetry = "*"
 ruff = "*"
+codespell = "^2.3.0"
 
 [tool.poetry.extras]
 ml = [
@@ -70,21 +72,29 @@ ml = [
   "pandas",
 ]
 
-[tool.isort]
-profile = "black"
-
 [tool.ruff]
-exclude = ["qoa4ml/utils/pynvml_forked.py"]
+exclude = ["src/qoa4ml/utils/pynvml_forked.py"]
 
 [tool.ruff.lint]
 select = [
-  "F",
-  "C",
-  #, "E", "R", "W", "N"
+  "F",   # Pyflakes
+  "C",   # Pylint convention
+  "R",   # Pylint refactor
+  "E",   # Pycode styles
+  "W",   # Pycode styles
+  "N",   # Pep8 naming
+  "I",   # Isort,
+  "UP",  # Pyupgrade
+  "C4",  # Flake8 compehension
+  "ISC", # Flake8 implicit str concat
+  "B",   # Flake8 bugbear
+  "PGH", # Pygrep hook
+  "RUF", # Ruff specific rules
 ]
 ignore = [
   "E501",   # Line too long
   "RET504", # Unnecessary assignment
   "RET505", # Unnecessary else after return
   "C901",   # Too complex function
+  "B904",   # raise-without-from-inside-except, enable when understand more
 ]

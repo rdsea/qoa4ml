@@ -83,7 +83,7 @@ class NodeAggregator:
                     fields,
                 )
             else:
-                logging.error("Value Error: Unkown report type")
+                logging.error("Value Error: Unknown report type")
         else:
             if isinstance(report, SystemReport):
                 node_name = report.metadata.node_name

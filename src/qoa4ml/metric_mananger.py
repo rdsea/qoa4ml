@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Union
 from .config.configs import MetricConfig
 from .lang.datamodel_enum import MetricClassEnum, MetricNameEnum
 from .metric import Counter, Gauge, Histogram, PrometheusMetric, Summary
-from .utils.qoa_utils import qoaLogger
+from .utils.qoa_utils import qoa_logger
 
 
 class MetricManager:
@@ -27,9 +27,9 @@ class MetricManager:
             else:
                 return self.metric_list[key].reset()
         except Exception as e:
-            qoaLogger.error(
+            qoa_logger.error(
                 str(
-                    "[ERROR] - Error {} when reseting metric in QoA client: {}".format(
+                    "[ERROR] - Error {} when resetting metric in QoA client: {}".format(
                         type(e), e.__traceback__
                     )
                 )
@@ -48,7 +48,7 @@ class MetricManager:
                 # Get a specific metric
                 return self.metric_list[key]
         except Exception as e:
-            qoaLogger.error(
+            qoa_logger.error(
                 str(
                     "[ERROR] - Error {} when getting metric from QoA client: {}".format(
                         type(e), e.__traceback__

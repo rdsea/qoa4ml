@@ -46,10 +46,10 @@ def eva_erronous(data, errors=None):
             results["errorRatio"] = 100 * error_df / total_count
             return results
         else:
-            qoaLogger.warning("Unsupported data: {}".format(type(data)))
+            qoaLogger.warning(f"Unsupported data: {type(data)}")
             return None
     except Exception as e:
-        qoaLogger.error("Error {} in eva_erronous: {}".format(type(e), e.__traceback__))
+        qoaLogger.error(f"Error {type(e)} in eva_erronous: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
 
 
@@ -67,18 +67,16 @@ def eva_duplicate(data):
             data = pd.DataFrame(data)
         if is_pddataframe(data):
             dc = DuplicateChecker(df=data)
-            dcEva = dc.exact_duplicates()
+            dc_eva = dc.exact_duplicates()
             results = {}
-            results["duplicateRatio"] = 100 * len(dcEva.index) / len(data.index)
-            results["totalDuplicate"] = len(dcEva.index)
+            results["duplicateRatio"] = 100 * len(dc_eva.index) / len(data.index)
+            results["totalDuplicate"] = len(dc_eva.index)
             return results
         else:
-            qoaLogger.warning("Unsupported data: {}".format(type(data)))
+            qoaLogger.warning(f"Unsupported data: {type(data)}")
             return None
     except Exception as e:
-        qoaLogger.error(
-            "Error {} in eva_duplicate: {}".format(type(e), e.__traceback__)
-        )
+        qoaLogger.error(f"Error {type(e)} in eva_duplicate: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
 
 
@@ -88,7 +86,7 @@ def eva_missing(
     try:
         if "MissingsProfiler" not in globals():
             global MissingsProfiler
-            from ydata_quality.missings import MissingsProfiler
+            from ydata_quality.missing import MissingsProfiler
         if is_numpyarray(data):
             data = pd.DataFrame(data)
         if is_pddataframe(data):
@@ -102,19 +100,21 @@ def eva_missing(
                 results["missingPrediction"] = mp.predict_missings()
             return results
         else:
-            qoaLogger.warning("Unsupported data: {}".format(type(data)))
+            qoaLogger.warning(f"Unsupported data: {type(data)}")
             return None
     except Exception as e:
-        qoaLogger.error("Error {} in eva_erronous: {}".format(type(e), e.__traceback__))
+        qoaLogger.error(f"Error {type(e)} in eva_erronous: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
 
 
-class Outlier_Detector(object):
+class OutlierDetector:
     def __init__(self, data):
         self.data = None
         self.update_data(data)
 
-    def detect_outlier(self, n_data, labels=[], random_state=0, n=10, cluster=False):
+    def detect_outlier(self, n_data, labels=None, random_state=0, n=10, cluster=False):
+        if labels is None:
+            labels = []
         if is_numpyarray(n_data):
             n_data = pd.DataFrame(n_data)
         if is_pddataframe(n_data):
@@ -124,9 +124,7 @@ class Outlier_Detector(object):
                     data = pd.concat([self.data, n_data])
                 except Exception as e:
                     qoaLogger.error(
-                        "Error {} in concatenating data: {}".format(
-                            type(e), e.__traceback__
-                        )
+                        f"Error {type(e)} in concatenating data: {e.__traceback__}"
                     )
                     traceback.print_exception(*sys.exc_info())
                 if data is not None:
@@ -144,9 +142,7 @@ class Outlier_Detector(object):
                             )
                         except Exception as e:
                             qoaLogger.error(
-                                "Error {} in LabelInspector: {}".format(
-                                    type(e), e.__traceback__
-                                )
+                                f"Error {type(e)} in LabelInspector: {e.__traceback__}"
                             )
                             traceback.print_exception(*sys.exc_info())
                     return results
@@ -155,7 +151,7 @@ class Outlier_Detector(object):
             else:
                 return {"Error": "Historical data has not been set"}
         else:
-            return {"Error": "Unsupported data: {}".format(type(data))}
+            return {"Error": f"Unsupported data: {type(data)}"}
 
     def update_data(self, data):
         if is_numpyarray(data):
@@ -164,7 +160,7 @@ class Outlier_Detector(object):
             self.data = data
             return {"Response": "Success"}
         else:
-            return {"Error": "Unsupported data: {}".format(type(data))}
+            return {"Error": f"Unsupported data: {type(data)}"}
 
 
 def image_quality(image):
@@ -199,8 +195,8 @@ def eva_none(data):
             results["noneRatio"] = valid_count / (valid_count + none_count)
             return results
         else:
-            qoaLogger.warning("Unsupported data: {}".format(type(data)))
+            qoaLogger.warning(f"Unsupported data: {type(data)}")
             return None
     except Exception as e:
-        qoaLogger.error("Error {} in eva_none: {}".format(type(e), e.__traceback__))
+        qoaLogger.error(f"Error {type(e)} in eva_none: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())

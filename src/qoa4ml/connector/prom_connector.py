@@ -1,7 +1,7 @@
 _INF = float("inf")
 
 
-class Prom_Connector(object):
+class PromConnector:
     def __init__(self, info):
         if "pr" not in globals():
             global pr

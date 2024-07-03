@@ -15,8 +15,8 @@ from .abstract_report import AbstractReport
 
 
 class GeneralApplicationReport(AbstractReport):
-    def __init__(self, clientConfig: ClientInfo):
-        self.client_config = copy.deepcopy(clientConfig)
+    def __init__(self, client_config: ClientInfo):
+        self.client_config = copy.deepcopy(client_config)
         self.reset()
         self.init_time = time.time()
 

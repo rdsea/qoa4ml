@@ -13,7 +13,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--prometheus", help="prometheus port", default=9098)
     args = parser.parse_args()
-    with open(args.qoaInfo, "r") as f:
+    with open(args.qoaInfo) as f:
         qoa_info = json.load(f)
         print(qoa_info)
     OPA_object = Mess_Handler(qoa_info, prom=True)

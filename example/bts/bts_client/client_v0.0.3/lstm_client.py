@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     # prometheus_client.start_http_server(int(args.prometheus))
     # Define a client for publising data
-    with open(args.clientInfo, "r") as f:
+    with open(args.clientInfo) as f:
         client_conf = json.load(f)
     lstm_predition_client = LSTM_Prediction_Client(client_conf)
     lstm_predition_client.start()

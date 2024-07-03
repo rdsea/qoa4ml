@@ -6,7 +6,7 @@ from qoa4ml import probes as qoa_probes
 from qoa4ml.qoa_client import Qoa_Client
 
 
-class LSTM_Prediction_Service(object):
+class LSTM_Prediction_Service:
     def __init__(self):
         # init base directory
         self.base_dir = os.environ.get("LSTM_BASE_DIR")

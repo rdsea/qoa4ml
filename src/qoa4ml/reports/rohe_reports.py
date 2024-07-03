@@ -21,8 +21,8 @@ from ..utils.qoa_utils import load_config
 
 
 class RoheReport(AbstractReport):
-    def __init__(self, clientConfig: ClientInfo):
-        self.client_config = copy.deepcopy(clientConfig)
+    def __init__(self, client_config: ClientInfo):
+        self.client_config = copy.deepcopy(client_config)
         self.reset()
         self.init_time = time.time()
 

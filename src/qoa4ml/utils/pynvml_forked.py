@@ -357,7 +357,7 @@ def _nvmlGetFunctionPointer(name):
 # Allows the object to be printed
 # Allows mismatched types to be assigned
 #  - like None when the Structure variant requires c_uint
-class nvmlFriendlyObject(object):
+class nvmlFriendlyObject:
     def __init__(self, dictionary):
         for x in dictionary:
             setattr(self, x, dictionary[x])
@@ -406,7 +406,7 @@ class _PrintableStructure(Structure):
     e.g. class that has _field_ 'hex_value', c_uint could be formatted with
       _fmt_ = {"hex_value" : "%08X"}
     to produce nicer output.
-    Default fomratting string for all fields can be set with key "<default>" like:
+    Default formatting string for all fields can be set with key "<default>" like:
       _fmt_ = {"<default>" : "%d MHz"} # e.g all values are numbers in MHz.
     If not set it's assumed to be just "%s"
 
@@ -671,7 +671,7 @@ def nvmlInit():
     libLoadLock.acquire()
     _nvmlLib_refcount += 1
     libLoadLock.release()
-    return None
+    return
 
 
 def _LoadNvmlLibrary():
@@ -723,7 +723,7 @@ def nvmlShutdown():
     if 0 < _nvmlLib_refcount:
         _nvmlLib_refcount -= 1
     libLoadLock.release()
-    return None
+    return
 
 
 # Added in 2.285
@@ -962,14 +962,14 @@ def nvmlDeviceSetCpuAffinity(handle):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetCpuAffinity")
     ret = fn(handle)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceClearCpuAffinity(handle):
     fn = _nvmlGetFunctionPointer("nvmlDeviceClearCpuAffinity")
     ret = fn(handle)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceGetMinorNumber(handle):
@@ -1024,7 +1024,7 @@ def nvmlDeviceValidateInforom(handle):
     fn = _nvmlGetFunctionPointer("nvmlDeviceValidateInforom")
     ret = fn(handle)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceGetDisplayMode(handle):
@@ -1424,7 +1424,7 @@ def nvmlDeviceGetComputeRunningProcesses(handle):
         return []
     elif ret == NVML_ERROR_INSUFFICIENT_SIZE:
         # typical case
-        # oversize the array incase more processes are created
+        # oversize the array in case more processes are created
         c_count.value = c_count.value * 2 + 5
         proc_array = c_nvmlProcessInfo_t * c_count.value
         c_procs = proc_array()
@@ -1459,7 +1459,7 @@ def nvmlDeviceGetGraphicsRunningProcesses(handle):
         return []
     elif ret == NVML_ERROR_INSUFFICIENT_SIZE:
         # typical case
-        # oversize the array incase more processes are created
+        # oversize the array in case more processes are created
         c_count.value = c_count.value * 2 + 5
         proc_array = c_nvmlProcessInfo_t * c_count.value
         c_procs = proc_array()
@@ -1498,49 +1498,49 @@ def nvmlUnitSetLedState(unit, color):
     fn = _nvmlGetFunctionPointer("nvmlUnitSetLedState")
     ret = fn(unit, _nvmlLedColor_t(color))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceSetPersistenceMode(handle, mode):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetPersistenceMode")
     ret = fn(handle, _nvmlEnableState_t(mode))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceSetComputeMode(handle, mode):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetComputeMode")
     ret = fn(handle, _nvmlComputeMode_t(mode))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceSetEccMode(handle, mode):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetEccMode")
     ret = fn(handle, _nvmlEnableState_t(mode))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceClearEccErrorCounts(handle, counterType):
     fn = _nvmlGetFunctionPointer("nvmlDeviceClearEccErrorCounts")
     ret = fn(handle, _nvmlEccCounterType_t(counterType))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceSetDriverModel(handle, model):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetDriverModel")
     ret = fn(handle, _nvmlDriverModel_t(model))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceSetAutoBoostedClocksEnabled(handle, enabled):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetAutoBoostedClocksEnabled")
     ret = fn(handle, _nvmlEnableState_t(enabled))
     _nvmlCheckReturn(ret)
-    return None
+    return
     # Throws NVML_ERROR_NOT_SUPPORTED if hardware doesn't support setting auto boosted clocks
 
 
@@ -1548,7 +1548,7 @@ def nvmlDeviceSetDefaultAutoBoostedClocksEnabled(handle, enabled, flags):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetDefaultAutoBoostedClocksEnabled")
     ret = fn(handle, _nvmlEnableState_t(enabled), c_uint(flags))
     _nvmlCheckReturn(ret)
-    return None
+    return
     # Throws NVML_ERROR_NOT_SUPPORTED if hardware doesn't support setting auto boosted clocks
 
 
@@ -1557,7 +1557,7 @@ def nvmlDeviceSetApplicationsClocks(handle, maxMemClockMHz, maxGraphicsClockMHz)
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetApplicationsClocks")
     ret = fn(handle, c_uint(maxMemClockMHz), c_uint(maxGraphicsClockMHz))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 4.304
@@ -1565,7 +1565,7 @@ def nvmlDeviceResetApplicationsClocks(handle):
     fn = _nvmlGetFunctionPointer("nvmlDeviceResetApplicationsClocks")
     ret = fn(handle)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 4.304
@@ -1573,7 +1573,7 @@ def nvmlDeviceSetPowerManagementLimit(handle, limit):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetPowerManagementLimit")
     ret = fn(handle, c_uint(limit))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 4.304
@@ -1581,7 +1581,7 @@ def nvmlDeviceSetGpuOperationMode(handle, mode):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetGpuOperationMode")
     ret = fn(handle, _nvmlGpuOperationMode_t(mode))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 2.285
@@ -1598,7 +1598,7 @@ def nvmlDeviceRegisterEvents(handle, eventTypes, eventSet):
     fn = _nvmlGetFunctionPointer("nvmlDeviceRegisterEvents")
     ret = fn(handle, c_ulonglong(eventTypes), eventSet)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 2.285
@@ -1625,7 +1625,7 @@ def nvmlEventSetFree(eventSet):
     fn = _nvmlGetFunctionPointer("nvmlEventSetFree")
     ret = fn(eventSet)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 # Added in 3.295
@@ -1713,14 +1713,14 @@ def nvmlDeviceSetAccountingMode(handle, mode):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetAccountingMode")
     ret = fn(handle, _nvmlEnableState_t(mode))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceClearAccountingPids(handle):
     fn = _nvmlGetFunctionPointer("nvmlDeviceClearAccountingPids")
     ret = fn(handle)
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceGetAccountingStats(handle, pid):
@@ -1794,7 +1794,7 @@ def nvmlDeviceSetAPIRestriction(handle, apiType, isRestricted):
     fn = _nvmlGetFunctionPointer("nvmlDeviceSetAPIRestriction")
     ret = fn(handle, _nvmlRestrictedAPI_t(apiType), _nvmlEnableState_t(isRestricted))
     _nvmlCheckReturn(ret)
-    return None
+    return
 
 
 def nvmlDeviceGetBridgeChipInfo(handle):

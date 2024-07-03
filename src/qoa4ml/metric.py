@@ -2,7 +2,7 @@
 from .lang.datamodel_enum import MetricNameEnum
 
 
-class PrometheusMetric(object):
+class PrometheusMetric:
     """
     This class defines the common attribute and provide basic function for handling a metric
     - Attribute:
