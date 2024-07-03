@@ -10,7 +10,7 @@ class ServiceMetricNameEnum(str, Enum):
 
 class MlSpecificMetricNameEnum(str, Enum):
     confidence = "confidence"
-    acccuracy = "accuracy"
+    accuracy = "accuracy"
     precision = "precision"
     recall = "recall"
     auc = "auc"
@@ -171,7 +171,7 @@ class MetricClassEnum(Enum):
     gauge = "Gauge"
     counter = "Counter"
     summary = "Summary"
-    histogram = "Historgram"
+    histogram = "Histogram"
 
 
 class ReportTypeEnum(Enum):

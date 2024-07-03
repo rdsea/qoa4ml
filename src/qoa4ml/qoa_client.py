@@ -18,7 +18,7 @@ from .config.configs import (
     ConnectorConfig,
     MetricConfig,
 )
-from .connector.amqp_connector import Amqp_Connector
+from .connector.amqp_connector import AmqpConnector
 from .connector.base_connector import BaseConnector
 from .lang.common_models import Metric
 from .lang.datamodel_enum import (
@@ -146,7 +146,7 @@ class QoaClient(Generic[T]):
             self.default_connector = None
         else:
             # Set default connector for sending monitoring data if not specify
-            self.default_connector = list(self.connector_list.keys())[0]
+            self.default_connector = next(iter(self.connector_list.keys()))
 
         # lock report to guarantee consistency
         self.lock = threading.Lock()
@@ -164,7 +164,7 @@ class QoaClient(Generic[T]):
             configuration.connector_class == ServiceAPIEnum.amqp
             and type(configuration.config) is AMQPConnectorConfig
         ):
-            return Amqp_Connector(configuration.config)
+            return AmqpConnector(configuration.config)
 
         # TODO: MQTT is both connector and collector
         #
@@ -246,14 +246,14 @@ class QoaClient(Generic[T]):
             return {}
         else:
             self.timer_flag = False
-            responseTime = {
+            response_time = {
                 "startTime": self.timerStart,
                 "responseTime": time.time() - self.timerStart,
             }
             self.observe_metric(
-                ServiceMetricNameEnum.response_time, responseTime, category=0
+                ServiceMetricNameEnum.response_time, response_time, category=0
             )
-            return responseTime
+            return response_time
 
     def import_previous_report(self, reports: Union[Dict, List[Dict]]):
         if isinstance(reports, list):
@@ -272,25 +272,21 @@ class QoaClient(Generic[T]):
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
                 qoaLogger.error(
-                    "Error {} in process cpu stat: {}".format(type(e), e.__traceback__)
+                    f"Error {type(e)} in process cpu stat: {e.__traceback__}"
                 )
                 traceback.print_exception(*sys.exc_info())
             try:
                 report["proc_mem_stats"] = get_proc_mem()
             except Exception as e:
                 qoaLogger.error(
-                    "Error {} in process memory stat: {}".format(
-                        type(e), e.__traceback__
-                    )
+                    f"Error {type(e)} in process memory stat: {e.__traceback__}"
                 )
                 traceback.print_exception(*sys.exc_info())
             try:
                 self.report(report=report, submit=True)
             except Exception as e:
                 qoaLogger.error(
-                    "Error {} in send process report: {}".format(
-                        type(e), e.__traceback__
-                    )
+                    f"Error {type(e)} in send process report: {e.__traceback__}"
                 )
                 traceback.print_exception(*sys.exc_info())
             time.sleep(interval)
@@ -338,10 +334,10 @@ class QoaClient(Generic[T]):
         if report is None:
             return_report = self.qoa_report.generate_report(reset)
         else:
-            UserDefinedReportModel = create_model(
+            user_defined_report_odel = create_model(
                 "UserDefinedReportModel", metadata=(dict, ...), report=(dict, ...)
             )
-            return_report = UserDefinedReportModel(
+            return_report = user_defined_report_odel(
                 report=report, metadata=copy.deepcopy(self.client_config.__dict__)
             )
 

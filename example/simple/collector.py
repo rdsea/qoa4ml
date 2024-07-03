@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-from qoa4ml.collector.amqp_collector import Amqp_Collector
+from qoa4ml.collector.amqp_collector import AmqpCollector
 from qoa4ml.config.configs import AMQPCollectorConfig
 
 conf = {
@@ -19,5 +19,5 @@ if __name__ == "__main__":
     parser.add_argument("--conf", help="configuration file", default="collector.json")
     args = parser.parse_args()
     ampq_conf = AMQPCollectorConfig(**conf)
-    collector = Amqp_Collector(configuration=ampq_conf)
+    collector = AmqpCollector(configuration=ampq_conf)
     collector.start_collecting()

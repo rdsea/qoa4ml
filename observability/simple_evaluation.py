@@ -17,7 +17,7 @@ args = parser.parse_args()
 if args.input is None:
     print("Input file is not specified")
     sys.exit(0)
-with open(args.input, "r", encoding="utf-8") as input_file:
+with open(args.input, encoding="utf-8") as input_file:
     data = input_file.read()
 input_metrics = json.loads(data)
 payload = {"input": input_metrics}

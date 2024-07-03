@@ -14,7 +14,7 @@ from qoa4ml_lib.qoa4ml.reports import Qoa_Client
 ######################################################################
 
 
-class LSTM_Prediction_Client(object):
+class LSTM_Prediction_Client:
     def __init__(self, configuration):
         # Connect to RabbitMQ host
         self.broker_info = configuration["broker_service"]

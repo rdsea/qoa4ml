@@ -7,7 +7,7 @@ from .base_collector import BaseCollector
 from .host_object import HostObject
 
 
-class Amqp_Collector(BaseCollector):
+class AmqpCollector(BaseCollector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(
         self,

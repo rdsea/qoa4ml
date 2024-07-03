@@ -1,14 +1,14 @@
-from qoa4ml.collector.amqp_collector import Amqp_Collector
+from qoa4ml.collector.amqp_collector import AmqpCollector
 import pymongo
 from threading import Thread
 import json
 
 
-class Rohe_Agent(object):
+class Rohe_Agent:
     def __init__(self, configuration, mg_db=False):
         self.conf = configuration
         colletor_conf = self.conf["collector"]
-        self.collector = Amqp_Collector(
+        self.collector = AmqpCollector(
             colletor_conf["amqp_collector"]["conf"], host_object=self
         )
         db_conf = self.conf["database"]

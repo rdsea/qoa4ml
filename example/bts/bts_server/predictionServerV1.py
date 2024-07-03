@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 
-class LSTM_Prediction_PlainServer(object):
+class LSTM_Prediction_PlainServer:
     def __init__(self, configuration):
         # Init the queue for ML request and load the ML model
         self.model_info = configuration["model"]

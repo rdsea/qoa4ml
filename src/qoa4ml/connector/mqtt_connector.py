@@ -14,7 +14,7 @@ else:
 
 
 # TODO: this client handle both connector and collector
-class Mqtt_Connector(BaseConnector):
+class MqttConnector(BaseConnector):
     # This class will handle all the mqtt connection for each client application
     # FIX: what is host object?
     def __init__(self, host_object: HostObject, configuration: MQTTConnectorConfig):

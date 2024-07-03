@@ -10,7 +10,7 @@ p_dir = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(p_dir))
 
 
-class Amqp_Connector(BaseConnector):
+class AmqpConnector(BaseConnector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(self, configuration: AMQPConnectorConfig, log: bool = False):
         """

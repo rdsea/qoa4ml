@@ -16,8 +16,8 @@ from .abstract_report import AbstractReport
 
 
 class MLReport(AbstractReport):
-    def __init__(self, clientConfig: ClientInfo):
-        self.client_config = copy.deepcopy(clientConfig)
+    def __init__(self, client_config: ClientInfo):
+        self.client_config = copy.deepcopy(client_config)
         self.reset()
         self.init_time = time.time()
 
@@ -92,15 +92,14 @@ class MLReport(AbstractReport):
     def observe_inference(self, inference_value):
         if self.client_config.id in self.report.ml_inference:
             raise RuntimeWarning(
-                "Inference existed, will overrride the existing inference"
+                "Inference existed, will override the existing inference"
             )
-        else:
-            self.report.ml_inference[self.client_config.id] = InferenceInstance(
-                inference_id=uuid4(),
-                instance_id=UUID(self.client_config.id),
-                functionality=self.client_config.functionality,
-                prediction=inference_value,
-            )
+        self.report.ml_inference[self.client_config.id] = InferenceInstance(
+            inference_id=uuid4(),
+            instance_id=UUID(self.client_config.id),
+            functionality=self.client_config.functionality,
+            prediction=inference_value,
+        )
 
     def observe_inference_metric(self, metric: Metric):
         if self.client_config.id in self.report.ml_inference:

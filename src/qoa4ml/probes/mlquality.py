@@ -20,9 +20,7 @@ def import_tf():
             import tensorflow as tf
         except Exception as e:
             qoaLogger.error(
-                "Error {} when importing TensorFlow: {}".format(
-                    type(e), e.__traceback__
-                )
+                f"Error {type(e)} when importing TensorFlow: {e.__traceback__}"
             )
             traceback.print_exception(*sys.exc_info())
 
@@ -37,9 +35,7 @@ def timeseries_metric(model):
         return metrics
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying timeseries model metrics: {}".format(
-                type(e), e.__traceback__
-            )
+            f"Error {type(e)} when querying timeseries model metrics: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get metrics"}
@@ -56,15 +52,13 @@ def ts_inference_metric(model, name):
         return results
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying timeseries {}: {}".format(
-                type(e), name, e.__traceback__
-            )
+            f"Error {type(e)} when querying timeseries {name}: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
-        return {"Error": "Unable to get model {}".format(name)}
+        return {"Error": f"Unable to get model {name}"}
 
 
-def ts_inference_MAE(model):
+def ts_inference_mae(model):
     try:
         metrics = ts_inference_metric(model, "mean_absolute_error")
         return {"MAE": metrics}
@@ -101,9 +95,7 @@ def training_metric(model):
             return None
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying training metrics: {}".format(
-                type(e), e.__traceback__
-            )
+            f"Error {type(e)} when querying training metrics: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get training metrics"}
@@ -118,7 +110,7 @@ def training_loss(model):
             return None
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying training loss: {}".format(type(e), e.__traceback__)
+            f"Error {type(e)} when querying training loss: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get training loss"}
@@ -150,9 +142,7 @@ def training_accuracy(model):
             return None
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying training accuracy: {}".format(
-                type(e), e.__traceback__
-            )
+            f"Error {type(e)} when querying training accuracy: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get accuracy"}
@@ -167,9 +157,7 @@ def training_val_loss(model):
             return None
     except Exception as e:
         qoaLogger.error(
-            "Error {} when querying training validation loss: {}".format(
-                type(e), e.__traceback__
-            )
+            f"Error {type(e)} when querying training validation loss: {e.__traceback__}"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get validation loss"}
@@ -185,7 +173,7 @@ def classification_confidence(data, score=True):
                 scores = tf.nn.softmax(data[0])
                 return {"Confidence": 100 * np.max(scores)}
             else:
-                return {"Error": "Unsupported data: {}".format(type(data))}
+                return {"Error": f"Unsupported data: {type(data)}"}
     except Exception as e:
         qoaLogger.error(
             "Error {} in extracting classification confidence: {}".format(

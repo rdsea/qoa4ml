@@ -10,7 +10,7 @@ def get_current_dir():
     return str(current_dir)
 
 
-class ML_Loader(object):
+class ML_Loader:
     def __init__(self, model_info, base_dir=None):
         if not base_dir:
             base_dir = get_current_dir()
