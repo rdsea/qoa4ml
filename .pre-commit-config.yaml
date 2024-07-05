@@ -56,6 +56,5 @@ repos:
     rev: 1.8.3
     hooks:
       - id: poetry-check
-        args: ["-C", "./src/qoa4ml", "--lock"]
       - id: poetry-lock
-        args: ["-C", "./src/qoa4ml", "--no-update"]
+        args: [--no-update]
