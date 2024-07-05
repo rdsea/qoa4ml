@@ -4,13 +4,13 @@ on: [push, pull_request]
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.10.12"
           cache: "pip"
 
       - name: cache poetry install
@@ -39,3 +39,5 @@ jobs:
       - run: poetry install --no-interaction
 
       - uses: pre-commit/action@v3.0.1
+      - uses: pre-commit-ci/lite-action@v1.0.2
+        if: always()
