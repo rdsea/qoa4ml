@@ -1,8 +1,10 @@
 import json
 from typing import Optional
 
+import pika
+
 from ..config.configs import AMQPCollectorConfig
-from ..utils.qoa_utils import qoaLogger
+from ..utils.logger import qoa_logger
 from .base_collector import BaseCollector
 from .host_object import HostObject
 
@@ -14,9 +16,6 @@ class AmqpCollector(BaseCollector):
         configuration: AMQPCollectorConfig,
         host_object: Optional[HostObject] = None,
     ):
-        if "pika" not in globals():
-            global pika
-            import pika
         self.host_object = host_object
         self.exchange_name = configuration.exchange_name
         self.exchange_type = configuration.exchange_type
@@ -58,7 +57,7 @@ class AmqpCollector(BaseCollector):
             self.host_object.message_processing(ch, method, props, body)
         else:
             mess = json.loads(str(body.decode("utf-8")))
-            qoaLogger.info(mess)
+            qoa_logger.info(mess)
 
     def start_collecting(self):
         # Start rabbit MQ

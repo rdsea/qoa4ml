@@ -172,9 +172,7 @@ def image_quality(image):
         image = PIL.Image.open(io.BytesIO(image))
     if isinstance(image, np.ndarray):
         image = PIL.Image.fromarray(image)
-    if isinstance(image, PIL.JpegImagePlugin.JpegImageFile) or isinstance(
-        image, PIL.Image.Image
-    ):
+    if isinstance(image, (PIL.Image.Image, PIL.JpegImagePlugin.JpegImageFile)):
         # qoaLogger.debug(dir(image)
         quality[ImageQualityNameEnum.image_size] = image.size
         quality[ImageQualityNameEnum.color_mode] = image.mode

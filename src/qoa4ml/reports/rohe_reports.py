@@ -114,23 +114,22 @@ class RoheReport(AbstractReport):
                     )
                 }
 
-        else:
-            if (
-                previous_report.inference_report.ml_specific
-                and previous_report.inference_report.ml_specific.end_point
-                and previous_report.inference_report.ml_specific.linked_list
-                and self.inference_report.ml_specific.end_point
-            ):
-                self.inference_report.ml_specific.linked_list |= (
-                    previous_report.inference_report.ml_specific.linked_list
-                )
-                current_end_point = self.inference_report.ml_specific.end_point
-                previous_end_point = (
-                    previous_report.inference_report.ml_specific.end_point
-                )
-                self.inference_report.ml_specific.linked_list[
-                    current_end_point.instance_id
-                ].previous.append(previous_end_point)
+        elif (
+            previous_report.inference_report.ml_specific
+            and previous_report.inference_report.ml_specific.end_point
+            and previous_report.inference_report.ml_specific.linked_list
+            and self.inference_report.ml_specific.end_point
+        ):
+            self.inference_report.ml_specific.linked_list |= (
+                previous_report.inference_report.ml_specific.linked_list
+            )
+            current_end_point = self.inference_report.ml_specific.end_point
+            previous_end_point = (
+                previous_report.inference_report.ml_specific.end_point
+            )
+            self.inference_report.ml_specific.linked_list[
+                current_end_point.instance_id
+            ].previous.append(previous_end_point)
         # NOTE: execution graph
         if not self.execution_graph:
             self.execution_graph = previous_report.execution_graph

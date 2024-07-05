@@ -36,11 +36,11 @@ from .probes.dataquality import (
 )
 from .reports.abstract_report import AbstractReport
 from .reports.rohe_reports import RoheReport
+from .utils.logger import qoa_logger
 from .utils.qoa_utils import (
     get_proc_cpu,
     get_proc_mem,
     load_config,
-    qoaLogger,
     set_logger_level,
 )
 
@@ -52,7 +52,6 @@ T = TypeVar("T", bound=AbstractReport)
 
 
 class QoaClient(Generic[T]):
-    # Init QoA Client
     def __init__(
         self,
         # NOTE: use text, number, enum
@@ -81,7 +80,7 @@ class QoaClient(Generic[T]):
 
         self.instance_id = os.environ.get("INSTANCE_ID")
         if self.instance_id is None:
-            qoaLogger.info("INSTANCE_ID is not defined, generating random uuid")
+            qoa_logger.info("INSTANCE_ID is not defined, generating random uuid")
             self.instance_id = uuid.uuid4()
         else:
             self.instance_id = uuid.UUID(self.instance_id)
@@ -95,12 +94,8 @@ class QoaClient(Generic[T]):
                 for connector in connector_conf:
                     self.connector_list[connector.name] = self.init_connector(connector)
             except Exception as e:
-                qoaLogger.error(
-                    str(
-                        "[ERROR] - Error {} when configuring connector in QoaClient: {}".format(
-                            type(e), e.__traceback__
-                        )
-                    )
+                qoa_logger.exception(
+                    f"Error {type(e)} when configuring connector in QoaClient"
                 )
         elif registration_url or self.configuration.registration_url:
             # init connectors using configuration received from monitoring service, if it's specified
@@ -128,21 +123,15 @@ class QoaClient(Generic[T]):
                                 self.init_connector(connector_config)
                             )
                 else:
-                    qoaLogger.warning(
+                    qoa_logger.warning(
                         "Unable to register Qoa Client: connector configuration must be dictionary"
                     )
             except Exception as e:
-                qoaLogger.error(
-                    str(
-                        "[ERROR] - Error {} when registering QoA client: {}".format(
-                            type(e), e.__traceback__
-                        )
-                    )
-                )
+                qoa_logger.exception(f"Error {type(e)} when registering QoA client")
                 traceback.print_exception(*sys.exc_info())
 
         if not self.connector_list:
-            qoaLogger.warning("No connector initiated")
+            qoa_logger.warning("No connector initiated")
             self.default_connector = None
         else:
             # Set default connector for sending monitoring data if not specify
@@ -190,27 +179,18 @@ class QoaClient(Generic[T]):
         return self.client_config
 
     def get_metric(self, key: Optional[Union[List, str]] = None):
-        # TO DO:
         pass
         # return self.metric_manager.get_metric(key)
 
     def reset_metric(self, key: Optional[Union[List, str]] = None):
-        # TO DO:
         pass
         # self.metric_manager.reset_metric(key)
 
     def set_config(self, key, value):
-        # TO DO:
         try:
             self.client_config.__setattr__(key, value)
         except Exception as e:
-            qoaLogger.error(
-                str(
-                    "[ERROR] - Error {} when setConfig in QoA client: {}".format(
-                        type(e), e.__traceback__
-                    )
-                )
-            )
+            qoa_logger.exception(f"Error {type(e)} when setConfig in QoA client")
 
     def observe_metric(
         self,
@@ -271,23 +251,17 @@ class QoaClient(Generic[T]):
             try:
                 report["proc_cpu_stats"] = get_proc_cpu()
             except Exception as e:
-                qoaLogger.error(
-                    f"Error {type(e)} in process cpu stat: {e.__traceback__}"
-                )
+                qoa_logger.exception(f"Error {type(e)} in process cpu stat")
                 traceback.print_exception(*sys.exc_info())
             try:
                 report["proc_mem_stats"] = get_proc_mem()
             except Exception as e:
-                qoaLogger.error(
-                    f"Error {type(e)} in process memory stat: {e.__traceback__}"
-                )
+                qoa_logger.exception(f"Error {type(e)} in process memory stat")
                 traceback.print_exception(*sys.exc_info())
             try:
                 self.report(report=report, submit=True)
             except Exception as e:
-                qoaLogger.error(
-                    f"Error {type(e)} in send process report: {e.__traceback__}"
-                )
+                qoa_logger.exception(f"Error {type(e)} in send process report")
                 traceback.print_exception(*sys.exc_info())
             time.sleep(interval)
 
@@ -312,7 +286,7 @@ class QoaClient(Generic[T]):
                     body_mess, corr_id=str(uuid.uuid4())
                 )
             else:
-                qoaLogger.error(
+                qoa_logger.error(
                     "No default connector, please specify the connector to use"
                 )
         else:
@@ -350,7 +324,7 @@ class QoaClient(Generic[T]):
                 )
                 sub_thread.start()
             else:
-                qoaLogger.warning("No connector available")
+                qoa_logger.warning("No connector available")
         return return_report.model_dump(mode="json")
 
     def observe_inference(

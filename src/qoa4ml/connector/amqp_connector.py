@@ -1,13 +1,10 @@
-import pathlib
-import sys
 import uuid
 from typing import Optional
 
+import pika
+
 from ..config.configs import AMQPConnectorConfig
 from .base_connector import BaseConnector
-
-p_dir = pathlib.Path(__file__).parent.parent.absolute()
-sys.path.append(str(p_dir))
 
 
 class AmqpConnector(BaseConnector):
@@ -18,9 +15,6 @@ class AmqpConnector(BaseConnector):
         configuration: a dictionary include broker and queue information
         log: a bool flag for logging message if being set to True, default is False
         """
-        if "pika" not in globals():
-            global pika
-            import pika
         self.conf = configuration
         self.exchange_name = configuration.exchange_name
         self.exchange_type = configuration.exchange_type

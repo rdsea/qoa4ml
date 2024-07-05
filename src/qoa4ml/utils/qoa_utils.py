@@ -11,14 +11,13 @@ import time
 import traceback
 from threading import Thread
 
+import docker
+import numpy as np
+import pandas as pd
 import psutil
 import yaml
 
-logging.basicConfig(
-    format="%(asctime)s:%(levelname)s -- %(message)s", level=logging.INFO
-)
-
-qoa_logger = logging.getLogger()
+from .logger import qoa_logger
 
 
 def make_folder(temp_path):
@@ -405,9 +404,6 @@ def docker_report(client, interval: int, metrics: dict | None = None, detail=Fal
         traceback.print_exception(*sys.exc_info())
     metric_list = list(metrics.keys())
 
-    if "docker" not in globals():
-        global docker
-        import docker
     doc_client = docker.from_env()
 
     while doc_monitor_flag:
@@ -462,12 +458,11 @@ def merge_report(f_report, i_report, prio=True):
                     f_report[key] = merge_report(f_report[key], i_report[key], prio)
                     i_report.pop(key)
             f_report.update(i_report)
-        else:
-            if f_report != i_report:
-                if prio is True:
-                    return f_report
-                else:
-                    return i_report
+        elif f_report != i_report:
+            if prio is True:
+                return f_report
+            else:
+                return i_report
     except Exception as e:
         qoa_logger.error(f"Error {type(e)} in mergeReport: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
@@ -502,16 +497,10 @@ def get_parent_dir(file, parent_level=1, to_string=True):
 
 
 def is_numpyarray(obj):
-    if "np" not in globals():
-        global np
-        import numpy as np
     return type(obj) == np.ndarray
 
 
 def is_pddataframe(obj):
-    if "pd" not in globals():
-        global pd
-        import pandas as pd
     return type(obj) == pd.DataFrame
 
 
