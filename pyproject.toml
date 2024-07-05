@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "qoa4ml"
-version = "0.2.8"
+version = "0.2.9"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 authors = ["AaltoSEA <tri.m.nguyen@aalto.fi>"]
@@ -77,9 +77,8 @@ exclude = ["src/qoa4ml/utils/pynvml_forked.py"]
 
 [tool.ruff.lint]
 select = [
-  "F",   # Pyflakes
-  "C",   # Pylint convention
-  "R",   # Pylint refactor
+  "F", # Pyflakes
+  # "PL",  # Pylint
   "E",   # Pycode styles
   "W",   # Pycode styles
   "N",   # Pep8 naming
@@ -98,3 +97,6 @@ ignore = [
   "C901",   # Too complex function
   "B904",   # raise-without-from-inside-except, enable when understand more
 ]
+
+[tool.ruff.lint.pylint]
+max-args = 10

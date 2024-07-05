@@ -84,34 +84,33 @@ class NodeAggregator:
                 )
             else:
                 logging.error("Value Error: Unknown report type")
-        else:
-            if isinstance(report, SystemReport):
-                node_name = report.metadata.node_name
-                timestamp = report.timestamp
-                del report.metadata, report.timestamp
-                fields = self.convert_unit(
-                    flatten(report.dict(exclude_none=True), self.config.data_separator)
-                )
-                self.embedded_database.insert(
-                    timestamp,
-                    {
-                        "type": "node",
-                        "node_name": node_name,
-                    },
-                    fields,
-                )
-            elif isinstance(report, ProcessReport):
-                metadata = flatten(
-                    {"metadata": report.metadata.dict()}, self.config.data_separator
-                )
-                timestamp = report.timestamp
-                del report.metadata, report.timestamp
-                fields = self.convert_unit(
-                    flatten(report.dict(exclude_none=True), self.config.data_separator)
-                )
-                self.embedded_database.insert(
-                    timestamp, {"type": "process", **metadata}, fields
-                )
+        elif isinstance(report, SystemReport):
+            node_name = report.metadata.node_name
+            timestamp = report.timestamp
+            del report.metadata, report.timestamp
+            fields = self.convert_unit(
+                flatten(report.dict(exclude_none=True), self.config.data_separator)
+            )
+            self.embedded_database.insert(
+                timestamp,
+                {
+                    "type": "node",
+                    "node_name": node_name,
+                },
+                fields,
+            )
+        elif isinstance(report, ProcessReport):
+            metadata = flatten(
+                {"metadata": report.metadata.dict()}, self.config.data_separator
+            )
+            timestamp = report.timestamp
+            del report.metadata, report.timestamp
+            fields = self.convert_unit(
+                flatten(report.dict(exclude_none=True), self.config.data_separator)
+            )
+            self.embedded_database.insert(
+                timestamp, {"type": "process", **metadata}, fields
+            )
 
     def convert_unit(self, report: dict):
         converted_report = report

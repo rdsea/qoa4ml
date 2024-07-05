@@ -1,43 +1,22 @@
-# This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
-
-import pathlib
 import sys
 import traceback
 
 import numpy as np
+import tensorflow as tf
 
-from ..qoa_utils import is_numpyarray, qoaLogger
-
-p_dir = pathlib.Path(__file__).parent.parent.absolute()
-sys.path.append(str(p_dir))
-
-
-################################################ ML QUALITY ########################################################
-def import_tf():
-    if "tf" not in globals():
-        global tf
-        try:
-            import tensorflow as tf
-        except Exception as e:
-            qoaLogger.error(
-                f"Error {type(e)} when importing TensorFlow: {e.__traceback__}"
-            )
-            traceback.print_exception(*sys.exc_info())
+from ..utils.logger import qoa_logger
+from ..utils.qoa_utils import is_numpyarray
 
 
 def timeseries_metric(model):
     metrics = {}
     try:
-        import_tf()
         if isinstance(model, tf.keras.Sequential):
             for metric in model.metrics:
                 metrics[metric.name] = metric.result().numpy()
         return metrics
     except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying timeseries model metrics: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} when querying timeseries model metrics")
         return {"Error": "Unable to get metrics"}
 
 
@@ -51,10 +30,7 @@ def ts_inference_metric(model, name):
             results["Error"] = metrics["Error"]
         return results
     except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying timeseries {name}: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} when querying timeseries {name}")
         return {"Error": f"Unable to get model {name}"}
 
 
@@ -63,12 +39,9 @@ def ts_inference_mae(model):
         metrics = ts_inference_metric(model, "mean_absolute_error")
         return {"MAE": metrics}
     except Exception as e:
-        qoaLogger.error(
-            "Error {} when querying timeseries mean absolute error: {}".format(
-                type(e), e.__traceback__
-            )
+        qoa_logger.exception(
+            f"Error {type(e)} when querying timeseries mean absolute error"
         )
-        traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get model mean absolute error"}
 
 
@@ -77,57 +50,43 @@ def ts_inference_loss(model):
         metrics = ts_inference_metric(model, "loss")
         return {"Loss": metrics}
     except Exception as e:
-        qoaLogger.error(
-            "Error {} when querying timeseries mean absolute error: {}".format(
-                type(e), e.__traceback__
-            )
+        qoa_logger.exception(
+            f"Error {type(e)} when querying timeseries mean absolute error"
         )
-        traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get model mean absolute error"}
 
 
 def training_metric(model):
     try:
-        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return model.history.history
         else:
             return None
     except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying training metrics: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} when querying training metrics")
         return {"Error": "Unable to get training metrics"}
 
 
 def training_loss(model):
     try:
-        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Training Loss": model.history.history["loss"]}
         else:
             return None
     except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying training loss: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} when querying training loss")
         return {"Error": "Unable to get training loss"}
 
 
 def training_val_accuracy(model):
     try:
-        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Evaluate Accuracy": model.history.history["val_accuracy"]}
         else:
             return None
     except Exception as e:
-        qoaLogger.error(
-            "Error {} when querying training validation accuracy: {}".format(
-                type(e), e.__traceback__
-            )
+        qoa_logger.exception(
+            f"Error {type(e)} when querying training validation accuracy"
         )
         traceback.print_exception(*sys.exc_info())
         return {"Error": "Unable to get validation accuracy"}
@@ -135,31 +94,12 @@ def training_val_accuracy(model):
 
 def training_accuracy(model):
     try:
-        import_tf()
-        if isinstance(model, tf.keras.Sequential):
-            return {"Train Accuracy": model.history.history["accuracy"]}
-        else:
-            return None
-    except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying training accuracy: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
-        return {"Error": "Unable to get accuracy"}
-
-
-def training_val_loss(model):
-    try:
-        import_tf()
         if isinstance(model, tf.keras.Sequential):
             return {"Evaluate Loss": model.history.history["val_loss"]}
         else:
             return None
     except Exception as e:
-        qoaLogger.error(
-            f"Error {type(e)} when querying training validation loss: {e.__traceback__}"
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} when querying training validation loss")
         return {"Error": "Unable to get validation loss"}
 
 
@@ -167,18 +107,11 @@ def classification_confidence(data, score=True):
     try:
         if score:
             return {"Confidence": 100 * np.max(data)}
+        elif is_numpyarray(data):
+            scores = tf.nn.softmax(data[0])
+            return {"Confidence": 100 * np.max(scores)}
         else:
-            if is_numpyarray(data):
-                import_tf()
-                scores = tf.nn.softmax(data[0])
-                return {"Confidence": 100 * np.max(scores)}
-            else:
-                return {"Error": f"Unsupported data: {type(data)}"}
+            return {"Error": f"Unsupported data: {type(data)}"}
     except Exception as e:
-        qoaLogger.error(
-            "Error {} in extracting classification confidence: {}".format(
-                type(e), e.__traceback__
-            )
-        )
-        traceback.print_exception(*sys.exc_info())
+        qoa_logger.exception(f"Error {type(e)} in extracting classification confidence")
         return {"Error": "Unable to get classification confidence"}

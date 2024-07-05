@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Union
 from .config.configs import MetricConfig
 from .lang.datamodel_enum import MetricClassEnum, MetricNameEnum
 from .metric import Counter, Gauge, Histogram, PrometheusMetric, Summary
-from .utils.qoa_utils import qoa_logger
+from .utils.logger import qoa_logger
 
 
 class MetricManager:
