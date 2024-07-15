@@ -22,23 +22,20 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"
-certifi = ">=2023.7.22"
 pika = ">=1.3.2"
 psutil = ">=5.9.2"
 python-dateutil = ">=2.8.2"
-pytz = ">=2023.3.post1"
 PyYAML = ">=6.0.1"
 requests = ">=2.31.0"
 tzdata = ">=2023.3"
 urllib3 = ">=1.26.16"
-pre-commit = ">=3.5.0"
 fastapi = ">=0.110.2"
 flatten_dict = ">=0.4.2"
 pydantic = ">=2.7.4,<2.8"
 tinyflux = ">=1.0.0"
 uvicorn = ">=0.29.0"
-setuptools = "==65.5.1"
 lazy-import = ">=0.2.2"
+confluent-kafka = "^2.4.0"
 
 docker_py = { version = "1.10.6", optional = true }
 paho_mqtt = { version = "1.6.1", optional = true }
@@ -78,7 +75,7 @@ exclude = ["src/qoa4ml/utils/pynvml_forked.py"]
 [tool.ruff.lint]
 select = [
   "F", # Pyflakes
-  # "PL",  # Pylint
+  # "PL",  # Pylint convention
   "E",   # Pycode styles
   "W",   # Pycode styles
   "N",   # Pep8 naming
@@ -96,6 +93,8 @@ ignore = [
   "RET505", # Unnecessary else after return
   "C901",   # Too complex function
   "B904",   # raise-without-from-inside-except, enable when understand more
+  "PLR",
+  "ISC001",
 ]
 
 [tool.ruff.lint.pylint]

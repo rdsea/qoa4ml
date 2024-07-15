@@ -29,9 +29,7 @@ class MetricManager:
         except Exception as e:
             qoa_logger.error(
                 str(
-                    "[ERROR] - Error {} when resetting metric in QoA client: {}".format(
-                        type(e), e.__traceback__
-                    )
+                    f"[ERROR] - Error {type(e)} when resetting metric in QoA client: {e.__traceback__}"
                 )
             )
 
@@ -50,9 +48,7 @@ class MetricManager:
         except Exception as e:
             qoa_logger.error(
                 str(
-                    "[ERROR] - Error {} when getting metric from QoA client: {}".format(
-                        type(e), e.__traceback__
-                    )
+                    f"[ERROR] - Error {type(e)} when getting metric from QoA client: {e.__traceback__}"
                 )
             )
 

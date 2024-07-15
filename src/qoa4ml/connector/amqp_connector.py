@@ -9,26 +9,26 @@ from .base_connector import BaseConnector
 
 class AmqpConnector(BaseConnector):
     # Init an amqp client handling the connection to amqp servier
-    def __init__(self, configuration: AMQPConnectorConfig, log: bool = False):
+    def __init__(self, config: AMQPConnectorConfig, log: bool = False):
         """
         AMQP connector
         configuration: a dictionary include broker and queue information
         log: a bool flag for logging message if being set to True, default is False
         """
-        self.conf = configuration
-        self.exchange_name = configuration.exchange_name
-        self.exchange_type = configuration.exchange_type
-        self.out_routing_key = configuration.out_routing_key
+        self.conf = config
+        self.exchange_name = config.exchange_name
+        self.exchange_type = config.exchange_type
+        self.out_routing_key = config.out_routing_key
         self.log_flag = log
 
         # Connect to RabbitMQ host
-        if "amqps://" in configuration.end_point:
+        if "amqps://" in config.end_point:
             self.out_connection = pika.BlockingConnection(
-                pika.URLParameters(configuration.end_point)
+                pika.URLParameters(config.end_point)
             )
         else:
             self.out_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=configuration.end_point)
+                pika.ConnectionParameters(host=config.end_point)
             )
 
         # Create a channel
