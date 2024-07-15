@@ -1,11 +1,17 @@
 import sys
 import traceback
+from typing import TYPE_CHECKING
 
-import numpy as np
-import tensorflow as tf
+import lazy_import
 
 from ..utils.logger import qoa_logger
 from ..utils.qoa_utils import is_numpyarray
+
+np = lazy_import.lazy_module("numpy")
+tf = lazy_import.lazy_module("tensorflow")
+if TYPE_CHECKING:
+    import numpy as np
+    import tensorflow as tf
 
 
 def timeseries_metric(model):
