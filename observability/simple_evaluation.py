@@ -1,6 +1,7 @@
 """
 a simple python showing how to invoke the QoA4ML OPA service
 """
+
 import sys
 import argparse
 import json

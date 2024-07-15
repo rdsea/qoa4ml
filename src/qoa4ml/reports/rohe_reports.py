@@ -124,9 +124,7 @@ class RoheReport(AbstractReport):
                 previous_report.inference_report.ml_specific.linked_list
             )
             current_end_point = self.inference_report.ml_specific.end_point
-            previous_end_point = (
-                previous_report.inference_report.ml_specific.end_point
-            )
+            previous_end_point = previous_report.inference_report.ml_specific.end_point
             self.inference_report.ml_specific.linked_list[
                 current_end_point.instance_id
             ].previous.append(previous_end_point)

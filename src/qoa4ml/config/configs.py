@@ -62,9 +62,26 @@ class PrometheusConnectorConfig(BaseModel):
     pass
 
 
+class KafkaConnectorConfig(BaseModel):
+    topic: str
+    broker_url: str
+
+
+class KafkaCollectorConfig(BaseModel):
+    topic: str
+    broker_url: str
+    group_id: str
+    auto_offset_reset: str = "earliest"
+    poll_inteval: float = 1.0
+
+
 # TODO: test if loading the config, the type of the config can be found
-CollectorConfigClass = Union[AMQPCollectorConfig, SocketCollectorConfig, Dict]
-ConnectorConfigClass = Union[AMQPConnectorConfig, SocketConnectorConfig, Dict]
+CollectorConfigClass = Union[
+    AMQPCollectorConfig, SocketCollectorConfig, KafkaCollectorConfig, Dict
+]
+ConnectorConfigClass = Union[
+    AMQPConnectorConfig, SocketConnectorConfig, KafkaConnectorConfig, Dict
+]
 
 
 class CollectorConfig(BaseModel):
