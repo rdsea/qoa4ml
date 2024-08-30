@@ -1,0 +1,15 @@
+client:
+  username: aaltoseas
+  instance_name: ml_inference2
+  stage_id: ml_inference_ensemble
+  functionality: TensorFlow
+  application_name: test
+  role: ml
+connector:
+  - name: amqp_connector
+    connector_class: AMQP
+    config:
+      end_point: localhost
+      exchange_name: test_qoa4ml
+      exchange_type: topic
+      out_routing_key: test.client4

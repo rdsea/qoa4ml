@@ -1,0 +1,5 @@
+frequency: 1
+require_register: false
+latency_logging_path: "logs/"
+log_latency_flag: true
+environment: "HPC"

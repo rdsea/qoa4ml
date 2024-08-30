@@ -1,0 +1,470 @@
+{
+  "execution_graph": {
+    "end_point": {
+      "functionality": "Max Aggregate",
+      "id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+      "name": "",
+      "stage": "Aggregate"
+    },
+    "linked_list": {
+      "3fc71830-cd50-4a10-a230-0c15fa794b4d": {
+        "instance": {
+          "functionality": "TensorFlow",
+          "id": "3fc71830-cd50-4a10-a230-0c15fa794b4d",
+          "name": "",
+          "stage": "ml_inference_ensemble"
+        },
+        "previous": [
+          {
+            "functionality": "transformation",
+            "id": "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175",
+            "name": "",
+            "stage": "data_processing"
+          }
+        ]
+      },
+      "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+        "instance": {
+          "functionality": "transformation",
+          "id": "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175",
+          "name": "",
+          "stage": "data_processing"
+        },
+        "previous": [
+          {
+            "functionality": "REST",
+            "id": "7448d242-1fb8-4a4d-bad1-a004b144d6a9",
+            "name": "",
+            "stage": "gateway"
+          }
+        ]
+      },
+      "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+        "instance": {
+          "functionality": "REST",
+          "id": "7448d242-1fb8-4a4d-bad1-a004b144d6a9",
+          "name": "",
+          "stage": "gateway"
+        },
+        "previous": []
+      },
+      "e3babe1d-3411-4b6c-8ba6-4f5466015129": {
+        "instance": {
+          "functionality": "Max Aggregate",
+          "id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+          "name": "",
+          "stage": "Aggregate"
+        },
+        "previous": [
+          {
+            "functionality": "TensorFlow",
+            "id": "3fc71830-cd50-4a10-a230-0c15fa794b4d",
+            "name": "",
+            "stage": "ml_inference_ensemble"
+          },
+          {
+            "functionality": "TensorFlow",
+            "id": "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9",
+            "name": "",
+            "stage": "ml_inference_ensemble"
+          }
+        ]
+      },
+      "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9": {
+        "instance": {
+          "functionality": "TensorFlow",
+          "id": "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9",
+          "name": "",
+          "stage": "ml_inference_ensemble"
+        },
+        "previous": [
+          {
+            "functionality": "transformation",
+            "id": "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175",
+            "name": "",
+            "stage": "data_processing"
+          }
+        ]
+      }
+    }
+  },
+  "inference_report": {
+    "data": {
+      "data_processing": {
+        "metrics": {
+          "image_height": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "image_height",
+              "records": [
+                50.0
+              ],
+              "unit": null
+            }
+          },
+          "image_width": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "image_width",
+              "records": [
+                97.0
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "object_height",
+              "records": [
+                76.0
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "object_width",
+              "records": [
+                57.0
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "data_processing"
+      },
+      "gateway": {
+        "metrics": {
+          "image_height": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "image_height",
+              "records": [
+                85.0
+              ],
+              "unit": null
+            }
+          },
+          "image_width": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "image_width",
+              "records": [
+                54.0
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "object_height",
+              "records": [
+                16.0
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "object_width",
+              "records": [
+                46.0
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "gateway"
+      }
+    },
+    "ml_specific": {
+      "end_point": {
+        "functionality": "Max Aggregate",
+        "inference_id": "c7613f93-3270-4d7d-b275-5c8a64561ae7",
+        "instance_id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+        "metrics": [
+          {
+            "description": null,
+            "metric_name": "confidence",
+            "records": [
+              19.0
+            ],
+            "unit": null
+          },
+          {
+            "description": null,
+            "metric_name": "accuracy",
+            "records": [
+              38.0
+            ],
+            "unit": null
+          }
+        ],
+        "prediction": 447.0
+      },
+      "linked_list": {
+        "3fc71830-cd50-4a10-a230-0c15fa794b4d": {
+          "instance": {
+            "functionality": "TensorFlow",
+            "inference_id": "59f33d12-9bbb-43cb-8762-a9f9aa10bc3d",
+            "instance_id": "3fc71830-cd50-4a10-a230-0c15fa794b4d",
+            "metrics": [
+              {
+                "description": null,
+                "metric_name": "confidence",
+                "records": [
+                  43.0
+                ],
+                "unit": null
+              },
+              {
+                "description": null,
+                "metric_name": "accuracy",
+                "records": [
+                  80.0
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": 286.0
+          },
+          "previous": []
+        },
+        "e3babe1d-3411-4b6c-8ba6-4f5466015129": {
+          "instance": {
+            "functionality": "Max Aggregate",
+            "inference_id": "c7613f93-3270-4d7d-b275-5c8a64561ae7",
+            "instance_id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+            "metrics": [
+              {
+                "description": null,
+                "metric_name": "confidence",
+                "records": [
+                  19.0
+                ],
+                "unit": null
+              },
+              {
+                "description": null,
+                "metric_name": "accuracy",
+                "records": [
+                  38.0
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": 447.0
+          },
+          "previous": [
+            {
+              "functionality": "Max Aggregate",
+              "inference_id": "c7613f93-3270-4d7d-b275-5c8a64561ae7",
+              "instance_id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+              "metrics": [
+                {
+                  "description": null,
+                  "metric_name": "confidence",
+                  "records": [
+                    19.0
+                  ],
+                  "unit": null
+                },
+                {
+                  "description": null,
+                  "metric_name": "accuracy",
+                  "records": [
+                    38.0
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": 447.0
+            },
+            {
+              "functionality": "TensorFlow",
+              "inference_id": "558bd7d4-cb5e-47fd-928d-7be1c5f5a2e6",
+              "instance_id": "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9",
+              "metrics": [
+                {
+                  "description": null,
+                  "metric_name": "confidence",
+                  "records": [
+                    48.0
+                  ],
+                  "unit": null
+                },
+                {
+                  "description": null,
+                  "metric_name": "accuracy",
+                  "records": [
+                    98.0
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": 784.0
+            }
+          ]
+        },
+        "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9": {
+          "instance": {
+            "functionality": "TensorFlow",
+            "inference_id": "558bd7d4-cb5e-47fd-928d-7be1c5f5a2e6",
+            "instance_id": "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9",
+            "metrics": [
+              {
+                "description": null,
+                "metric_name": "confidence",
+                "records": [
+                  48.0
+                ],
+                "unit": null
+              },
+              {
+                "description": null,
+                "metric_name": "accuracy",
+                "records": [
+                  98.0
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": 784.0
+          },
+          "previous": []
+        }
+      }
+    },
+    "service": {
+      "Aggregate": {
+        "metrics": {
+          "response_time": {
+            "e3babe1d-3411-4b6c-8ba6-4f5466015129": {
+              "description": "",
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 2.0742416381835938e-05,
+                  "startTime": 1716897586.0072067
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "Aggregate"
+      },
+      "data_processing": {
+        "metrics": {
+          "metric1": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "metric1",
+              "records": [
+                79.0
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "metric2",
+              "records": [
+                100.0
+              ],
+              "unit": null
+            }
+          },
+          "response_time": {
+            "5c517e3f-a8bd-4ca3-b891-4d6bc9f64175": {
+              "description": "",
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 8.559226989746094e-05,
+                  "startTime": 1716897586.00482
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "data_processing"
+      },
+      "gateway": {
+        "metrics": {
+          "metric1": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "metric1",
+              "records": [
+                69.0
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "7448d242-1fb8-4a4d-bad1-a004b144d6a9": {
+              "description": "",
+              "metric_name": "metric2",
+              "records": [
+                72.0
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "gateway"
+      },
+      "ml_inference_ensemble": {
+        "metrics": {
+          "response_time": {
+            "3fc71830-cd50-4a10-a230-0c15fa794b4d": {
+              "description": "",
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 7.033348083496094e-05,
+                  "startTime": 1716897586.0054817
+                }
+              ],
+              "unit": null
+            },
+            "fb6ceb5e-f464-4e65-9c3b-7c95c494bac9": {
+              "description": "",
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 6.0558319091796875e-05,
+                  "startTime": 1716897586.0062585
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "ml_inference_ensemble"
+      }
+    }
+  },
+  "metadata": {
+    "client_config": {
+      "application_name": "test",
+      "functionality": "Max Aggregate",
+      "id": "e3babe1d-3411-4b6c-8ba6-4f5466015129",
+      "instance_id": "Agg01",
+      "name": "",
+      "role": "ml",
+      "run_id": "",
+      "stage_id": "Aggregate",
+      "user_id": "aaltosea5"
+    },
+    "runtime": 0.007564067840576172,
+    "timestamp": 1716897586.0073323
+  }
+}

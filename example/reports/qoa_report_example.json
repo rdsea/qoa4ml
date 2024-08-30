@@ -1,0 +1,164 @@
+{
+  "execution_graph": {
+    "instances": {
+      "22e0af69-3fe2-4451-9d63-b3f627e3a676": {
+        "instance_name": "data processing Raps 02",
+        "method": "Transformation",
+        "previous_instance": [
+          "40a7fd9b-84cb-4c4f-9531-af91c05b9f77"
+        ]
+      },
+      "40a7fd9b-84cb-4c4f-9531-af91c05b9f77": {
+        "instance_name": "data handling01 Raps",
+        "method": "REST",
+        "previous_instance": []
+      },
+      "5e4f82e8-f2ff-45a8-8809-140f98253e4d": {
+        "instance_name": "Inference Jet 05",
+        "method": "Max Aggregate",
+        "previous_instance": [
+          "78c2f055-721b-4867-85ff-f90494b5dd7b",
+          "8ae48ecc-b2f0-482f-9845-a03ab05764cb"
+        ]
+      },
+      "78c2f055-721b-4867-85ff-f90494b5dd7b": {
+        "instance_name": "Inference Jet 03",
+        "method": "TensorFlow",
+        "previous_instance": [
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676"
+        ]
+      },
+      "8ae48ecc-b2f0-482f-9845-a03ab05764cb": {
+        "instance_name": "Inference Jet 04",
+        "method": "TensorFlow",
+        "previous_instance": [
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676"
+        ]
+      }
+    },
+    "last_instance": "5e4f82e8-f2ff-45a8-8809-140f98253e4d"
+  },
+  "quality": {
+    "data": {
+      "DataProcessing": {
+        "image_height": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 242
+        },
+        "image_width": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 100
+        },
+        "object_height": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 52
+        },
+        "object_width": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 40
+        }
+      },
+      "Gateway": {
+        "image_height": {
+          "40a7fd9b-84cb-4c4f-9531-af91c05b9f77": 42
+        },
+        "image_width": {
+          "40a7fd9b-84cb-4c4f-9531-af91c05b9f77": 20
+        }
+      },
+      "MLInference Aggregate": {
+        "object_height2": {
+          "5e4f82e8-f2ff-45a8-8809-140f98253e4d": 345
+        }
+      },
+      "MLInference Ensemble": {
+        "object_height": {
+          "78c2f055-721b-4867-85ff-f90494b5dd7b": 52
+        },
+        "object_height3": {
+          "8ae48ecc-b2f0-482f-9845-a03ab05764cb": 654
+        }
+      }
+    },
+    "inference": {
+      "0b39a5db-b16c-42e6-af8e-f3a0ca022a85": {
+        "confidence": 0.4,
+        "instance_id": "8ae48ecc-b2f0-482f-9845-a03ab05764cb",
+        "source": [],
+        "value": {
+          "cat": 841
+        }
+      },
+      "51fe4c60-7f30-4cfb-8521-69d4c6b810f2": {
+        "confidence": 0.8,
+        "instance_id": "78c2f055-721b-4867-85ff-f90494b5dd7b",
+        "source": [],
+        "value": {
+          "number": 19
+        }
+      },
+      "5595ed89-41c5-4a0c-b18e-85a0aab912fa": {
+        "confidence": 0.5,
+        "instance_id": "5e4f82e8-f2ff-45a8-8809-140f98253e4d",
+        "source": [
+          "51fe4c60-7f30-4cfb-8521-69d4c6b810f2",
+          "0b39a5db-b16c-42e6-af8e-f3a0ca022a85"
+        ],
+        "value": {
+          "cat": 345
+        }
+      },
+      "last_inference": "5595ed89-41c5-4a0c-b18e-85a0aab912fa"
+    },
+    "service": {
+      "DataProcessing": {
+        "Response Time": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": {
+            "response_time": 0.2010021209716797,
+            "start_time": 1684746282.105319
+          }
+        },
+        "metric1": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 56
+        },
+        "metric2": {
+          "22e0af69-3fe2-4451-9d63-b3f627e3a676": 34
+        }
+      },
+      "Gateway": {
+        "Response Time": {
+          "40a7fd9b-84cb-4c4f-9531-af91c05b9f77": {
+            "response_time": 0.10008597373962402,
+            "start_time": 1684746281.902005
+          }
+        },
+        "metric1": {
+          "40a7fd9b-84cb-4c4f-9531-af91c05b9f77": 10
+        }
+      },
+      "MLInference Aggregate": {
+        "Response Time": {
+          "5e4f82e8-f2ff-45a8-8809-140f98253e4d": {
+            "response_time": 0.20208120346069336,
+            "start_time": 1684746282.947917
+          }
+        },
+        "metric15": {
+          "5e4f82e8-f2ff-45a8-8809-140f98253e4d": 4345
+        }
+      },
+      "MLInference Ensemble": {
+        "Response Time": {
+          "78c2f055-721b-4867-85ff-f90494b5dd7b": {
+            "response_time": 0.20420598983764648,
+            "start_time": 1684746282.383123
+          },
+          "8ae48ecc-b2f0-482f-9845-a03ab05764cb": {
+            "response_time": 0.20443487167358398,
+            "start_time": 1684746282.663837
+          }
+        },
+        "metric1": {
+          "78c2f055-721b-4867-85ff-f90494b5dd7b": 56,
+          "8ae48ecc-b2f0-482f-9845-a03ab05764cb": 342
+        }
+      }
+    }
+  }
+}

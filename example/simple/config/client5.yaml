@@ -1,0 +1,15 @@
+client:
+  username: aaltosea5
+  instance_name: Agg01
+  stage_id: Aggregate
+  functionality: Max Aggregate
+  application_name: test
+  role: ml
+connector:
+  - name: amqp_connector
+    connector_class: AMQP
+    config:
+      end_point: localhost
+      exchange_name: test_qoa4ml
+      exchange_type: topic
+      out_routing_key: test.client5

@@ -1,0 +1,260 @@
+{
+  "cost": {
+    "cost": {
+      "class": "cost",
+      "operators": [
+        "min",
+        "max"
+      ],
+      "unit": [
+        "USD",
+        "EUR",
+        "other"
+      ],
+      "value": "value"
+    },
+    "pricingmodel": {
+      "class": "cost",
+      "name": "name"
+    }
+  },
+  "fairness": {
+    "Predictionbias": {
+      "class": [
+        "Accuracy"
+      ],
+      "operators": [
+        "min",
+        "max"
+      ],
+      "unit": "percentage",
+      "value": "value"
+    }
+  },
+  "interpretability": {
+    "explainability": {
+      "modes": [
+        "full",
+        "compact"
+      ]
+    }
+  },
+  "privacy": {
+    "membershipinferencerisk": {
+      "class": [
+        "Privacy"
+      ],
+      "operators": [
+        "min",
+        "max"
+      ],
+      "range": [
+        0,
+        1
+      ],
+      "unit": "float",
+      "value": "value"
+    }
+  },
+  "quality": {
+    "data": {
+      "Accuracy": {
+        "class": [
+          "qualityofdata"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "Completeness": {
+        "operators": [
+          "min",
+          "max"
+        ],
+        "resourceType": [
+          "qualityofdata"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      }
+    },
+    "mlmodels": {
+      "AUC": {
+        "class": [
+          "Accuracy"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "Accuracy": {
+        "class": [
+          "Accuracy"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "MSE": {
+        "class": [
+          "Accuracy"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "Precision": {
+        "class": [
+          "Accuracy"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "Recall": {
+        "class": [
+          "Accuracy"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      }
+    },
+    "services": {
+      "Reliability": {
+        "class": [
+          "performance"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "percentage",
+        "value": "value"
+      },
+      "ResponseTime": {
+        "class": [
+          "performance"
+        ],
+        "operators": [
+          "min",
+          "max"
+        ],
+        "unit": "ms",
+        "value": "value"
+      }
+    }
+  },
+  "resources": {
+    "data": [
+      {
+        "datatypes": [
+          "video",
+          "image",
+          "message"
+        ],
+        "formats": [
+          "binary",
+          "csv",
+          "json",
+          "avro"
+        ],
+        "id": "data_id"
+      }
+    ],
+    "mlmodels": [
+      {
+        "formats": [
+          "kerash5",
+          "onnx"
+        ],
+        "id": "mlmodel_id",
+        "inferencemodes": [
+          "static",
+          "dynamic"
+        ],
+        "mlinfrastructures": [
+          "tensorflow",
+          "predictio"
+        ],
+        "modelclasses": [
+          "SVM",
+          "DT",
+          "CNN",
+          "RNN",
+          "LR",
+          "KMeans",
+          "ANN"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "id": "service_id",
+        "machinetypes": [
+          "micro",
+          "small",
+          "normal"
+        ],
+        "processortypes": [
+          "CPU",
+          "GPU",
+          "TPU"
+        ],
+        "serviceapis": [
+          "rest",
+          "mqtt",
+          "kafka",
+          "amqp",
+          "coapp"
+        ]
+      }
+    ]
+  },
+  "security": {
+    "encryptedinference": {
+      "mode": [
+        true,
+        false
+      ]
+    },
+    "encryption": {
+      "types": [
+        "end2end"
+      ]
+    }
+  },
+  "stakeholders": [
+    {
+      "id": "name",
+      "provisioning": [
+        "mlservice",
+        "storage",
+        "mlmodels"
+      ],
+      "roles": [
+        "mlconsumer",
+        "mlprovider",
+        "mlinfrastructure"
+      ]
+    }
+  ]
+}

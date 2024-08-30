@@ -1,0 +1,37 @@
+client:
+  username: aaltosea1
+  instance_name: data_handling01
+  stage_id: gateway
+  functionality: REST
+  application_name: test
+  role: ml
+connector:
+  - name: debug_connector
+    connector_class: Debug
+  # - name: amqp_connector
+  #   connector_class: AMQP
+  #   config:
+  #     end_point: localhost
+  #     exchange_name: test_qoa4ml
+  #     exchange_type: topic
+  #     out_routing_key: test.client1
+probes:
+  - probe_type: "docker"
+    frequency: 9999999
+    require_register: false
+    log_latency_flag: false
+    environment: Edge
+    container_list: ["test"]
+
+  - probe_type: "system"
+    frequency: 1
+    require_register: false
+    log_latency_flag: false
+    environment: Edge
+    node_name: "Edge1"
+
+  - probe_type: "process"
+    frequency: 1
+    require_register: false
+    log_latency_flag: false
+    environment: Edge

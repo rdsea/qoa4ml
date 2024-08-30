@@ -1,0 +1,312 @@
+{
+  "data": {
+    "data_processing": {
+      "metrics": {
+        "image_height": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "image_height",
+            "records": [
+              26.0
+            ],
+            "unit": null
+          }
+        },
+        "image_width": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "image_width",
+            "records": [
+              59.0
+            ],
+            "unit": null
+          }
+        },
+        "object_height": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "object_height",
+            "records": [
+              46.0
+            ],
+            "unit": null
+          }
+        },
+        "object_width": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "object_width",
+            "records": [
+              62.0
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "data_processing"
+    },
+    "gateway": {
+      "metrics": {
+        "image_height": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "image_height",
+            "records": [
+              47.0
+            ],
+            "unit": null
+          }
+        },
+        "image_width": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "image_width",
+            "records": [
+              29.0
+            ],
+            "unit": null
+          }
+        },
+        "object_height": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "object_height",
+            "records": [
+              41.0
+            ],
+            "unit": null
+          }
+        },
+        "object_width": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "object_width",
+            "records": [
+              36.0
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "gateway"
+    }
+  },
+  "metadata": {
+    "client_config": {
+      "application_name": "test",
+      "custom_info": "",
+      "environment": "Edge",
+      "functionality": "Max Aggregate",
+      "id": "91691ea2-71cd-46e5-a71b-3cdc1a759ab7",
+      "instance_id": "d3f45252-6751-4b8d-a447-40348af78829",
+      "instance_name": "Agg01",
+      "name": "",
+      "role": "ml",
+      "run_id": "",
+      "stage_id": "Aggregate",
+      "user_id": "",
+      "username": "aaltosea5"
+    },
+    "runtime": 3.034541130065918,
+    "timestamp": 1724329473.9458544
+  },
+  "ml_inference": {
+    "44423580-1d94-4f48-997a-72ece3d8c27e": {
+      "functionality": "TensorFlow",
+      "inference_id": "f0c84e68-f912-4de8-9fd5-efa69d14194d",
+      "instance_id": "44423580-1d94-4f48-997a-72ece3d8c27e",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            26.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            99.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 873.0
+    },
+    "4f407cf0-aa93-4d01-9fb2-17d576515ce5": {
+      "functionality": "TensorFlow",
+      "inference_id": "e041bb37-9ffd-4d1e-8cff-a72e75e3ad2a",
+      "instance_id": "4f407cf0-aa93-4d01-9fb2-17d576515ce5",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            24.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            86.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 323.0
+    },
+    "91691ea2-71cd-46e5-a71b-3cdc1a759ab7": {
+      "functionality": "Max Aggregate",
+      "inference_id": "f113bf1b-09de-4645-a63c-a54944900273",
+      "instance_id": "91691ea2-71cd-46e5-a71b-3cdc1a759ab7",
+      "metrics": [
+        {
+          "description": null,
+          "metric_name": "confidence",
+          "records": [
+            72.0
+          ],
+          "unit": null
+        },
+        {
+          "description": null,
+          "metric_name": "accuracy",
+          "records": [
+            67.0
+          ],
+          "unit": null
+        }
+      ],
+      "prediction": 579.0
+    }
+  },
+  "service": {
+    "Aggregate": {
+      "metrics": {
+        "response_time": {
+          "91691ea2-71cd-46e5-a71b-3cdc1a759ab7": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 7.62939453125e-05,
+                "startTime": 1724329473.9457033
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "Aggregate"
+    },
+    "data_processing": {
+      "metrics": {
+        "metric1": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "metric1",
+            "records": [
+              14.0
+            ],
+            "unit": null
+          }
+        },
+        "metric2": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "metric2",
+            "records": [
+              86.0
+            ],
+            "unit": null
+          }
+        },
+        "response_time": {
+          "bae6476c-70b4-41aa-ada7-aed491159824": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 0.00013113021850585938,
+                "startTime": 1724329473.9405596
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "data_processing"
+    },
+    "gateway": {
+      "metrics": {
+        "metric1": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "metric1",
+            "records": [
+              18.0
+            ],
+            "unit": null
+          }
+        },
+        "metric2": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "metric2",
+            "records": [
+              27.0
+            ],
+            "unit": null
+          }
+        },
+        "response_time": {
+          "070e8661-d078-451b-98c5-dd481ff5ad70": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 1.0082156658172607,
+                "startTime": 1724329472.9313204
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "gateway"
+    },
+    "ml_inference_ensemble": {
+      "metrics": {
+        "response_time": {
+          "44423580-1d94-4f48-997a-72ece3d8c27e": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 0.00013828277587890625,
+                "startTime": 1724329473.943732
+              }
+            ],
+            "unit": null
+          },
+          "4f407cf0-aa93-4d01-9fb2-17d576515ce5": {
+            "description": "",
+            "metric_name": "response_time",
+            "records": [
+              {
+                "responseTime": 9.179115295410156e-05,
+                "startTime": 1724329473.9419549
+              }
+            ],
+            "unit": null
+          }
+        }
+      },
+      "name": "ml_inference_ensemble"
+    }
+  }
+}

@@ -1,0 +1,436 @@
+{
+  "execution_graph": {
+    "end_point": {
+      "functionality": "REST",
+      "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+      "name": "",
+      "stage": "Aggregate"
+    },
+    "linked_list": {
+      "0f1dfa69-ba94-4aec-9c56-36677414a582": {
+        "instance": {
+          "functionality": "REST",
+          "id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+          "name": "",
+          "stage": "ml_inference_ensemble"
+        },
+        "previous": [
+          {
+            "functionality": "REST",
+            "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+            "name": "",
+            "stage": "data_processing"
+          }
+        ]
+      },
+      "3d203a15-9c30-4f5f-b9dd-03510ef8631f": {
+        "instance": {
+          "functionality": "REST",
+          "id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+          "name": "",
+          "stage": "ml_inference_ensemble"
+        },
+        "previous": [
+          {
+            "functionality": "REST",
+            "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+            "name": "",
+            "stage": "data_processing"
+          }
+        ]
+      },
+      "95d033ca-8cee-4642-92f5-de8afb00a650": {
+        "instance": {
+          "functionality": "REST",
+          "id": "95d033ca-8cee-4642-92f5-de8afb00a650",
+          "name": "",
+          "stage": "gateway"
+        },
+        "previous": []
+      },
+      "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+        "instance": {
+          "functionality": "REST",
+          "id": "9ffc52c1-297c-408f-88b7-8874520e9c57",
+          "name": "",
+          "stage": "data_processing"
+        },
+        "previous": [
+          {
+            "functionality": "REST",
+            "id": "95d033ca-8cee-4642-92f5-de8afb00a650",
+            "name": "",
+            "stage": "gateway"
+          }
+        ]
+      },
+      "de49f688-096f-4e06-8308-4d24a595dec5": {
+        "instance": {
+          "functionality": "REST",
+          "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+          "name": "",
+          "stage": "Aggregate"
+        },
+        "previous": [
+          {
+            "functionality": "REST",
+            "id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+            "name": "",
+            "stage": "ml_inference_ensemble"
+          },
+          {
+            "functionality": "REST",
+            "id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+            "name": "",
+            "stage": "ml_inference_ensemble"
+          }
+        ]
+      }
+    }
+  },
+  "inference_report": {
+    "data": {
+      "data_processing": {
+        "metrics": {
+          "image_height": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "image_height",
+              "records": [
+                78
+              ],
+              "unit": null
+            }
+          },
+          "image_width": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "image_width",
+              "records": [
+                31
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "object_height",
+              "records": [
+                12
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "object_width",
+              "records": [
+                26
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "data_processing"
+      },
+      "gateway": {
+        "metrics": {
+          "image_height": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "image_height",
+              "records": [
+                19
+              ],
+              "unit": null
+            }
+          },
+          "image_width": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "image_width",
+              "records": [
+                46
+              ],
+              "unit": null
+            }
+          },
+          "object_height": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "object_height",
+              "records": [
+                58
+              ],
+              "unit": null
+            }
+          },
+          "object_width": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "object_width",
+              "records": [
+                28
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "gateway"
+      }
+    },
+    "ml_specific": {
+      "end_point": {
+        "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+        "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+        "metrics": [
+          {
+            "metric_name": "confidence",
+            "records": [
+              5
+            ],
+            "unit": null
+          },
+          {
+            "metric_name": "accuracy",
+            "records": [
+              61
+            ],
+            "unit": null
+          }
+        ],
+        "prediction": null
+      },
+      "linked_list": {
+        "072fa88f-e335-41e7-b030-88e3ed22fba8": {
+          "instance": {
+            "execution_instance_id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+            "id": "072fa88f-e335-41e7-b030-88e3ed22fba8",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  84
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  91
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          },
+          "previous": []
+        },
+        "4cd15734-5e59-49fc-ade5-05c6a3df4e71": {
+          "instance": {
+            "execution_instance_id": "0f1dfa69-ba94-4aec-9c56-36677414a582",
+            "id": "4cd15734-5e59-49fc-ade5-05c6a3df4e71",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  76
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  7
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          },
+          "previous": []
+        },
+        "d56a4e83-a221-44dd-93fc-a5560d412fb0": {
+          "instance": {
+            "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+            "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+            "metrics": [
+              {
+                "metric_name": "confidence",
+                "records": [
+                  5
+                ],
+                "unit": null
+              },
+              {
+                "metric_name": "accuracy",
+                "records": [
+                  61
+                ],
+                "unit": null
+              }
+            ],
+            "prediction": null
+          },
+          "previous": [
+            {
+              "execution_instance_id": "de49f688-096f-4e06-8308-4d24a595dec5",
+              "id": "d56a4e83-a221-44dd-93fc-a5560d412fb0",
+              "metrics": [
+                {
+                  "metric_name": "confidence",
+                  "records": [
+                    5
+                  ],
+                  "unit": null
+                },
+                {
+                  "metric_name": "accuracy",
+                  "records": [
+                    61
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": null
+            },
+            {
+              "execution_instance_id": "3d203a15-9c30-4f5f-b9dd-03510ef8631f",
+              "id": "072fa88f-e335-41e7-b030-88e3ed22fba8",
+              "metrics": [
+                {
+                  "metric_name": "confidence",
+                  "records": [
+                    84
+                  ],
+                  "unit": null
+                },
+                {
+                  "metric_name": "accuracy",
+                  "records": [
+                    91
+                  ],
+                  "unit": null
+                }
+              ],
+              "prediction": null
+            }
+          ]
+        }
+      }
+    },
+    "service": {
+      "Aggregate": {
+        "metrics": {
+          "response_time": {
+            "de49f688-096f-4e06-8308-4d24a595dec5": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 1.8835067749023438e-05,
+                  "startTime": 1716535580.7241704
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "Aggregate"
+      },
+      "data_processing": {
+        "metrics": {
+          "metric1": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "metric1",
+              "records": [
+                24
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "metric2",
+              "records": [
+                8
+              ],
+              "unit": null
+            }
+          },
+          "response_time": {
+            "9ffc52c1-297c-408f-88b7-8874520e9c57": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 0.00010895729064941406,
+                  "startTime": 1716535580.7217674
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "data_processing"
+      },
+      "gateway": {
+        "metrics": {
+          "metric1": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "metric1",
+              "records": [
+                40
+              ],
+              "unit": null
+            }
+          },
+          "metric2": {
+            "95d033ca-8cee-4642-92f5-de8afb00a650": {
+              "metric_name": "metric2",
+              "records": [
+                95
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "gateway"
+      },
+      "ml_inference_ensemble": {
+        "metrics": {
+          "response_time": {
+            "0f1dfa69-ba94-4aec-9c56-36677414a582": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 7.271766662597656e-05,
+                  "startTime": 1716535580.7223608
+                }
+              ],
+              "unit": null
+            },
+            "3d203a15-9c30-4f5f-b9dd-03510ef8631f": {
+              "metric_name": "response_time",
+              "records": [
+                {
+                  "responseTime": 7.176399230957031e-05,
+                  "startTime": 1716535580.7232397
+                }
+              ],
+              "unit": null
+            }
+          }
+        },
+        "name": "ml_inference_ensemble"
+      }
+    }
+  },
+  "metadata": {
+    "client_config": {
+      "application_name": "",
+      "functionality": "REST",
+      "id": "de49f688-096f-4e06-8308-4d24a595dec5",
+      "instance_id": "Agg01",
+      "name": "",
+      "role": "ml",
+      "run_id": "",
+      "stage_id": "Aggregate",
+      "user_id": "aaltosea5"
+    },
+    "runtime": 0.006242036819458008,
+    "timestamp": 1716535580.724298
+  }
+}

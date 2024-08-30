@@ -1,0 +1,14 @@
+{
+  "client_info": {
+    "id": "aaltosea1",
+    "roles": "ml_provider"
+  },
+  "command": "CREATE",
+  "model": {
+    "name": "LSTM"
+  },
+  "service": {
+    "metric": "power_grid",
+    "name": "PowerGrid Prediction"
+  }
+}

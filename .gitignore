@@ -1,0 +1,22 @@
+test/
+modules/orchestration/temp/
+.venv
+*.DS_Store
+*.jpg
+*.pt
+*.pyc
+*.egg-info
+*.whl
+*.gz
+*__pycache__/
+# *.pyc
+.pypirc
+.cache/
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+.env
+*.pem
+observability/odop_obs/logs/*.txt
+observability/odop_obs/tinyflux/*.csv
+.python-version

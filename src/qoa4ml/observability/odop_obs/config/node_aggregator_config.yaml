@@ -1,0 +1,24 @@
+socket_collector_config:
+  host: "127.0.0.1"
+  port: 12345
+  backlog: 5
+  bufsize: 4096
+environment: "HPC"
+query_method: "GET"
+data_separator: "dot"
+unit_conversion:
+  cpu:
+    usage:
+      milicpu: 1
+      cputime: 2
+      percentage: 3
+  gpu:
+    usage:
+      percentage: 1
+  mem:
+    Gb: 1
+    Mb: 2
+    Kb: 3
+  frequency:
+    GHz: 1
+    MHz: 2

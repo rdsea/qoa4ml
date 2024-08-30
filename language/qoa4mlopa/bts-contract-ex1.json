@@ -1,0 +1,80 @@
+{
+  "interpretability": {
+    "explanability": {
+      "modes": [
+        "full"
+      ]
+    }
+  },
+  "quality": {
+    "data": {
+      "Accuracy": {
+        "operators": [
+          "min"
+        ],
+        "value": "100"
+      }
+    },
+    "mlmodels": {
+      "Accuracy": {
+        "operators": [
+          "min"
+        ],
+        "value": "100"
+      }
+    },
+    "services": {
+      "ResponseTime": {
+        "operators": [
+          "min"
+        ],
+        "value": "100"
+      }
+    }
+  },
+  "resources": {
+    "data": [
+      {
+        "datatypes": [
+          "files"
+        ],
+        "formats": [
+          "wrong"
+        ],
+        "id": "alarmdata"
+      }
+    ],
+    "mlmodels": [
+      {
+        "formats": [
+          "kerash5"
+        ],
+        "id": "model1",
+        "mlinfrastructures": [
+          "tensorflow",
+          "predictio"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "id": "alarmservice",
+        "machinetypes": [
+          "small"
+        ],
+        "processortypes": [
+          "GPU"
+        ],
+        "serviceapi": [
+          "mqtt"
+        ]
+      }
+    ]
+  },
+  "stakeholders": {
+    "id": "mobifone",
+    "roles": [
+      "mlprovider"
+    ]
+  }
+}

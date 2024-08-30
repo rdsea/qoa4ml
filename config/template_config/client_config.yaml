@@ -1,0 +1,30 @@
+---
+#client configuration
+client:
+  user_id: aaltosea1
+  instance_name: data_handling01
+  stage_id: Gateway
+  functionality: REST
+  application_name: test
+  role: ml
+
+# collector configuration
+collector:
+  amqp_collector:
+    class: amqp
+    conf:
+      end_point: localhost
+      exchange_name: exchange_name
+      exchange_type: topic
+      in_routing_key: qoa1.report.#
+      in_queue: collector_1
+
+# connector configuration
+connector:
+  amqp_connector:
+    class: amqp
+    conf:
+      end_point: localhost
+      exchange_name: qoa4ml
+      exchange_type: topic
+      out_routing_key: qoa1.report.ml

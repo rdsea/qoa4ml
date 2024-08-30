@@ -1,0 +1,44 @@
+{
+  "qoa4mlattributes": {
+    "__comment": "it is like a catalog of attributes. We can load it for APIs",
+    "quality": {
+      "data": {
+        "Accuracy": {
+          "description": "The ratio between correct and total data the service received (%)"
+        },
+        "Completeness": {
+          "description": "The ratio between received and expected number of data attributes sent to the service"
+        }
+      },
+      "mlmodels": {
+        "AUC": {
+          "description": "the measure of the ability of a classifier to distinguish between classes and is used as a summary of the ROC curve"
+        },
+        "Accuracy": {
+          "description": "can be measure in different way such as confidence score in classification models"
+        },
+        "MSE": {
+          "description": "Mean square error using for regression models"
+        },
+        "Precision": {
+          "description": "the fraction of true possitive respones over total number of positive responses"
+        },
+        "Recall": {
+          "description": "the fraction of true possitive respones over total number of correct responses"
+        },
+        "description": "Depend on model development, the model can provide diverse metric such as accuracy, precision, recall, mse. Sometime, the metrics can be infer after prediction, other ways, their measuring requires future data from client."
+      },
+      "services": {
+        "Availability": {
+          "description": "The ratio between up time and down time of the service (%)"
+        },
+        "Reliability": {
+          "description": "The ratio between correct and total service responses (%)"
+        },
+        "ResponseTime": {
+          "description": "The response time of each microservice, measured by the time period between receving and replying the request (s)"
+        }
+      }
+    }
+  }
+}
