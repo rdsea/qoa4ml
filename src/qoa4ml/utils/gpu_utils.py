@@ -1,4 +1,3 @@
-from .jetson_utils import find_igpu
 from .pynvml_forked import (
     nvmlDeviceGetCount,
     nvmlDeviceGetHandleByIndex,
@@ -38,7 +37,7 @@ def get_sys_gpu_usage():
 def get_sys_gpu_metadata():
     metadata = {}
     if not HAS_NVIDIA_GPU:
-        return find_igpu()
+        return {}
     try:
         device_count = nvmlDeviceGetCount()
     except Exception:

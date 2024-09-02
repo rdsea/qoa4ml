@@ -56,10 +56,10 @@ def find_dgpu():
     pass
 
 
-def get_gpu_load(gpu_load):
+def get_gpu_load(gpu_list):
     gpu_load = {}
     # Read iGPU frequency
-    for name, data in gpu_load.items():
+    for name, data in gpu_list.items():
         # Initialize GPU status
         gpu = {"type": data["type"]}
         if gpu["type"] == "integrated":

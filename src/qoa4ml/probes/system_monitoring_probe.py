@@ -8,8 +8,8 @@ import lazy_import
 from ..config.configs import ClientInfo, SystemProbeConfig
 from ..connector.base_connector import BaseConnector
 from ..lang.datamodel_enum import EnvironmentEnum
-from ..utils.gpu_utils import get_sys_gpu_metadata
-from ..utils.jetson_utils import get_gpu_load
+from ..utils.gpu_utils import get_sys_gpu_metadata, get_sys_gpu_usage
+from ..utils.jetson_utils import find_igpu, get_gpu_load
 from ..utils.qoa_utils import (
     convert_to_gbyte,
     convert_to_mbyte,
@@ -56,11 +56,17 @@ class SystemMonitoringProbe(Probe):
         return {"value": value, "unit": "percentage"}
 
     def get_gpu_metadata(self):
-        report = get_sys_gpu_metadata()
+        if self.environment == EnvironmentEnum.edge:
+            report = find_igpu()
+        else:
+            report = get_sys_gpu_metadata()
         return report
 
     def get_gpu_usage(self):
-        report = get_gpu_load(self.gpu_metadata)
+        if self.environment == EnvironmentEnum.edge:
+            report = get_gpu_load(self.gpu_metadata)
+        else:
+            report = get_sys_gpu_usage()
         return report
 
     def get_mem_metadata(self):
