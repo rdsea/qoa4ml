@@ -56,10 +56,10 @@ def find_dgpu():
     pass
 
 
-def get_gpu_status(self):
-    gpu_list = {}
+def get_gpu_load(gpu_load):
+    gpu_load = {}
     # Read iGPU frequency
-    for name, data in self._gpu_list.items():
+    for name, data in gpu_load.items():
         # Initialize GPU status
         gpu = {"type": data["type"]}
         if gpu["type"] == "integrated":
@@ -68,8 +68,8 @@ def get_gpu_status(self):
                     gpu["load"] = float(f.read()) / 10.0
         elif gpu["type"] == "discrete":
             qoa_logger.info("TODO discrete GPU")
-        gpu_list[name] = gpu
-    return gpu_list
+        gpu_load[name] = gpu
+    return gpu_load
 
 
 def meminfo():

@@ -8,7 +8,8 @@ import lazy_import
 from ..config.configs import ClientInfo, SystemProbeConfig
 from ..connector.base_connector import BaseConnector
 from ..lang.datamodel_enum import EnvironmentEnum
-from ..utils.gpu_utils import get_sys_gpu_metadata, get_sys_gpu_usage
+from ..utils.gpu_utils import get_sys_gpu_metadata
+from ..utils.jetson_utils import get_gpu_load
 from ..utils.qoa_utils import (
     convert_to_gbyte,
     convert_to_mbyte,
@@ -59,7 +60,7 @@ class SystemMonitoringProbe(Probe):
         return report
 
     def get_gpu_usage(self):
-        report = get_sys_gpu_usage()
+        report = get_gpu_load(self.gpu_metadata)
         return report
 
     def get_mem_metadata(self):
