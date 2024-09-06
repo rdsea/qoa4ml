@@ -6,18 +6,18 @@ client:
   application_name: test
   role: ml
 connector:
-  - name: debug_connector
-    connector_class: Debug
-  # - name: amqp_connector
-  #   connector_class: AMQP
-  #   config:
-  #     end_point: localhost
-  #     exchange_name: test_qoa4ml
-  #     exchange_type: topic
-  #     out_routing_key: test.client1
+  # - name: debug_connector
+  #   connector_class: Debug
+  - name: amqp_connector
+    connector_class: AMQP
+    config:
+      end_point: localhost
+      exchange_name: test_qoa4ml
+      exchange_type: topic
+      out_routing_key: test.client1
 probes:
   - probe_type: "docker"
-    frequency: 9999999
+    frequency: 1
     require_register: false
     log_latency_flag: false
     environment: Edge

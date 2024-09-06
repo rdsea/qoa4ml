@@ -4,29 +4,23 @@
 # last locked with the following flags:
 #   pre: false
 #   features: []
-#   all-features: true
+#   all-features: false
 #   with-sources: false
 #   generate-hashes: false
 #   universal: true
 
 -e file:.
-absl-py==2.1.0
-    # via keras
-    # via tensorboard
-    # via tensorflow
 annotated-types==0.7.0
     # via pydantic
 anyio==4.4.0
     # via starlette
 asttokens==2.4.1
     # via devtools
-astunparse==1.6.3
-    # via tensorflow
 babel==2.16.0
     # via mkdocs-material
 cachetools==5.5.0
     # via tox
-certifi==2024.7.4
+certifi==2024.8.30
     # via requests
 cfgv==3.4.0
     # via pre-commit
@@ -44,12 +38,8 @@ colorama==0.4.6
     # via mkdocs-material
     # via pytest
     # via tox
-confluent-kafka==2.5.0
-    # via qoa4ml
-deprecated==1.2.14
-    # via opentelemetry-api
-    # via opentelemetry-semantic-conventions
 devtools==0.12.2
+    # via qoa4ml
 distlib==0.3.8
     # via virtualenv
 docker==7.1.0
@@ -59,124 +49,64 @@ eval-type-backport==0.2.0
 exceptiongroup==1.2.2 ; python_full_version < '3.11'
     # via anyio
     # via pytest
-executing==2.0.1
+executing==2.1.0
     # via devtools
-fastapi==0.112.1
+fastapi==0.113.0
     # via qoa4ml
 filelock==3.15.4
     # via tox
     # via virtualenv
-flatbuffers==24.3.25
-    # via tensorflow
 flatten-dict==0.4.2
     # via qoa4ml
-gast==0.6.0
-    # via tensorflow
 ghp-import==2.1.0
     # via mkdocs
-google-pasta==0.2.0
-    # via tensorflow
-grpcio==1.66.0
-    # via tensorboard
-    # via tensorflow
 h11==0.14.0
     # via uvicorn
-h5py==3.11.0
-    # via keras
-    # via tensorflow
 identify==2.6.0
     # via pre-commit
-idna==3.7
+idna==3.8
     # via anyio
     # via requests
-importlib-metadata==8.0.0
-    # via opentelemetry-api
 iniconfig==2.0.0
     # via pytest
 jinja2==3.1.4
     # via mkdocs
     # via mkdocs-material
-keras==3.5.0
-    # via tensorflow
 lazy-import==0.2.2
     # via qoa4ml
-libclang==18.1.1
-    # via tensorflow
 markdown==3.7
     # via mkdocs
     # via mkdocs-material
     # via pymdown-extensions
-    # via tensorboard
-markdown-it-py==3.0.0
-    # via rich
 markupsafe==2.1.5
     # via jinja2
     # via mkdocs
-    # via werkzeug
-mdurl==0.1.2
-    # via markdown-it-py
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
-mkdocs==1.6.0
+mkdocs==1.6.1
     # via mkdocs-material
 mkdocs-get-deps==0.2.0
     # via mkdocs
-mkdocs-material==9.5.32
+mkdocs-material==9.5.34
 mkdocs-material-extensions==1.3.1
     # via mkdocs-material
-ml-dtypes==0.4.0
-    # via keras
-    # via tensorflow
-namex==0.0.8
-    # via keras
 nodeenv==1.9.1
     # via pre-commit
-numpy==1.26.4
-    # via h5py
-    # via keras
-    # via ml-dtypes
-    # via opt-einsum
+numpy==2.1.1
     # via qoa4ml
-    # via tensorboard
-    # via tensorflow
-opentelemetry-api==1.26.0
-    # via opentelemetry-instrumentation
-    # via opentelemetry-instrumentation-system-metrics
-    # via opentelemetry-sdk
-    # via opentelemetry-semantic-conventions
-    # via qoa4ml
-opentelemetry-instrumentation==0.47b0
-    # via opentelemetry-instrumentation-system-metrics
-opentelemetry-instrumentation-system-metrics==0.47b0
-    # via qoa4ml
-opentelemetry-sdk==1.26.0
-    # via qoa4ml
-opentelemetry-semantic-conventions==0.47b0
-    # via opentelemetry-sdk
-opt-einsum==3.3.0
-    # via tensorflow
-optree==0.12.1
-    # via keras
 packaging==24.1
-    # via keras
     # via mkdocs
     # via pyproject-api
     # via pytest
     # via pytest-sugar
-    # via tensorboard
-    # via tensorflow
     # via tox
     # via tox-uv
-paginate==0.5.6
+paginate==0.5.7
     # via mkdocs-material
-paho-mqtt==1.6.1
-    # via qoa4ml
 pathspec==0.12.1
     # via mkdocs
 pika==1.3.2
-    # via qoa4ml
-pillow==10.0.0
     # via qoa4ml
 pip==24.2
 platformdirs==4.2.2
@@ -187,13 +117,7 @@ pluggy==1.5.0
     # via pytest
     # via tox
 pre-commit==3.8.0
-prometheus-client==0.16.0
-    # via qoa4ml
-protobuf==4.25.4
-    # via tensorboard
-    # via tensorflow
 psutil==6.0.0
-    # via opentelemetry-instrumentation-system-metrics
     # via qoa4ml
 pydantic==2.7.4
     # via fastapi
@@ -203,7 +127,6 @@ pydantic-core==2.18.4
 pygments==2.18.0
     # via devtools
     # via mkdocs-material
-    # via rich
 pymdown-extensions==10.9
     # via mkdocs-material
 pyproject-api==1.7.1
@@ -230,38 +153,18 @@ requests==2.32.3
     # via docker
     # via mkdocs-material
     # via qoa4ml
-    # via tensorflow
-rich==13.7.1
-    # via keras
-ruff==0.6.1
-setuptools==73.0.1
-    # via opentelemetry-instrumentation
-    # via tensorboard
-    # via tensorflow
+ruff==0.6.4
 six==1.16.0
     # via asttokens
-    # via astunparse
     # via flatten-dict
-    # via google-pasta
     # via lazy-import
     # via python-dateutil
-    # via tensorboard
-    # via tensorflow
 sniffio==1.3.1
     # via anyio
-starlette==0.38.2
+starlette==0.38.4
     # via fastapi
-tensorboard==2.17.1
-    # via tensorflow
-tensorboard-data-server==0.7.2
-    # via tensorboard
-tensorflow==2.17.0
-    # via qoa4ml
-tensorflow-io-gcs-filesystem==0.37.1 ; python_full_version < '3.12'
-    # via tensorflow
 termcolor==2.4.0
     # via pytest-sugar
-    # via tensorflow
 tinyflux==1.0.0
     # via qoa4ml
 tomli==2.0.1 ; python_full_version < '3.11'
@@ -276,31 +179,18 @@ tox-uv==1.11.2
 typing-extensions==4.12.2
     # via anyio
     # via fastapi
-    # via opentelemetry-sdk
-    # via optree
     # via pydantic
     # via pydantic-core
-    # via tensorflow
     # via uvicorn
 urllib3==2.2.2
     # via docker
     # via requests
-uv==0.3.3
+uv==0.4.6
     # via tox-uv
 uvicorn==0.30.6
     # via qoa4ml
 virtualenv==20.26.3
     # via pre-commit
     # via tox
-watchdog==4.0.2
+watchdog==5.0.2
     # via mkdocs
-werkzeug==3.0.4
-    # via tensorboard
-wheel==0.44.0
-    # via astunparse
-wrapt==1.16.0
-    # via deprecated
-    # via opentelemetry-instrumentation
-    # via tensorflow
-zipp==3.20.0
-    # via importlib-metadata

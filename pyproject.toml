@@ -10,7 +10,7 @@ include = ["src/qoa4ml"]
 
 [project]
 name = "qoa4ml"
-version = "0.3.1"
+version = "0.3.3"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 
@@ -49,12 +49,13 @@ dependencies = [
   "tinyflux>=1.0.0",
   "uvicorn>=0.29.0",
   "lazy-import>=0.2.2",
-  "confluent-kafka>=2.4.0",
   "docker==7.1.0",
   "numpy>=1.23.5",
   "eval-type-backport>=0.2.0",
+  "devtools",
 ]
 
+optional-dependencies.kafka = ["confluent-kafka>=2.4.0"]
 optional-dependencies.ml = [
   "paho-mqtt==1.6.1",
   "Pillow==10.0.0",
@@ -77,17 +78,16 @@ AaltoSEA = "https://rdsea.github.io/"
 
 [tool.rye]
 dev-dependencies = [
-    "mkdocs-material",
-    "pre-commit",
-    "devtools",
-    "ruff",
-    "codespell",
-    "pip>=24.2",
-    "pytest>=8.3.2",
-    "tox>=4.18.0",
-    "pytest-sugar>=1.0.0",
-    "tox-uv>=1.11.2",
-    "tox-gh-actions>=3.2.0",
+  "mkdocs-material",
+  "pre-commit",
+  "ruff",
+  "codespell",
+  "pip>=24.2",
+  "pytest>=8.3.2",
+  "tox>=4.18.0",
+  "pytest-sugar>=1.0.0",
+  "tox-uv>=1.11.2",
+  "tox-gh-actions>=3.2.0",
 ]
 managed = true
 universal = true
