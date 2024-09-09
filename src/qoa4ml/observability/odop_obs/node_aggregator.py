@@ -32,13 +32,14 @@ else:
 
 
 class NodeAggregator:
-    def __init__(self, config: NodeAggregatorConfig):
+    def __init__(self, config: NodeAggregatorConfig, odop_path: str):
         self.config = config
         self.unit_conversion = self.config.unit_conversion
         self.node_name = socket.gethostname().split(".")[0]
-        make_folder(self.config.database_path)
+        self.database_path = odop_path + "metric_database/"
+        make_folder(self.database_path)
         self.embedded_database = EmbeddedDatabase(
-            self.config.database_path + self.node_name + ".csv"
+            self.database_path + self.node_name + ".csv"
         )
         self.environment = config.environment
         self.collector = SocketCollector(

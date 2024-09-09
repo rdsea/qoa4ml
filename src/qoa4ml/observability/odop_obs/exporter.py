@@ -12,10 +12,10 @@ logging.basicConfig(
 
 
 class Exporter:
-    def __init__(self, config: ExporterConfig) -> None:
+    def __init__(self, config: ExporterConfig, odop_path: str) -> None:
         self.app = FastAPI()
         self.config = config
-        self.node_aggregator = NodeAggregator(self.config.node_aggregator)
+        self.node_aggregator = NodeAggregator(self.config.node_aggregator, odop_path)
         self.app.include_router(self.node_aggregator.router)
 
     def start(self):

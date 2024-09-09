@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -35,7 +37,7 @@ class ProcessMonitoringProbe(Probe):
         self,
         config: ProcessProbeConfig,
         connector: BaseConnector,
-        client_info: ClientInfo,
+        client_info: ClientInfo | None = None,
     ) -> None:
         super().__init__(config, connector, client_info)
         self.config = config

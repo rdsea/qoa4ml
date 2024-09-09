@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 import time
 from abc import ABC, abstractmethod
@@ -11,7 +13,10 @@ from ..utils.repeated_timer import RepeatedTimer
 
 class Probe(ABC):
     def __init__(
-        self, config: ProbeConfig, connector: BaseConnector, client_info: ClientInfo
+        self,
+        config: ProbeConfig,
+        connector: BaseConnector,
+        client_info: ClientInfo | None = None,
     ) -> None:
         self.config = config
         self.client_info = client_info

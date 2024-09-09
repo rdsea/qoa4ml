@@ -209,7 +209,6 @@ class NodeAggregatorConfig(BaseModel):
     query_method: str
     data_separator: str
     unit_conversion: dict
-    database_path: str
 
 
 class ExporterConfig(BaseModel):
