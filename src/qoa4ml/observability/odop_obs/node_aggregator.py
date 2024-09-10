@@ -1,3 +1,4 @@
+import json
 import logging
 import socket
 from datetime import datetime
@@ -53,29 +54,34 @@ class NodeAggregator:
             methods=[self.config.query_method],
         )
 
-    def process_report(self, report):
+    def process_report(self, report: str):
+        report_dict = json.loads(report)
         if self.environment == EnvironmentEnum.hpc:
-            if report["type"] == "system":
-                del report["type"]
+            if report_dict["type"] == "system":
+                del report_dict["type"]
                 metadata = flatten(
-                    {"metadata": report["metadata"]}, self.config.data_separator
+                    {"metadata": report_dict["metadata"]}, self.config.data_separator
                 )
-                timestamp = report["timestamp"]
-                del report["metadata"], report["timestamp"]
-                fields = self.convert_unit(flatten(report, self.config.data_separator))
+                timestamp = report_dict["timestamp"]
+                del report_dict["metadata"], report_dict["timestamp"]
+                fields = self.convert_unit(
+                    flatten(report_dict, self.config.data_separator)
+                )
                 self.embedded_database.insert(
                     timestamp,
                     {"type": "node", **metadata},
                     fields,
                 )
-            elif report["type"] == "process":
-                del report["type"]
+            elif report_dict["type"] == "process":
+                del report_dict["type"]
                 metadata = flatten(
-                    {"metadata": report["metadata"]}, self.config.data_separator
+                    {"metadata": report_dict["metadata"]}, self.config.data_separator
                 )
-                timestamp = report["timestamp"]
-                del report["metadata"], report["timestamp"]
-                fields = self.convert_unit(flatten(report, self.config.data_separator))
+                timestamp = report_dict["timestamp"]
+                del report_dict["metadata"], report_dict["timestamp"]
+                fields = self.convert_unit(
+                    flatten(report_dict, self.config.data_separator)
+                )
                 self.embedded_database.insert(
                     timestamp,
                     {"type": "process", **metadata},
@@ -83,12 +89,12 @@ class NodeAggregator:
                 )
             else:
                 logging.error("Value Error: Unknown report type")
-        elif isinstance(report, SystemReport):
-            node_name = report.metadata.node_name
-            timestamp = report.timestamp
-            del report.metadata, report.timestamp
+        elif isinstance(report_dict, SystemReport):
+            node_name = report_dict.metadata.node_name
+            timestamp = report_dict.timestamp
+            del report_dict.metadata, report_dict.timestamp
             fields = self.convert_unit(
-                flatten(report.dict(exclude_none=True), self.config.data_separator)
+                flatten(report_dict.dict(exclude_none=True), self.config.data_separator)
             )
             self.embedded_database.insert(
                 timestamp,
@@ -98,14 +104,14 @@ class NodeAggregator:
                 },
                 fields,
             )
-        elif isinstance(report, ProcessReport):
+        elif isinstance(report_dict, ProcessReport):
             metadata = flatten(
-                {"metadata": report.metadata.dict()}, self.config.data_separator
+                {"metadata": report_dict.metadata.dict()}, self.config.data_separator
             )
-            timestamp = report.timestamp
-            del report.metadata, report.timestamp
+            timestamp = report_dict.timestamp
+            del report_dict.metadata, report_dict.timestamp
             fields = self.convert_unit(
-                flatten(report.dict(exclude_none=True), self.config.data_separator)
+                flatten(report_dict.dict(exclude_none=True), self.config.data_separator)
             )
             self.embedded_database.insert(
                 timestamp, {"type": "process", **metadata}, fields
