@@ -172,16 +172,17 @@ def report_proc_child_cpu(process: psutil.Process):
         child_processes_cpu[f"child_{id}"] = float(cpu_time.user + cpu_time.system)
 
     total_cpu_usage = sum(child_processes_cpu.values())
-    total_cpu_usage += float(
+    main_process = float(
         process_cpu_time.user
         + process_cpu_time.system
         + process_cpu_time.children_user
         + process_cpu_time.children_system
     )
-
+    total_cpu_usage += main_process
     return {
         "child_process": child_processes_count,
         "value": child_processes_cpu,
+        "main_process": main_process,
         "total": total_cpu_usage,
         "unit": "cputime",
     }
