@@ -2,10 +2,31 @@ import io
 
 import numpy as np
 import pandas as pd
+from fastapi import UploadFile
 from PIL import Image
 
 from ..lang.datamodel_enum import DataQualityNameEnum, ImageQualityNameEnum
 from ..utils.logger import qoa_logger
+
+
+def input_file_type(input_file: UploadFile, allowed_data_type: list[str]):
+    """
+    Check if the input file matches any of the allowed data types
+
+    Parameters:
+    -----------
+    input_file : UploadFile
+        The uploaded file object to be checked for data type.
+    allowed_data_type : List[str]
+        A list of allowed data types to compare against the content type of the input file.
+
+    Returns:
+    --------
+    bool
+        True if the content type of the input file is in the list of allowed data types,
+        otherwise False.
+    """
+    return input_file.content_type in allowed_data_type
 
 
 def image_quality(input_image: bytes | np.ndarray):
