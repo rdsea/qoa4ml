@@ -93,6 +93,12 @@ dev-dependencies = [
 managed = true
 universal = true
 
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257" # Accepts: "google", "numpy", or "pep257".
 
 [tool.ruff.lint]
 exclude = ["src/qoa4ml/utils/pynvml_forked.py"]

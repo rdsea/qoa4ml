@@ -1,10 +1,11 @@
 import argparse
 import uuid
 
-import qoa4ml.utils as utils
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 from rohe_Agent import Rohe_Agent
+
+import qoa4ml.utils as utils
 
 app = Flask(__name__)
 api = Api(app)

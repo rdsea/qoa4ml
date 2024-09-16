@@ -72,7 +72,7 @@ def execute_command():
     except Exception as e:
         print(f"[ERROR] - Error {type(e)} in execute_command: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
-        status = "error occured"
+        status = "error occurred"
     resp_info = {"status": status, "msg": f"the data is {req_data}"}
     return resp_info
 
@@ -111,7 +111,7 @@ def predict():
     except Exception as e:
         print(f"[ERROR] - Error {type(e)} in execute_command: {e.__traceback__}")
         traceback.print_exception(*sys.exc_info())
-        status = "error occured"
+        status = "error occurred"
 
     # Response
     resp_info = {

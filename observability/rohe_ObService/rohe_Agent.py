@@ -2,6 +2,7 @@ import json
 from threading import Thread
 
 import pymongo
+
 from qoa4ml.collector.amqp_collector import AmqpCollector
 
 

@@ -28,7 +28,7 @@ class LSTM_Prediction_PlainServer:
             [[norm_1], [norm_2], [norm_3], [norm_4], [norm_5], [norm_6]]
         )
         pas_series = np.array(pas_series)[np.newaxis, :, :]
-        # Making prediciton using loader
+        # Making prediction using loader
         result = self.model.prediction(pas_series)
         result = result.reshape(result.shape[1], result.shape[2])
         # Load the result into json format

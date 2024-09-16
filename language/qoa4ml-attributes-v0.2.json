@@ -21,10 +21,10 @@
           "description": "Mean square error using for regression models"
         },
         "Precision": {
-          "description": "the fraction of true possitive respones over total number of positive responses"
+          "description": "the fraction of true positive responses over total number of positive responses"
         },
         "Recall": {
-          "description": "the fraction of true possitive respones over total number of correct responses"
+          "description": "the fraction of true positive responses over total number of correct responses"
         },
         "description": "Depend on model development, the model can provide diverse metric such as accuracy, precision, recall, mse. Sometime, the metrics can be infer after prediction, other ways, their measuring requires future data from client."
       },
@@ -36,7 +36,7 @@
           "description": "The ratio between correct and total service responses (%)"
         },
         "ResponseTime": {
-          "description": "The response time of each microservice, measured by the time period between receving and replying the request (s)"
+          "description": "The response time of each microservice, measured by the time period between receiving and replying the request (s)"
         }
       }
     }

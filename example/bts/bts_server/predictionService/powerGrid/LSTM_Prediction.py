@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+
 from qoa4ml import probes as qoa_probes
 from qoa4ml import qoaUtils as qoa_utils
 from qoa4ml.qoa_client import Qoa_Client
@@ -39,7 +40,7 @@ class LSTM_Prediction_Service:
         self.model = ML_Loader(self.model_info, self.base_dir)
 
     def ML_prediction(self, pas_series):
-        # Making prediciton using loader
+        # Making prediction using loader
         result = self.model.prediction(pas_series)
         result = result.reshape(result.shape[1], result.shape[2])
         # Load the result into json format

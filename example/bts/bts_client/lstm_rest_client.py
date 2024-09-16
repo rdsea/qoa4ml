@@ -5,6 +5,7 @@ import time
 
 import pandas as pd
 import requests
+
 from qoa4ml import qoaUtils as qoa_utils
 from qoa4ml.qoa_client import Qoa_Client
 

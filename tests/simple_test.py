@@ -1,6 +1,3 @@
-import qoa4ml
-
-
 def inc(x):
     return x + 1
 

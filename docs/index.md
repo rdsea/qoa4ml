@@ -67,7 +67,7 @@ For example: "http://localhost:5001/registration"
     - Thus output of probes must be correlated to objects to be monitored and the tenant
   - Support high or low-level metrics/attributes
     - depending on probes implementation
-  - Can be instrumented into source code or standlone
+  - Can be instrumented into source code or standalone
 
 ## Metric
 We support some metric classes for collecting different types of metric: Counter, Gauge, Summary, Histogram
@@ -183,7 +183,7 @@ https://github.com/rdsea/QoA4ML/tree/main/example
 ![Class](img/class.png)
 
 Probes will be integrated to client program or system service to collect metrics at the edge
-Probes will generate reports and sent to message broker using different connector. Coresponding collector should be used to acquire the metrics.
+Probes will generate reports and sent to message broker using different connector. Corresponding collector should be used to acquire the metrics.
 
 ## Collector
 The manager/orchestrator have to integrate collector to collect metric using different protocols for further analysis.

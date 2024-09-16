@@ -13,7 +13,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # prometheus_client.start_http_server(int(args.prometheus))
-    # Define a client for publising data
+    # Define a client for publishing data
     with open(args.clientInfo) as f:
         client_conf = json.load(f)
     lstm_predition_client = LSTM_Prediction_Client(client_conf)

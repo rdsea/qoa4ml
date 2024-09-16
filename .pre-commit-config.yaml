@@ -14,7 +14,6 @@ repos:
         additional_dependencies:
           - tomli
         args: ["--write-changes", "--interactive", "3"]
-        files: ^src/qoa4ml/.*\.py$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.5

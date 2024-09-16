@@ -6,7 +6,6 @@ import time
 
 import numpy as np
 import pandas as pd
-from PIL import Image
 
 from qoa4ml.probes.dataquality import (
     eva_duplicate,

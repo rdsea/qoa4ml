@@ -49,7 +49,7 @@ Examples are in [examples](example/).
 
 The code is in [observability](observability/)
 
-![The overal architecture of the Observability Service](img/qoa4mlos-overview.png)
+![The overall architecture of the Observability Service](img/qoa4mlos-overview.png)
 
 QoA4ML Monitor is a component monitoring QoA for a ML model which is deployed in a serving platform.
 

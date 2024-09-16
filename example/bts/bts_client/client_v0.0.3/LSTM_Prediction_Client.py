@@ -31,7 +31,7 @@ class LSTM_Prediction_Client:
 
         #################### Declare the QoA Object ###############################
         self.qoa_client = Qoa_Client(self.qoa_info, self.broker_info)
-        self.metrices = self.qoa_client.getMetric()
+        self.metrics = self.qoa_client.getMetric()
         ###########################################################################
 
     # Check if the response is available
@@ -61,12 +61,12 @@ class LSTM_Prediction_Client:
         self.print_result(self.ml_response)
         ####################### SEND THE QOA4ML REPORT #########################
         # Sending QoA report
-        self.metrices["Accuracy"].set(self.ml_response["Accuracy"])
-        self.metrices["ResponseTime"].set(self.ml_response["ResponseTime"])
-        metrices = {}
-        for metric in self.metrices:
-            metrices = {**metrices, **self.metrices[metric].to_dict()}
-        self.qoa_client.send_report(metrices)
+        self.metrics["Accuracy"].set(self.ml_response["Accuracy"])
+        self.metrics["ResponseTime"].set(self.ml_response["ResponseTime"])
+        metrics = {}
+        for metric in self.metrics:
+            metrics = {**metrics, **self.metrics[metric].to_dict()}
+        self.qoa_client.send_report(metrics)
         ########################################################################
 
     # Send prediction request
