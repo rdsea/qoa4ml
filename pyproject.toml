@@ -61,6 +61,7 @@ optional-dependencies.ml = [
   "Pillow==10.0.0",
   "prometheus-client==0.16.0",
   "tensorflow>=2.15.0",
+  "pandas>=2.2.2",
   # "ydata-quality==0.1.0",
 ]
 

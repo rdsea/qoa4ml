@@ -29,6 +29,18 @@ class ImageQualityNameEnum(str, Enum):
     color_channel = "color_channel"
 
 
+class DataQualityNameEnum(str, Enum):
+    total_errors = "total_errors"
+    error_ratios = "error_ratios"
+    duplicate_ratio = "duplicate_ratio"
+    total_duplicate = "total_duplicate"
+    null_count = "null_count"
+    null_correlations = "null_correlations"
+    total_valid = "total_valid"
+    total_none = "total_none"
+    none_ratio = "none_ratio"
+
+
 MetricNameEnum = Union[
     ServiceMetricNameEnum,
     MlSpecificMetricNameEnum,
@@ -115,7 +127,7 @@ class ServingPlatformEnum(Enum):
     predictio = "predictio"
 
 
-class ModelCategoryEnum(Enum):
+class ModelCategoryEnum(str, Enum):
     svm = "SVM"
     dt = "DT"
     cnn = "CNN"
@@ -124,12 +136,12 @@ class ModelCategoryEnum(Enum):
     ann = "ANN"
 
 
-class InferenceModeEnum(Enum):
+class InferenceModeEnum(str, Enum):
     static = "static"
     dynamic = "dynamic"
 
 
-class OperatorEnum(Enum):
+class OperatorEnum(str, Enum):
     range = "range"
     leq = "less_equal"
     geq = "greater_equal"
@@ -138,7 +150,7 @@ class OperatorEnum(Enum):
     eq = "equal"
 
 
-class AggregateFunctionEnum(Enum):
+class AggregateFunctionEnum(str, Enum):
     MIN = "MIN"
     MAX = "MAX"
     AVG = "AVERAGE"
@@ -149,13 +161,13 @@ class AggregateFunctionEnum(Enum):
     PRODUCT = "PRODUCT"
 
 
-class CostUnitEnum(Enum):
+class CostUnitEnum(str, Enum):
     usd = "USD"
     eur = "EUR"
     other = "other"
 
 
-class MetricCategoryEnum(Enum):
+class MetricCategoryEnum(str, Enum):
     service = "service"
     data = "data"
     ml_specific = "ml_specific"
@@ -163,19 +175,19 @@ class MetricCategoryEnum(Enum):
     inference = "inference"
 
 
-class CgroupVersionEnum(Enum):
+class CgroupVersionEnum(str, Enum):
     v1 = "cgroupv1"
     v2 = "cgroupv2"
 
 
-class MetricClassEnum(Enum):
+class MetricClassEnum(str, Enum):
     gauge = "Gauge"
     counter = "Counter"
     summary = "Summary"
     histogram = "Histogram"
 
 
-class ReportTypeEnum(Enum):
+class ReportTypeEnum(str, Enum):
     data = "data_report"
     service = "service_report"
     ml_specific = "ml_specific_report"

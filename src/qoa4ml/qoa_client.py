@@ -226,6 +226,12 @@ class QoaClient(Generic[T]):
         category: int = 0,
         description: str = "",
     ):
+        """
+        category: int
+            0: service
+            1: data
+            2: security
+        """
         if category == 0:
             report_type = ReportTypeEnum.service
         elif category == 1:

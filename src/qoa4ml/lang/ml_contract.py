@@ -1,5 +1,7 @@
-from common_models import BaseConstraint
-from datamodel_enum import (
+from pydantic import BaseModel
+
+from .common_models import BaseConstraint
+from .datamodel_enum import (
     DataFormatEnum,
     DataTypeEnum,
     DevelopmentEnvironmentEnum,
@@ -12,7 +14,6 @@ from datamodel_enum import (
     ServingPlatformEnum,
     StakeholderRoleEnum,
 )
-from pydantic import BaseModel
 
 
 class Stakeholder(BaseModel):
@@ -64,7 +65,7 @@ class FairnessConstraint(BaseConstraint):
     name: str = "fairness_constraint"
 
 
-class PrivacyConstraint:
+class PrivacyConstraint(BaseModel):
     risks: dict
 
 

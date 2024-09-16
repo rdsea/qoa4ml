@@ -1,111 +1,141 @@
 # This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
 
-# import io
-# import pathlib
-# import sys
-# import traceback
-#
-# import numpy as np
-# import pandas as pd
-#
-# from ..lang.datamodel_enum import ImageQualityNameEnum
-# from ..utils.logger import qoa_logger
-# from ..utils.qoa_utils import is_numpyarray
-#
-# p_dir = pathlib.Path(__file__).parent.parent.absolute()
-# sys.path.append(str(p_dir))
-#
-# # Define metric names, return formats: dictionary {metric name} {sub-element}
-# # Return error/debugging
-# ################################################ DATA QUALITY ########################################################
-#
-#
-# def eva_erronous(data, errors=None):
-#     """
-#     Return number/percentage of error data
-#     data: numpy array or pandas data frame
-#     errors: list of item considered as error
-#     ratio: return percentage if set to True
-#     sum: sum the result if set to True, otherwise return errors following the categories in list of 'errors'
-#     """
-#     try:
-#         if "ErroneousDataIdentifier" not in globals():
-#             global ErroneousDataIdentifier
-#             from ydata_quality.erroneous_data import ErroneousDataIdentifier
-#         if is_numpyarray(data):
-#             data = pd.DataFrame(data)
-#         if is_pddataframe(data):
-#             if errors and isinstance(errors, list):
-#                 eva_err = ErroneousDataIdentifier(df=data, ed_extensions=errors)
-#             else:
-#                 eva_err = ErroneousDataIdentifier(df=data)
-#             error_df = eva_err.predefined_erroneous_data()
-#
-#             total_count = data.count().to_numpy().flatten().sum()
-#             results = {}
-#             results["totalErrors"] = error_df.to_numpy().flatten().sum()
-#             results["errorRatio"] = 100 * error_df / total_count
-#             return results
-#         else:
-#             qoa_logger.warning(f"Unsupported data: {type(data)}")
-#             return None
-#     except Exception as e:
-#         qoa_logger.error(f"Error {type(e)} in eva_erronous: {e.__traceback__}")
-#         traceback.print_exception(*sys.exc_info())
-#
-#
-# def eva_duplicate(data):
-#     """
-#     Return data/percentage of duplicate
-#     data: numpy array or pandas data frame
-#     ratio: return percentage if set to True
-#     """
-#     try:
-#         if "DuplicateChecker" not in globals():
-#             global DuplicateChecker
-#             from ydata_quality.duplicates import DuplicateChecker
-#         if is_numpyarray(data):
-#             data = pd.DataFrame(data)
-#         if is_pddataframe(data):
-#             dc = DuplicateChecker(df=data)
-#             dc_eva = dc.exact_duplicates()
-#             results = {}
-#             results["duplicateRatio"] = 100 * len(dc_eva.index) / len(data.index)
-#             results["totalDuplicate"] = len(dc_eva.index)
-#             return results
-#         else:
-#             qoa_logger.warning(f"Unsupported data: {type(data)}")
-#             return None
-#     except Exception as e:
-#         qoa_logger.error(f"Error {type(e)} in eva_duplicate: {e.__traceback__}")
-#         traceback.print_exception(*sys.exc_info())
+import io
+
+import numpy as np
+import pandas as pd
+from PIL import Image
+
+from ..lang.datamodel_enum import DataQualityNameEnum, ImageQualityNameEnum
+from ..utils.logger import qoa_logger
+
+
+def image_quality(input_image: bytes | np.ndarray):
+    quality = {}
+    if isinstance(input_image, bytes):
+        image = Image.open(io.BytesIO(input_image))
+    elif isinstance(input_image, np.ndarray):
+        image = Image.fromarray(input_image)
+    quality[ImageQualityNameEnum.image_size] = image.size
+    quality[ImageQualityNameEnum.color_mode] = image.mode
+    quality[ImageQualityNameEnum.color_channel] = len(image.getbands())
+    return quality
+
+
+def eva_erronous(data, errors=None):
+    """
+    Return number/percentage of error data
+    data: numpy array or pandas data frame
+    errors: list of items considered as errors
+    ratio: return percentage if set to True
+    sum: sum the result if set to True, otherwise return errors following the categories in list of 'errors'
+    """
+    try:
+        if isinstance(data, np.ndarray):
+            data = pd.DataFrame(data)
+
+        if isinstance(data, pd.DataFrame):
+            if errors and isinstance(errors, list):
+                error_mask = data.isin(errors)
+            else:
+                error_mask = data.isna()
+
+            total_errors = error_mask.sum().sum()
+            total_count = data.count().sum()
+
+            results = {
+                DataQualityNameEnum.total_errors: total_errors,
+                DataQualityNameEnum.error_ratios: 100 * total_errors / total_count
+                if total_count > 0
+                else np.nan,
+            }
+            return results
+        else:
+            qoa_logger.warning(f"Unsupported data: {type(data)}")
+            return None
+    except Exception as e:
+        qoa_logger.exception(f"Error {type(e)} in eva_erronous")
+        return None
+
+
 #
 #
-# def eva_missing(
-#     data, null_count=True, correlations=False, predict=False, random_state=0
-# ):
-#     try:
-#         if "MissingsProfiler" not in globals():
-#             global MissingsProfiler
-#             from ydata_quality.missing import MissingsProfiler
-#         if is_numpyarray(data):
-#             data = pd.DataFrame(data)
-#         if is_pddataframe(data):
-#             mp = MissingsProfiler(df=data, random_state=random_state)
-#             results = {}
-#             if null_count:
-#                 results["nullCount"] = mp.null_count()
-#             if correlations:
-#                 results["correlations"] = mp.missing_correlations()
-#             if predict:
-#                 results["missingPrediction"] = mp.predict_missings()
-#             return results
-#         else:
-#             qoa_logger.warning(f"Unsupported data: {type(data)}")
-#             return None
-#     except Exception as e:
-#         qoa_logger.error(f"Error {type(e)} in eva_erronous: {e.__traceback__}")
-#         traceback.print_exception(*sys.exc_info())
+def eva_duplicate(data):
+    """
+    Return data/percentage of duplicates
+    data: numpy array or pandas data frame
+    ratio: return percentage if set to True
+    """
+    try:
+        if isinstance(data, np.ndarray):
+            data = pd.DataFrame(data)
+
+        if isinstance(data, pd.DataFrame):
+            duplicate_mask = data.duplicated(keep=False)
+            duplicate_data = data[duplicate_mask]
+
+            results = {
+                DataQualityNameEnum.duplicate_ratio: 100
+                * duplicate_data.shape[0]
+                / data.shape[0],
+                DataQualityNameEnum.total_duplicate: duplicate_data.shape[0],
+            }
+            return results
+        else:
+            qoa_logger.warning(f"Unsupported data: {type(data)}")
+            return None
+    except Exception as e:
+        qoa_logger.exception(f"Error {type(e)} in eva_duplicate")
+        return None
+
+
+def eva_missing(data, null_count=True, correlations=False, predict=False):
+    try:
+        if isinstance(data, np.ndarray):
+            data = pd.DataFrame(data)
+        if isinstance(data, pd.DataFrame):
+            results = {}
+            if null_count:
+                count = data.isnull().sum()
+                results[DataQualityNameEnum.null_count] = count
+
+            if correlations:
+                nulls = data.loc[:, results["null_count"] > 0]
+                results[DataQualityNameEnum.null_correlations] = nulls.isnull().corr()
+
+            if predict:
+                raise RuntimeWarning("Predict is enabled but not implemented yet")
+                # results["missing_prediction"] = mp.predict_missings()
+
+            return results
+        else:
+            qoa_logger.warning(f"Unsupported data: {type(data)}")
+            return None
+    except Exception as e:
+        qoa_logger.exception(f"Error {type(e)} in eva_erronous")
+
+
+def eva_none(data):
+    try:
+        if isinstance(data, pd.DataFrame):
+            data = data.to_numpy()
+        if isinstance(data, np.ndarray):
+            valid_count = np.count_nonzero(~np.isnan(data))
+            none_count = np.count_nonzero(np.isnan(data))
+            results = {}
+            results[DataQualityNameEnum.total_valid] = valid_count
+            results[DataQualityNameEnum.total_none] = none_count
+            results[DataQualityNameEnum.none_ratio] = valid_count / (
+                valid_count + none_count
+            )
+            return results
+        else:
+            qoa_logger.warning(f"Unsupported data: {type(data)}")
+            return None
+    except Exception as e:
+        qoa_logger.exception(f"Error {type(e)} in eva_none")
+
+
 #
 #
 # class OutlierDetector:
@@ -162,40 +192,3 @@
 #             return {"Response": "Success"}
 #         else:
 #             return {"Error": f"Unsupported data: {type(data)}"}
-#
-#
-# def image_quality(image):
-#     if "PIL" not in globals():
-#         global PIL
-#         import PIL
-#     quality = {}
-#     if isinstance(image, bytes):
-#         image = PIL.Image.open(io.BytesIO(image))
-#     if isinstance(image, np.ndarray):
-#         image = PIL.Image.fromarray(image)
-#     if isinstance(image, (PIL.Image.Image, PIL.JpegImagePlugin.JpegImageFile)):
-#         # qoa_logger.debug(dir(image)
-#         quality[ImageQualityNameEnum.image_size] = image.size
-#         quality[ImageQualityNameEnum.color_mode] = image.mode
-#         quality[ImageQualityNameEnum.color_channel] = len(image.getbands())
-#     return quality
-#
-#
-# def eva_none(data):
-#     try:
-#         if is_pddataframe(data):
-#             data = data.to_numpy()
-#         if is_numpyarray(data):
-#             valid_count = np.count_nonzero(~np.isnan(data))
-#             none_count = np.count_nonzero(np.isnan(data))
-#             results = {}
-#             results["totalValid"] = valid_count
-#             results["totalNone"] = none_count
-#             results["noneRatio"] = valid_count / (valid_count + none_count)
-#             return results
-#         else:
-#             qoa_logger.warning(f"Unsupported data: {type(data)}")
-#             return None
-#     except Exception as e:
-#         qoa_logger.error(f"Error {type(e)} in eva_none: {e.__traceback__}")
-#         traceback.print_exception(*sys.exc_info())
