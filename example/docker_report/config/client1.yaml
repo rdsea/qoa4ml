@@ -8,6 +8,8 @@ client:
 connector:
   # - name: debug_connector
   #   connector_class: Debug
+  #   config:
+  #     silence: True
   - name: amqp_connector
     connector_class: AMQP
     config:

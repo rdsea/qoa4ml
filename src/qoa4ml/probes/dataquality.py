@@ -1,5 +1,3 @@
-# This library is built based on ydata_quality: https://github.com/ydataai/ydata-quality
-
 import io
 
 import numpy as np
@@ -41,13 +39,11 @@ def eva_erronous(data, errors=None):
                 error_mask = data.isna()
 
             total_errors = error_mask.sum().sum()
-            total_count = data.count().sum()
+            total_count = data.size
 
             results = {
                 DataQualityNameEnum.total_errors: total_errors,
-                DataQualityNameEnum.error_ratios: 100 * total_errors / total_count
-                if total_count > 0
-                else np.nan,
+                DataQualityNameEnum.error_ratios: 100 * total_errors / total_count,
             }
             return results
         else:
@@ -71,7 +67,7 @@ def eva_duplicate(data):
             data = pd.DataFrame(data)
 
         if isinstance(data, pd.DataFrame):
-            duplicate_mask = data.duplicated(keep=False)
+            duplicate_mask = data.duplicated()
             duplicate_data = data[duplicate_mask]
 
             results = {
@@ -118,15 +114,16 @@ def eva_missing(data, null_count=True, correlations=False, predict=False):
 def eva_none(data):
     try:
         if isinstance(data, pd.DataFrame):
-            data = data.to_numpy()
+            data_numeric = data.select_dtypes(include=[np.number])
+            data = data_numeric.to_numpy()
         if isinstance(data, np.ndarray):
             valid_count = np.count_nonzero(~np.isnan(data))
             none_count = np.count_nonzero(np.isnan(data))
             results = {}
             results[DataQualityNameEnum.total_valid] = valid_count
             results[DataQualityNameEnum.total_none] = none_count
-            results[DataQualityNameEnum.none_ratio] = valid_count / (
-                valid_count + none_count
+            results[DataQualityNameEnum.none_ratio] = (
+                100 * valid_count / (valid_count + none_count)
             )
             return results
         else:
