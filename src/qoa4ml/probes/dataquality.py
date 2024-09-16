@@ -9,6 +9,22 @@ from ..utils.logger import qoa_logger
 
 
 def image_quality(input_image: bytes | np.ndarray):
+    """
+    Assess various quality metrics of an input image.
+
+    Parameters:
+    -----------
+    input_image : bytes or np.ndarray
+        The input image in either byte format or as a numpy array.
+
+    Returns:
+    --------
+    dict
+        A dictionary containing the following keys:
+          - ImageQualityNameEnum.image_size: The size of the image (width, height).
+          - ImageQualityNameEnum.color_mode: The color mode of the image (e.g., 'RGB').
+          - ImageQualityNameEnum.color_channel: The number of color channels in the image.
+    """
     quality = {}
     if isinstance(input_image, bytes):
         image = Image.open(io.BytesIO(input_image))
@@ -20,13 +36,24 @@ def image_quality(input_image: bytes | np.ndarray):
     return quality
 
 
-def eva_erronous(data, errors=None):
+def eva_erronous(data: np.ndarray | pd.DataFrame, errors: list | None = None):
     """
-    Return number/percentage of error data
-    data: numpy array or pandas data frame
-    errors: list of items considered as errors
-    ratio: return percentage if set to True
-    sum: sum the result if set to True, otherwise return errors following the categories in list of 'errors'
+    Evaluate and return the number or percentage of erroneous data entries.
+
+    Parameters:
+    -----------
+    data : numpy.ndarray or pandas.DataFrame
+        Input data to be evaluated.
+    errors : list, optional
+        List of items considered as errors. If not provided, NaNs will be considered as errors.
+
+    Returns:
+    --------
+    dict or None
+        A dictionary containing the following keys if successful:
+          - DataQualityNameEnum.total_errors: Total number of errors.
+          - DataQualityNameEnum.error_ratios: Percentage of errors.
+        Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
         if isinstance(data, np.ndarray):
@@ -54,13 +81,22 @@ def eva_erronous(data, errors=None):
         return None
 
 
-#
-#
-def eva_duplicate(data):
+def eva_duplicate(data: np.ndarray | pd.DataFrame):
     """
-    Return data/percentage of duplicates
-    data: numpy array or pandas data frame
-    ratio: return percentage if set to True
+    Evaluate and return the number or percentage of duplicate entries in the data.
+
+    Parameters:
+    -----------
+    data : numpy.ndarray or pandas.DataFrame
+        Input data to be evaluated.
+
+    Returns:
+    --------
+    dict or None
+        A dictionary containing the following keys if successful:
+          - DataQualityNameEnum.duplicate_ratio: Percentage of duplicate data.
+          - DataQualityNameEnum.total_duplicate: Total number of duplicate entries.
+        Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
         if isinstance(data, np.ndarray):
@@ -85,7 +121,31 @@ def eva_duplicate(data):
         return None
 
 
-def eva_missing(data, null_count=True, correlations=False, predict=False):
+def eva_missing(
+    data: np.ndarray | pd.DataFrame, null_count=True, correlations=False, predict=False
+):
+    """
+    Evaluate and return statistics about missing data in the dataset.
+
+    Parameters:
+    -----------
+    data : numpy.ndarray or pandas.DataFrame
+        Input data to be evaluated.
+    null_count : bool, default=True
+        If True, return the count of missing values in each column.
+    correlations : bool, default=False
+        If True, return the correlation matrix of missing values.
+    predict : bool, default=False
+        If True, enable missing data prediction (not implemented).
+
+    Returns:
+    --------
+    dict or None
+        A dictionary containing:
+          - DataQualityNameEnum.null_count: Count of missing values (if null_count is True).
+          - DataQualityNameEnum.null_correlations: Correlation matrix of missing values (if correlations is True).
+        Returns None if the input data type is unsupported or if an exception occurs.
+    """
     try:
         if isinstance(data, np.ndarray):
             data = pd.DataFrame(data)
@@ -96,7 +156,7 @@ def eva_missing(data, null_count=True, correlations=False, predict=False):
                 results[DataQualityNameEnum.null_count] = count
 
             if correlations:
-                nulls = data.loc[:, results["null_count"] > 0]
+                nulls = data.loc[:, results[DataQualityNameEnum.null_count] > 0]
                 results[DataQualityNameEnum.null_correlations] = nulls.isnull().corr()
 
             if predict:
@@ -108,10 +168,28 @@ def eva_missing(data, null_count=True, correlations=False, predict=False):
             qoa_logger.warning(f"Unsupported data: {type(data)}")
             return None
     except Exception as e:
-        qoa_logger.exception(f"Error {type(e)} in eva_erronous")
+        qoa_logger.exception(f"Error {type(e)} in eva_missing")
+        return None
 
 
-def eva_none(data):
+def eva_none(data: np.ndarray | pd.DataFrame):
+    """
+    Evaluate and return statistics about valid and None (NaN) values in the dataset.
+
+    Parameters:
+    -----------
+    data : numpy.ndarray or pandas.DataFrame
+        Input data to be evaluated.
+
+    Returns:
+    --------
+    dict or None
+        A dictionary containing the following keys if successful:
+          - DataQualityNameEnum.total_valid: Total count of valid (non-NaN) entries.
+          - DataQualityNameEnum.total_none: Total count of None (NaN) entries.
+          - DataQualityNameEnum.none_ratio: Percentage of valid entries.
+        Returns None if the input data type is unsupported or if an exception occurs.
+    """
     try:
         if isinstance(data, pd.DataFrame):
             data_numeric = data.select_dtypes(include=[np.number])
@@ -131,6 +209,7 @@ def eva_none(data):
             return None
     except Exception as e:
         qoa_logger.exception(f"Error {type(e)} in eva_none")
+        return None
 
 
 #
