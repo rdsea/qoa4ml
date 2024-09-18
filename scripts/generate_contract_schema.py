@@ -5,7 +5,7 @@ from qoa4ml.lang.ml_contract import ML_CONTRACT_NAME, ML_CONTRACT_VERSION, MLCon
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--target-dir", help="Target directory to save the JSON file", default="."
+    "--target-dir", help="Target directory to save the JSON file", default="../language"
 )
 args = parser.parse_args()
 

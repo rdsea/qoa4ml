@@ -26,12 +26,12 @@ from .config.configs import (
 from .connector.amqp_connector import AmqpConnector
 from .connector.base_connector import BaseConnector
 from .connector.debug_connector import DebugConnector
+from .lang.attributes import ServiceQualityEnum
 from .lang.common_models import Metric
 from .lang.datamodel_enum import (
     MetricNameEnum,
     ReportTypeEnum,
     ServiceAPIEnum,
-    ServiceMetricNameEnum,
 )
 from .probes.docker_monitoring_probe import DockerMonitoringProbe
 from .probes.probe import Probe
@@ -351,11 +351,6 @@ class QoaClient(Generic[T]):
         -------
         dict
             A dictionary containing the start time and response time.
-
-        Observes
-        --------
-        ServiceMetricNameEnum.response_time
-            Records the response time when stopping the timer.
         """
         if self.timer_flag is False:
             self.timer_flag = True
@@ -368,7 +363,7 @@ class QoaClient(Generic[T]):
                 "responseTime": time.time() - self.timerStart,
             }
             self.observe_metric(
-                ServiceMetricNameEnum.response_time, response_time, category=0
+                ServiceQualityEnum.RESPONSE_TIME, response_time, category=0
             )
             return response_time
 

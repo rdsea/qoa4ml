@@ -58,7 +58,7 @@ dependencies = [
 optional-dependencies.kafka = ["confluent-kafka>=2.4.0"]
 optional-dependencies.ml = [
   "paho-mqtt==1.6.1",
-  "Pillow==10.0.0",
+  "Pillow>=10.0.0",
   "prometheus-client==0.16.0",
   "tensorflow>=2.15.0",
   "pandas>=2.2.2",
@@ -71,6 +71,15 @@ optional-dependencies.otel = [
   "opentelemetry-instrumentation-system-metrics>=0.47b0",
 ]
 
+optional-dependencies.docs = [
+  "mkdocs-material[recommended,imaging]>=9.5.17 ",
+  "mkdocstrings-python",
+  "cairosvg",
+  "mkdocs-gen-files",
+  "mkdocs-literate-nav",
+  "mkdocs-section-index",
+]
+
 [project.urls]
 Repository = "https://github.com/rdsea/QoA4ML"
 Documentation = "https://rdsea.github.io/QoA4ML/"
@@ -79,7 +88,6 @@ AaltoSEA = "https://rdsea.github.io/"
 
 [tool.rye]
 dev-dependencies = [
-  "mkdocs-material",
   "pre-commit",
   "ruff",
   "codespell",
@@ -89,7 +97,6 @@ dev-dependencies = [
   "pytest-sugar>=1.0.0",
   "tox-uv>=1.11.2",
   "tox-gh-actions>=3.2.0",
-  "click>=8.1.7",
 ]
 managed = true
 universal = true

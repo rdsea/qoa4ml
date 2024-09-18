@@ -15,7 +15,7 @@ from qoa4ml.reports.ml_report_model import (
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--target-dir", help="Target directory to save the JSON file", default="."
+    "--target-dir", help="Target directory to save the JSON file", default="../language"
 )
 args = parser.parse_args()
 
