@@ -6,6 +6,15 @@ from pydantic import BaseModel
 from ..lang.common_models import Metric
 from ..lang.datamodel_enum import MetricNameEnum, ReportTypeEnum
 
+GENERAL_REPORT_VERSION = "v0.1"
+GENERAL_REPORT_NAME = "qoa4ml-report-common-schema"
+
+ML_REPORT_VERSION = "v0.1"
+ML_REPORT_NAME = "qoa4ml-report-ml-schema"
+
+ENSEMBLE_REPORT_VERSION = "v0.1"
+ENSEMBLE_REPORT_NAME = "qoa4ml-report-eemls-schema"
+
 
 class MicroserviceInstance(BaseModel):
     id: UUID

@@ -89,9 +89,11 @@ dev-dependencies = [
   "pytest-sugar>=1.0.0",
   "tox-uv>=1.11.2",
   "tox-gh-actions>=3.2.0",
+  "click>=8.1.7",
 ]
 managed = true
 universal = true
+
 
 [tool.ruff.format]
 docstring-code-format = true

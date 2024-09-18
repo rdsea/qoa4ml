@@ -1,20 +1,7 @@
 from enum import Enum
 from typing import Union
 
-
-class ServiceMetricNameEnum(str, Enum):
-    response_time = "response_time"
-    reliability = "reliability"
-    completeness = "completeness"
-
-
-class MlSpecificMetricNameEnum(str, Enum):
-    confidence = "confidence"
-    accuracy = "accuracy"
-    precision = "precision"
-    recall = "recall"
-    auc = "auc"
-    mse = "mse"
+from .attributes import DataQualityEnum, MLModelQualityEnum, ServiceQualityEnum
 
 
 class ResourcesUtilizationMetricNameEnum(str, Enum):
@@ -29,21 +16,10 @@ class ImageQualityNameEnum(str, Enum):
     color_channel = "color_channel"
 
 
-class DataQualityNameEnum(str, Enum):
-    total_errors = "total_errors"
-    error_ratios = "error_ratios"
-    duplicate_ratio = "duplicate_ratio"
-    total_duplicate = "total_duplicate"
-    null_count = "null_count"
-    null_correlations = "null_correlations"
-    total_valid = "total_valid"
-    total_none = "total_none"
-    none_ratio = "none_ratio"
-
-
 MetricNameEnum = Union[
-    ServiceMetricNameEnum,
-    MlSpecificMetricNameEnum,
+    ServiceQualityEnum,
+    MLModelQualityEnum,
+    DataQualityEnum,
     ResourcesUtilizationMetricNameEnum,
     ImageQualityNameEnum,
     str,
