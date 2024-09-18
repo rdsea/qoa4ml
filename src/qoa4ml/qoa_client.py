@@ -55,28 +55,33 @@ T = TypeVar("T", bound=AbstractReport)
 class QoaClient(Generic[T]):
     def __init__(
         self,
-        # NOTE: use text, number, enum
         report_cls: type[T] = MLReport,
         config_dict: Optional[dict] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
-        logging_level=2,
+        logging_level: int = 2,
     ):
         """
-        Initialize the QoA Client with configuration settings and report class.
+        Initialize the QoA Client with configuration settings and a report class.
 
         Parameters
         ----------
         report_cls : type[T], optional
             The class type for reports, default is MLReport.
-        config_dict : Optional[dict], optional
-            A dictionary to load the client's configuration.
-        config_path : Optional[str], optional
+        config_dict : dict, optional
+            A dictionary to load the client's configuration from.
+        config_path : str, optional
             Path to a JSON configuration file.
-        registration_url : Optional[str], optional
+        registration_url : str, optional
             URL for registering the client and receiving configuration data.
         logging_level : int, optional
             The logging verbosity level (default: 2).
+
+        Notes
+        -----
+        - If both `config_dict` and `config_path` are provided, the `config_dict` will take precedence.
+        - If neither `config_dict` nor `config_path` is provided, the client may attempt to fetch configurations from the `registration_url`.
+        - The method will raise an exception if the necessary configuration details are not found.
         """
         set_logger_level(logging_level)
 
@@ -108,7 +113,6 @@ class QoaClient(Generic[T]):
         self.client_config.id = str(uuid.uuid4())
         self.qoa_report = report_cls(self.client_config)
         if self.configuration.connector:
-            # init connectors offline if it's specified
             connector_conf = self.configuration.connector
             try:
                 for connector in connector_conf:
@@ -118,12 +122,10 @@ class QoaClient(Generic[T]):
                     f"Error {type(e)} when configuring connector in QoaClient"
                 )
         elif registration_url or self.configuration.registration_url:
-            # init connectors using configuration received from monitoring service, if it's specified
             try:
                 if registration_url:
                     registration_data = self.registration(registration_url)
                 else:
-                    # NOTE: logically true
                     registration_data = self.registration(
                         self.configuration.registration_url
                     )
@@ -154,7 +156,6 @@ class QoaClient(Generic[T]):
             qoa_logger.warning("No connector initiated")
             self.default_connector = None
         else:
-            # Set default connector for sending monitoring data if not specify
             self.default_connector = next(iter(self.connector_list.keys()))
 
         self.probes_list = None
@@ -162,10 +163,9 @@ class QoaClient(Generic[T]):
             self.probes_list = self.init_probes(
                 self.configuration.probes, self.configuration.client
             )
-        # lock report to guarantee consistency
         self.lock = threading.Lock()
 
-    def registration(self, url: str):
+    def registration(self, url: str) -> requests.Response:
         """
         Registers the client with the monitoring service and retrieves connector configurations.
 
@@ -178,16 +178,18 @@ class QoaClient(Generic[T]):
         -------
         requests.Response
             The response from the registration service, containing connector configurations.
-        """
-        # get connector configuration by registering with the monitoring service
 
+        Notes
+        -----
+        This method sends a POST request to the given URL with the client's configuration in JSON format.
+        """
         return requests.request(
             "POST", url, headers=headers, data=self.client_config.json()
         )
 
     def init_probes(
         self, probe_config_list: list[ProbeConfig], client_info: ClientInfo
-    ):
+    ) -> list[Probe]:
         """
         Initialize monitoring probes based on the provided probe configuration list.
 
@@ -202,9 +204,13 @@ class QoaClient(Generic[T]):
         -------
         list[Probe]
             A list of initialized probe instances.
+
+        Raises
+        ------
+        ValueError
+            If an unsupported probe configuration type is provided.
         """
         probes_list: list[Probe] = []
-        # TODO: each probe can have their own connector
         if self.default_connector:
             selected_connector = self.connector_list[self.default_connector]
         else:
@@ -212,7 +218,6 @@ class QoaClient(Generic[T]):
             selected_connector = DebugConnector(DebugConnectorConfig(silence=False))
 
         for probe_config in probe_config_list:
-            # TODO: can be simplify for less duplicate code
             if isinstance(probe_config, DockerProbeConfig):
                 probes_list.append(
                     DockerMonitoringProbe(probe_config, selected_connector, client_info)
@@ -261,16 +266,9 @@ class QoaClient(Generic[T]):
         ):
             return DebugConnector(configuration.config)
 
-        # TODO: MQTT is both connector and collector
-        #
-        # if (
-        #    configuration.connector_class == ServiceAPIEnum.mqtt
-        #    and type(configuration.config) is MQTTConnectorConfig
-        # ):
-        #    return Mqtt_Connector(configuration.config)
         raise RuntimeError("Connector config is not of correct type")
 
-    def get_client_config(self):
+    def get_client_config(self) -> ClientConfig:
         """
         Get the current client configuration.
 
@@ -281,7 +279,7 @@ class QoaClient(Generic[T]):
         """
         return self.client_config
 
-    def set_config(self, key, value):
+    def set_config(self, key: str, value: Any) -> None:
         """
         Update a specific configuration setting by key.
 
@@ -305,10 +303,10 @@ class QoaClient(Generic[T]):
     def observe_metric(
         self,
         metric_name: MetricNameEnum,
-        value,
+        value: Any,
         category: int = 0,
         description: str = "",
-    ):
+    ) -> None:
         """
         Observe and report a metric.
 
@@ -343,7 +341,7 @@ class QoaClient(Generic[T]):
             Metric(metric_name=metric_name, records=[value], description=description),
         )
 
-    def timer(self):
+    def timer(self) -> dict:
         """
         Start or stop a timer and record the response time.
 
@@ -351,6 +349,11 @@ class QoaClient(Generic[T]):
         -------
         dict
             A dictionary containing the start time and response time.
+
+        Notes
+        -----
+        - When called for the first time, it starts the timer.
+        - When called again, it stops the timer and records the response time as a metric.
         """
         if self.timer_flag is False:
             self.timer_flag = True
@@ -367,7 +370,7 @@ class QoaClient(Generic[T]):
             )
             return response_time
 
-    def import_previous_report(self, reports: Union[dict, list[dict]]):
+    def import_previous_report(self, reports: Union[dict, list[dict]]) -> None:
         """
         Import and process previous reports.
 
@@ -382,7 +385,7 @@ class QoaClient(Generic[T]):
         else:
             self.qoa_report.process_previous_report(reports)
 
-    def asyn_report(self, body_mess: str, connectors: Optional[list] = None):
+    def asyn_report(self, body_mess: str, connectors: Optional[list] = None) -> None:
         """
         Asynchronously send a report through the connectors.
 
@@ -390,12 +393,15 @@ class QoaClient(Generic[T]):
         ----------
         body_mess : str
             The message body to be sent.
-            connectors : Optional[list], optional
-                A list of connectors to send the report through. If None, the default connector is used.
+        connectors : list, optional
+            A list of connectors to send the report through. If None, the default connector is used.
+
+        Notes
+        -----
+        Uses threading to send reports asynchronously.
         """
         self.lock.acquire()
         if connectors is None:
-            # if connectors are not specify, use default
             if self.default_connector:
                 chosen_connector = self.connector_list[self.default_connector]
                 if isinstance(chosen_connector, AmqpConnector):
@@ -407,42 +413,42 @@ class QoaClient(Generic[T]):
                     "No default connector, please specify the connector to use"
                 )
         else:
-            # iterate connector to send report
-            # for connector in connectors:
-            # print(connector)
-            # Todo: send by multiple connector
             pass
-
         self.lock.release()
 
     def report(
         self,
         report: Optional[dict] = None,
         connectors: Optional[list] = None,
-        submit=False,
-        reset=True,
-        corr_id=None,
-    ):
+        submit: bool = False,
+        reset: bool = True,
+        corr_id: Optional[str] = None,
+    ) -> str:
         """
         Generate a report and optionally submit it through the default connector.
 
         Parameters
         ----------
-        report : Optional[dict], optional
+        report : dict, optional
             The report data to be submitted. If None, a report will be generated.
-        connectors : Optional[list], optional
+        connectors : list, optional
             A list of connectors through which to send the report, default is None.
         submit : bool, optional
             Whether to submit the report, default is False.
         reset : bool, optional
             Whether to reset the report state after submission, default is True.
-        corr_id : Optional[str], optional
+        corr_id : str, optional
             The correlation ID for the report, default is None.
 
         Returns
         -------
         str
             The JSON-encoded report.
+
+        Notes
+        -----
+        The method will create a report based on the current state if none is provided.
+        If `submit` is True, the report will be sent through the default or specified connectors.
         """
         if report is None:
             return_report = self.qoa_report.generate_report(reset, corr_id=corr_id)
@@ -470,7 +476,7 @@ class QoaClient(Generic[T]):
                 qoa_logger.warning("No connector available")
         return return_report.model_dump(mode="json")
 
-    def start_all_probes(self):
+    def start_all_probes(self) -> None:
         """
         Start all probes for monitoring, running them in the background.
 
@@ -479,7 +485,9 @@ class QoaClient(Generic[T]):
         RuntimeError
             If no probes have been initialized.
 
-        NOTE: if the probe takes long to report, and the main process exit, no report may be sent
+        Notes
+        -----
+        If the probe takes a long time to report and the main process exits, no report may be sent.
         """
         if not self.probes_list:
             raise RuntimeError(
@@ -488,7 +496,7 @@ class QoaClient(Generic[T]):
         for probe in self.probes_list:
             probe.start_reporting()
 
-    def stop_all_probes(self):
+    def stop_all_probes(self) -> None:
         """
         Stop all running probes.
 
@@ -496,18 +504,19 @@ class QoaClient(Generic[T]):
         ------
         RuntimeError
             If no probes have been initialized.
+
+        Notes
+        -----
+        This method stops the background monitoring activities of all active probes.
         """
         if not self.probes_list:
             raise RuntimeError(
-                "There is no initiated probes, please recheck the config"
+                "There are no initiated probes, please recheck the config"
             )
         for probe in self.probes_list:
             probe.stop_reporting()
 
-    def observe_inference(
-        self,
-        inference_value,
-    ):
+    def observe_inference(self, inference_value: Any) -> None:
         """
         Observe and record inference data.
 
@@ -515,6 +524,10 @@ class QoaClient(Generic[T]):
         ----------
         inference_value : Any
             The value of the inference to be observed.
+
+        Notes
+        -----
+        This method is used to record predictions or inference results for later analysis.
         """
         self.qoa_report.observe_inference(inference_value)
 
@@ -522,7 +535,7 @@ class QoaClient(Generic[T]):
         self,
         metric_name: MetricNameEnum,
         value: Any,
-    ):
+    ) -> None:
         """
         Observe and report a specific inference metric.
 
@@ -532,9 +545,25 @@ class QoaClient(Generic[T]):
             The name of the inference metric being observed.
         value : Any
             The value of the observed metric.
+
+        Notes
+        -----
+        This method can be used to log performance metrics, evaluation scores, etc. during inference.
         """
         metric = Metric(metric_name=metric_name, records=[value])
         self.qoa_report.observe_inference_metric(metric)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the client's configuration and connectors.
+
+        Returns
+        -------
+        str
+            JSON representation of the client configuration and a string representation of the connector list.
+
+        Notes
+        -----
+        This method is particularly useful for debugging and logging purposes.
+        """
         return self.client_config.model_dump_json() + "\n" + str(self.connector_list)
