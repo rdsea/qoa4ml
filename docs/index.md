@@ -2,7 +2,7 @@
 
 ## Source code
 
-[QoA4ML](https://github.com/rdsea/QoA4ML/tree/main/qoa4ml_lib)
+[QoA4ML](https://github.com/rdsea/QoA4ML/tree/main/src/qoa4ml)
 
 ## Monitoring Client
 
