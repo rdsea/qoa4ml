@@ -10,7 +10,10 @@ from .base_connector import BaseConnector
 class AmqpConnector(BaseConnector):
     # Init an amqp client handling the connection to amqp servier
     def __init__(
-        self, config: AMQPConnectorConfig, log: bool = False, health_check: bool = False
+        self,
+        config: AMQPConnectorConfig,
+        log: bool = False,
+        health_check_disable: bool = False,
     ):
         """
         AmqpConnector handles the connection to an AMQP server for sending messages.
@@ -63,10 +66,10 @@ class AmqpConnector(BaseConnector):
         # Connect to RabbitMQ host
         if "amqps://" in self.config.end_point:
             parameters = pika.URLParameters(self.config.end_point)
-            if health_check:
+            if health_check_disable:
                 parameters.heartbeat = 0
         else:
-            if health_check:
+            if health_check_disable:
                 parameters = pika.ConnectionParameters(
                     host=self.config.end_point, heartbeat=0
                 )
