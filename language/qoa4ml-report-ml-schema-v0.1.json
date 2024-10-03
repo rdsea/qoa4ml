@@ -1,5 +1,22 @@
 {
   "$defs": {
+    "DataQualityEnum": {
+      "enum": [
+        "accuracy",
+        "completeness",
+        "total_errors",
+        "error_ratios",
+        "duplicate_ratio",
+        "total_duplicate",
+        "null_count",
+        "null_correlations",
+        "total_valid",
+        "total_none",
+        "none_ratio"
+      ],
+      "title": "DataQualityEnum",
+      "type": "string"
+    },
     "ImageQualityNameEnum": {
       "enum": [
         "image_size",
@@ -58,6 +75,17 @@
       "title": "InferenceInstance",
       "type": "object"
     },
+    "MLModelQualityEnum": {
+      "enum": [
+        "auc",
+        "accuracy",
+        "mse",
+        "precision",
+        "recall"
+      ],
+      "title": "MLModelQualityEnum",
+      "type": "string"
+    },
     "Metric": {
       "properties": {
         "description": {
@@ -75,10 +103,13 @@
         "metric_name": {
           "anyOf": [
             {
-              "$ref": "#/$defs/ServiceMetricNameEnum"
+              "$ref": "#/$defs/ServiceQualityEnum"
             },
             {
-              "$ref": "#/$defs/MlSpecificMetricNameEnum"
+              "$ref": "#/$defs/MLModelQualityEnum"
+            },
+            {
+              "$ref": "#/$defs/DataQualityEnum"
             },
             {
               "$ref": "#/$defs/ResourcesUtilizationMetricNameEnum"
@@ -136,18 +167,6 @@
       "title": "Metric",
       "type": "object"
     },
-    "MlSpecificMetricNameEnum": {
-      "enum": [
-        "confidence",
-        "accuracy",
-        "precision",
-        "recall",
-        "auc",
-        "mse"
-      ],
-      "title": "MlSpecificMetricNameEnum",
-      "type": "string"
-    },
     "ResourcesUtilizationMetricNameEnum": {
       "enum": [
         "cpu_usage",
@@ -156,13 +175,13 @@
       "title": "ResourcesUtilizationMetricNameEnum",
       "type": "string"
     },
-    "ServiceMetricNameEnum": {
+    "ServiceQualityEnum": {
       "enum": [
-        "response_time",
+        "availability",
         "reliability",
-        "completeness"
+        "response_time"
       ],
-      "title": "ServiceMetricNameEnum",
+      "title": "ServiceQualityEnum",
       "type": "string"
     },
     "StageReport": {

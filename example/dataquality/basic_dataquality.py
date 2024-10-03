@@ -7,15 +7,15 @@ import time
 import numpy as np
 import pandas as pd
 
-from qoa4ml.probes.dataquality import (
+from qoa4ml.qoa_client import QoaClient
+from qoa4ml.reports.ml_reports import MLReport
+from qoa4ml.utils.dataquality_utils import (
     eva_duplicate,
     eva_erronous,
     eva_missing,
     eva_none,
     image_quality,
 )
-from qoa4ml.qoa_client import QoaClient
-from qoa4ml.reports.ml_reports import MLReport
 
 client1 = QoaClient(report_cls=MLReport, config_path="./config/client1.yaml")
 

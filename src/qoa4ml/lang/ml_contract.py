@@ -15,6 +15,9 @@ from .datamodel_enum import (
     StakeholderRoleEnum,
 )
 
+ML_CONTRACT_VERSION = "v0.3"
+ML_CONTRACT_NAME = "qoa4ml-contract-schema"
+
 
 class Stakeholder(BaseModel):
     id: str

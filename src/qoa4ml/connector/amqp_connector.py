@@ -13,9 +13,46 @@ class AmqpConnector(BaseConnector):
         self, config: AMQPConnectorConfig, log: bool = False, health_check: bool = False
     ):
         """
-        AMQP connector
-        configuration: a dictionary include broker and queue information
-        log: a bool flag for logging message if being set to True, default is False
+        AmqpConnector handles the connection to an AMQP server for sending messages.
+
+        Parameters
+        ----------
+        config : AMQPConnectorConfig
+            Configuration settings for the AMQP connector.
+        log : bool, optional
+            A flag to enable logging of messages, default is False.
+
+        Attributes
+        ----------
+        conf : AMQPConnectorConfig
+            The AMQP connector configuration.
+        exchange_name : str
+            The name of the exchange to connect to.
+        exchange_type : str
+            The type of the exchange (e.g., 'direct', 'topic').
+        out_routing_key : str
+            The routing key for outgoing messages.
+        log_flag : bool
+            Flag indicating whether to log messages.
+        out_connection : pika.BlockingConnection
+            The connection to the RabbitMQ server.
+        out_channel : pika.channel.Channel
+            The channel for communication with RabbitMQ.
+
+        Methods
+        -------
+        send_report(body_message: str, corr_id: Optional[str] = None, routing_key: Optional[str] = None, expiration: int = 1000)
+            Send data to the desired destination.
+        get() -> AMQPConnectorConfig
+            Get the current configuration of the connector.
+            Initialize an instance of AmqpConnector.
+
+            Parameters
+            ----------
+            config : AMQPConnectorConfig
+                Configuration settings for the AMQP connector.
+            log : bool, optional
+                A flag to enable logging of messages, default is False.
         """
         self.conf = config
         self.exchange_name = config.exchange_name
@@ -48,7 +85,7 @@ class AmqpConnector(BaseConnector):
         # Create a channel
         self.out_channel = self.out_connection.channel()
 
-        # Init an Exchange
+        # Initialize an Exchange
         self.out_channel.exchange_declare(
             exchange=self.exchange_name, exchange_type=self.exchange_type
         )
@@ -65,13 +102,29 @@ class AmqpConnector(BaseConnector):
     def send_report(
         self,
         body_message: str,
-        corr_id=None,
+        corr_id: Optional[str] = None,
         routing_key: Optional[str] = None,
-        expiration=1000,
-    ):
-        # Sending data to desired destination
-        # if sender is client, it will include the "reply_to" attribute to specify where to reply this message
-        # if sender is server, it will reply the message to "reply_to" via default exchange
+        expiration: int = 1000,
+    ) -> None:
+        """
+        Send data to the desired destination.
+
+        Parameters
+        ----------
+        body_message : str
+            The message body to be sent.
+        corr_id : str, optional
+            The correlation ID for the message, default is None.
+        routing_key : str, optional
+            The routing key for the message, default is None.
+        expiration : int, optional
+            Message expiration time in milliseconds, default is 1000.
+
+        Notes
+        -----
+        - If `corr_id` is not provided, a new UUID will be generated.
+        - If `routing_key` is not provided, the default `out_routing_key` will be used.
+        """
         if corr_id is None:
             corr_id = str(uuid.uuid4())
         if routing_key is None:
@@ -85,8 +138,14 @@ class AmqpConnector(BaseConnector):
             properties=self.sub_properties,
             body=body_message,
         )
-        # if self.log_flag:
-        #     self.mess_logging.log_request(body_mess,corr_id)
 
-    def get(self):
+    def get(self) -> AMQPConnectorConfig:
+        """
+        Get the current configuration of the connector.
+
+        Returns
+        -------
+        AMQPConnectorConfig
+            The AMQP connector configuration.
+        """
         return self.conf

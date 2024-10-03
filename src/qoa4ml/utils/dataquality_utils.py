@@ -5,11 +5,14 @@ import pandas as pd
 from fastapi import UploadFile
 from PIL import Image
 
-from ..lang.datamodel_enum import DataQualityNameEnum, ImageQualityNameEnum
-from ..utils.logger import qoa_logger
+from ..lang.attributes import DataQualityEnum
+from ..lang.datamodel_enum import ImageQualityNameEnum
+from .logger import qoa_logger
 
 
-def input_file_type(input_file: UploadFile, allowed_data_type: list[str]):
+# TODO: add citation for each metric implementation
+# Abstract class for return value
+def eva_input_file_type(input_file: UploadFile, allowed_data_type: list[str]):
     """
     Check if the input file matches any of the allowed data types
 
@@ -72,8 +75,8 @@ def eva_erronous(data: np.ndarray | pd.DataFrame, errors: list | None = None):
     --------
     dict or None
         A dictionary containing the following keys if successful:
-          - DataQualityNameEnum.total_errors: Total number of errors.
-          - DataQualityNameEnum.error_ratios: Percentage of errors.
+          - DataQualityEnum.total_errors: Total number of errors.
+          - DataQualityEnum.error_ratios: Percentage of errors.
         Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
@@ -90,8 +93,8 @@ def eva_erronous(data: np.ndarray | pd.DataFrame, errors: list | None = None):
             total_count = data.size
 
             results = {
-                DataQualityNameEnum.total_errors: total_errors,
-                DataQualityNameEnum.error_ratios: 100 * total_errors / total_count,
+                DataQualityEnum.TOTAL_ERRORS: total_errors,
+                DataQualityEnum.ERROR_RATIOS: 100 * total_errors / total_count,
             }
             return results
         else:
@@ -115,8 +118,8 @@ def eva_duplicate(data: np.ndarray | pd.DataFrame):
     --------
     dict or None
         A dictionary containing the following keys if successful:
-          - DataQualityNameEnum.duplicate_ratio: Percentage of duplicate data.
-          - DataQualityNameEnum.total_duplicate: Total number of duplicate entries.
+          - DataQualityEnum.duplicate_ratio: Percentage of duplicate data.
+          - DataQualityEnum.total_duplicate: Total number of duplicate entries.
         Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
@@ -128,10 +131,10 @@ def eva_duplicate(data: np.ndarray | pd.DataFrame):
             duplicate_data = data[duplicate_mask]
 
             results = {
-                DataQualityNameEnum.duplicate_ratio: 100
+                DataQualityEnum.DUPLICATE_RATIO: 100
                 * duplicate_data.shape[0]
                 / data.shape[0],
-                DataQualityNameEnum.total_duplicate: duplicate_data.shape[0],
+                DataQualityEnum.TOTAL_DUPLICATE: duplicate_data.shape[0],
             }
             return results
         else:
@@ -163,8 +166,8 @@ def eva_missing(
     --------
     dict or None
         A dictionary containing:
-          - DataQualityNameEnum.null_count: Count of missing values (if null_count is True).
-          - DataQualityNameEnum.null_correlations: Correlation matrix of missing values (if correlations is True).
+          - DataQualityEnum.null_count: Count of missing values (if null_count is True).
+          - DataQualityEnum.null_correlations: Correlation matrix of missing values (if correlations is True).
         Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
@@ -174,11 +177,11 @@ def eva_missing(
             results = {}
             if null_count:
                 count = data.isnull().sum()
-                results[DataQualityNameEnum.null_count] = count
+                results[DataQualityEnum.NULL_COUNT] = count
 
             if correlations:
-                nulls = data.loc[:, results[DataQualityNameEnum.null_count] > 0]
-                results[DataQualityNameEnum.null_correlations] = nulls.isnull().corr()
+                nulls = data.loc[:, results[DataQualityEnum.NULL_COUNT] > 0]
+                results[DataQualityEnum.NULL_CORRELATIONS] = nulls.isnull().corr()
 
             if predict:
                 raise RuntimeWarning("Predict is enabled but not implemented yet")
@@ -206,9 +209,9 @@ def eva_none(data: np.ndarray | pd.DataFrame):
     --------
     dict or None
         A dictionary containing the following keys if successful:
-          - DataQualityNameEnum.total_valid: Total count of valid (non-NaN) entries.
-          - DataQualityNameEnum.total_none: Total count of None (NaN) entries.
-          - DataQualityNameEnum.none_ratio: Percentage of valid entries.
+          - DataQualityEnum.total_valid: Total count of valid (non-NaN) entries.
+          - DataQualityEnum.total_none: Total count of None (NaN) entries.
+          - DataQualityEnum.none_ratio: Percentage of valid entries.
         Returns None if the input data type is unsupported or if an exception occurs.
     """
     try:
@@ -219,9 +222,9 @@ def eva_none(data: np.ndarray | pd.DataFrame):
             valid_count = np.count_nonzero(~np.isnan(data))
             none_count = np.count_nonzero(np.isnan(data))
             results = {}
-            results[DataQualityNameEnum.total_valid] = valid_count
-            results[DataQualityNameEnum.total_none] = none_count
-            results[DataQualityNameEnum.none_ratio] = (
+            results[DataQualityEnum.TOTAL_VALID] = valid_count
+            results[DataQualityEnum.TOTAL_NONE] = none_count
+            results[DataQualityEnum.NONE_RATIO] = (
                 100 * valid_count / (valid_count + none_count)
             )
             return results
