@@ -61,6 +61,7 @@ class QoaClient(Generic[T]):
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
         logging_level=2,
+        health_check: bool = False,
     ):
         """
         Initialize the QoA Client with configuration settings and report class.
@@ -79,7 +80,7 @@ class QoaClient(Generic[T]):
             The logging verbosity level (default: 2).
         """
         set_logger_level(logging_level)
-
+        self.health_check = health_check
         if config_dict is not None:
             self.configuration = ClientConfig.model_validate(config_dict)
 
@@ -255,7 +256,7 @@ class QoaClient(Generic[T]):
         if configuration.connector_class == ServiceAPIEnum.amqp and isinstance(
             configuration.config, AMQPConnectorConfig
         ):
-            return AmqpConnector(configuration.config)
+            return AmqpConnector(configuration.config, health_check=self.health_check)
         elif configuration.connector_class == ServiceAPIEnum.debug and isinstance(
             configuration.config, DebugConnectorConfig
         ):

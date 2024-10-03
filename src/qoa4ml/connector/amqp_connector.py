@@ -9,7 +9,9 @@ from .base_connector import BaseConnector
 
 class AmqpConnector(BaseConnector):
     # Init an amqp client handling the connection to amqp servier
-    def __init__(self, config: AMQPConnectorConfig, log: bool = False):
+    def __init__(
+        self, config: AMQPConnectorConfig, log: bool = False, health_check: bool = False
+    ):
         """
         AMQP connector
         configuration: a dictionary include broker and queue information
@@ -22,14 +24,26 @@ class AmqpConnector(BaseConnector):
         self.log_flag = log
 
         # Connect to RabbitMQ host
-        if "amqps://" in config.end_point:
-            self.out_connection = pika.BlockingConnection(
-                pika.URLParameters(config.end_point)
-            )
+        if "amqps://" in self.config.end_point:
+            parameters = pika.URLParameters(self.config.end_point)
+            if health_check:
+                parameters.heartbeat = 0
         else:
-            self.out_connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=config.end_point)
-            )
+            if health_check:
+                parameters = pika.ConnectionParameters(
+                    host=self.config.end_point, heartbeat=0
+                )
+            else:
+                parameters = pika.ConnectionParameters(host=self.config.end_point)
+        self.out_connection = pika.BlockingConnection(parameters)
+        # if "amqps://" in config.end_point:
+        #     self.out_connection = pika.BlockingConnection(
+        #         pika.URLParameters(config.end_point)
+        #     )
+        # else:
+        #     self.out_connection = pika.BlockingConnection(
+        #         pika.ConnectionParameters(host=config.end_point)
+        #     )
 
         # Create a channel
         self.out_channel = self.out_connection.channel()
@@ -38,6 +52,15 @@ class AmqpConnector(BaseConnector):
         self.out_channel.exchange_declare(
             exchange=self.exchange_name, exchange_type=self.exchange_type
         )
+
+    # def create_connection(self):
+    #     if "amqps://" in self.config.end_point:
+    #         parameters = pika.URLParameters(self.config.end_point)
+    #         parameters.heartbeat = 0
+
+    #     else:
+    #         parameters = pika.ConnectionParameters(host=self.config.end_point, heartbeat=0)
+    #     self.out_connection = pika.BlockingConnection(parameters)
 
     def send_report(
         self,

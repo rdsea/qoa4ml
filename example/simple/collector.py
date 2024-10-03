@@ -4,10 +4,10 @@ from qoa4ml.collector.amqp_collector import AmqpCollector
 from qoa4ml.config.configs import AMQPCollectorConfig
 
 conf = {
-    "end_point": "localhost",
-    "exchange_name": "test_qoa4ml",
+    "end_point": "rabbitmq.aaltosea.csc",
+    "exchange_name": "eemls",
     "exchange_type": "topic",
-    "in_routing_key": "test.#",
+    "in_routing_key": "eemls.#",
     "in_queue": "collector_1",
 }
 
