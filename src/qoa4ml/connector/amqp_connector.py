@@ -57,7 +57,7 @@ class AmqpConnector(BaseConnector):
             log : bool, optional
                 A flag to enable logging of messages, default is False.
         """
-        self.conf = config
+        self.config = config
         self.exchange_name = config.exchange_name
         self.exchange_type = config.exchange_type
         self.out_routing_key = config.out_routing_key
@@ -151,4 +151,4 @@ class AmqpConnector(BaseConnector):
         AMQPConnectorConfig
             The AMQP connector configuration.
         """
-        return self.conf
+        return self.config
