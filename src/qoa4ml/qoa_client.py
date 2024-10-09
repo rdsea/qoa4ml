@@ -60,7 +60,6 @@ class QoaClient(Generic[T]):
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
         logging_level: int = 2,
-        health_check_disable: bool = False,
     ):
         """
         Initialize the QoA Client with configuration settings and a report class.
@@ -85,7 +84,6 @@ class QoaClient(Generic[T]):
         - The method will raise an exception if the necessary configuration details are not found.
         """
         set_logger_level(logging_level)
-        self.health_check_disable = health_check_disable
         if config_dict is not None:
             self.configuration = ClientConfig.model_validate(config_dict)
 
@@ -261,9 +259,7 @@ class QoaClient(Generic[T]):
         if configuration.connector_class == ServiceAPIEnum.amqp and isinstance(
             configuration.config, AMQPConnectorConfig
         ):
-            return AmqpConnector(
-                configuration.config, health_check_disable=self.health_check_disable
-            )
+            return AmqpConnector(configuration.config)
         elif configuration.connector_class == ServiceAPIEnum.debug and isinstance(
             configuration.config, DebugConnectorConfig
         ):
@@ -408,6 +404,9 @@ class QoaClient(Generic[T]):
             if self.default_connector:
                 chosen_connector = self.connector_list[self.default_connector]
                 if isinstance(chosen_connector, AmqpConnector):
+                    if not chosen_connector.check_connection():
+                        chosen_connector.reconnect()
+
                     chosen_connector.send_report(body_mess, corr_id=str(uuid.uuid4()))
                 else:
                     chosen_connector.send_report(body_mess)

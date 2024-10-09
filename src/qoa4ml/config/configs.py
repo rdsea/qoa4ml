@@ -59,6 +59,7 @@ class AMQPConnectorConfig(BaseModel):
     exchange_name: str
     exchange_type: str
     out_routing_key: str
+    health_check_disable: bool
 
 
 class MQTTConnectorConfig(BaseModel):

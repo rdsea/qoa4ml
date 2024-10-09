@@ -52,3 +52,6 @@ class DebugConnector(BaseConnector):
         """
         if not self.silence:
             debug(json.loads(body_message))
+
+    def check_connection(self) -> bool:
+        return True
