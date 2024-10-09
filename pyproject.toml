@@ -10,7 +10,7 @@ include = ["src/qoa4ml"]
 
 [project]
 name = "qoa4ml"
-version = "0.3.9"
+version = "0.3.11"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 
