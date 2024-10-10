@@ -1,12 +1,13 @@
 import math
 import time
 from datetime import datetime
+from pathlib import Path
 
 from tinyflux import Point, TimeQuery, TinyFlux
 
 
 class EmbeddedDatabase:
-    def __init__(self, db_path: str) -> None:
+    def __init__(self, db_path: Path) -> None:
         self.db = TinyFlux(db_path)
 
     def insert(self, timestamp: float, tags: dict, fields: dict):

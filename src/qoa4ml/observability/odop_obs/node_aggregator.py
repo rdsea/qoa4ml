@@ -1,7 +1,9 @@
 import json
 import logging
+import os
 import socket
 from datetime import datetime
+from pathlib import Path
 from threading import Thread
 from typing import TYPE_CHECKING
 
@@ -33,11 +35,11 @@ else:
 
 
 class NodeAggregator:
-    def __init__(self, config: NodeAggregatorConfig, odop_path: str):
+    def __init__(self, config: NodeAggregatorConfig, odop_path: Path):
         self.config = config
         self.unit_conversion = self.config.unit_conversion
         self.node_name = socket.gethostname().split(".")[0]
-        self.database_path = odop_path + "metric_database/"
+        self.database_path = os.path.join(odop_path, "metric_database/")
         make_folder(self.database_path)
         self.embedded_database = EmbeddedDatabase(
             self.database_path + self.node_name + ".csv"

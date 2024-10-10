@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
@@ -12,7 +13,7 @@ logging.basicConfig(
 
 
 class Exporter:
-    def __init__(self, config: ExporterConfig, odop_path: str) -> None:
+    def __init__(self, config: ExporterConfig, odop_path: Path) -> None:
         self.app = FastAPI()
         self.config = config
         self.node_aggregator = NodeAggregator(self.config.node_aggregator, odop_path)
