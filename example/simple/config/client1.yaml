@@ -13,3 +13,4 @@ connector:
       exchange_name: test_qoa4ml
       exchange_type: topic
       out_routing_key: test.client1
+      health_check_disable: true
