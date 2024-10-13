@@ -44,6 +44,18 @@ class ClientInfo(BaseModel):
     custom_info: dict | str = Field(
         default="", description="Additional information that you can add"
     )
+    logging_level: int = Field(
+        default=2,
+        description="""Change logging level
+        The desired logging level:
+        0 - NOTSET
+        1 - DEBUG
+        2 - INFO
+        3 - WARNING
+        4 - ERROR
+        5 - CRITICAL
+        """,
+    )
 
 
 class AMQPCollectorConfig(BaseModel):

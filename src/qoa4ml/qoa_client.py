@@ -59,7 +59,6 @@ class QoaClient(Generic[T]):
         config_dict: Optional[dict] = None,
         config_path: Optional[str] = None,
         registration_url: Optional[str] = None,
-        logging_level: int = 2,
     ):
         """
         Initialize the QoA Client with configuration settings and a report class.
@@ -74,8 +73,6 @@ class QoaClient(Generic[T]):
             Path to a JSON configuration file.
         registration_url : str, optional
             URL for registering the client and receiving configuration data.
-        logging_level : int, optional
-            The logging verbosity level (default: 2).
 
         Notes
         -----
@@ -83,13 +80,13 @@ class QoaClient(Generic[T]):
         - If neither `config_dict` nor `config_path` is provided, the client may attempt to fetch configurations from the `registration_url`.
         - The method will raise an exception if the necessary configuration details are not found.
         """
-        set_logger_level(logging_level)
         if config_dict is not None:
             self.configuration = ClientConfig.model_validate(config_dict)
 
         if config_path is not None:
             self.configuration = ClientConfig.model_validate(load_config(config_path))
 
+        set_logger_level(self.configuration.client.logging_level)
         self.client_config = self.configuration.client
         self.connector_list: dict[str, BaseConnector] = {}
         self.timer_flag = False
