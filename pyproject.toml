@@ -10,7 +10,7 @@ include = ["src/qoa4ml"]
 
 [project]
 name = "qoa4ml"
-version = "0.3.15"
+version = "0.3.16"
 description = "Quality of Analysis for Machine Learning"
 readme = "README.md"
 
@@ -23,11 +23,10 @@ keywords = ["Monitoring", "Machine Learning"]
 homepage = "https://rdsea.github.io/"
 repository = "https://github.com/rdsea/QoA4ML"
 documentation = "https://rdsea.github.io/QoA4ML/"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Development Status :: 3 - Alpha",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
